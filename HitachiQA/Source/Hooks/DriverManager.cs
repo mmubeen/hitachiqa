@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using WebDriverManager.DriverConfigs.Impl;
+using WebDriverManager.Helpers;
 using NetDriverManager = WebDriverManager.DriverManager;
 
 namespace HitachiQA.Hooks
@@ -90,7 +91,7 @@ namespace HitachiQA.Hooks
             switch (browser?.ToLower())
             {
                 case "chrome":
-                    _ = new NetDriverManager().SetUpDriver(new ChromeConfig());
+                    _ = new NetDriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
                     var cOptions = new ChromeOptions();
                     cOptions.AddArgument("--window-size=1920,1080");
                     cOptions.AddArgument("--no-sandbox"); // Bypass OS security model
@@ -99,14 +100,14 @@ namespace HitachiQA.Hooks
                     break;
 
                 case "firefox":
-                    _ = new NetDriverManager().SetUpDriver(new FirefoxConfig());
+                    _ = new NetDriverManager().SetUpDriver(new FirefoxConfig(), VersionResolveStrategy.MatchingBrowser);
                     var fOptions = new FirefoxOptions();
                     fOptions.AddArgument("--no-sandbox");
                     driver = new FirefoxDriver(fOptions);
                     break;
 
                 case "edge":
-                    _ = new NetDriverManager().SetUpDriver(new EdgeConfig());
+                    _ = new NetDriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
                     EdgeOptions edgeOptions = new EdgeOptions();
                     edgeOptions.AddArgument("--no-sandbox");
                     driver = new EdgeDriver(edgeOptions);
