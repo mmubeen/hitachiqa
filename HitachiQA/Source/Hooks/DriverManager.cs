@@ -100,7 +100,7 @@ namespace HitachiQA.Hooks
                     break;
 
                 case "firefox":
-                    _ = new NetDriverManager().SetUpDriver(new FirefoxConfig(), VersionResolveStrategy.MatchingBrowser);
+                    _ = new NetDriverManager().SetUpDriver(new FirefoxConfig(), VersionResolveStrategy.Latest);
                     var fOptions = new FirefoxOptions();
                     fOptions.AddArgument("--no-sandbox");
                     driver = new FirefoxDriver(fOptions);
