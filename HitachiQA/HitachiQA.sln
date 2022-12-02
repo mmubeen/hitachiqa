@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitachiQA", "HitachiQA.csproj", "{CF9BBB97-409D-4D86-B39C-0B3D070C732A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HitachiQA.UnitTests", "..\HitachiQA.UnitTests\HitachiQA.UnitTests.csproj", "{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF9BBB97-409D-4D86-B39C-0B3D070C732A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF9BBB97-409D-4D86-B39C-0B3D070C732A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF9BBB97-409D-4D86-B39C-0B3D070C732A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF9BBB97-409D-4D86-B39C-0B3D070C732A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D36AC23-1D65-42DD-88F8-29BD4A4C1121}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,70 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+parameters:
+  - name: TargetFeed
+    displayName: Target Feed
+    type: string
+    default: HitachiQA
+    values:
+    - HitachiTest
+    - HitachiQA
+
+  - name: TargetOrg
+    displayName: Target Organization
+    type: string
+    values:
+    - https://dev.azure.com/biberk
+
+  - name: TargetOrgPAT
+    displayName: Target Org PAT
+    type: string
+
+
+variables:
+  solution: '**/*.sln'
+  project: '**/*.csproj'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  name: $(Date:yyyyMMdd)$(Rev:.r)
+  artifactPath: $(Build.ArtifactStagingDirectory)/*.nupkg
+
+steps:
+# The first task is the dotnet command build, pointing to our csproj file
+- task: UseDotNet@2
+  inputs:
+    version: 6.0.x
+
+- script: echo '$(Build.BuildNumber)' # outputs customized build number like 20200828.1
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    arguments: '--configuration $(buildConfiguration)'
+    projects: '$(project)'
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'pack'
+  inputs:
+    command: 'pack'
+    projects: '$(solution)'
+    searchPatternPack: '$(project)'
+    nobuild: true
+    outputDir: '$(Build.ArtifactStagingDirectory)'
+    versioningScheme: 'byPrereleaseNumber'
+    majorVersion: '1'
+
+- script: |
+    echo “Loading Azure DevOps extension”
+    az extension add —-name azure-devops
+    echo “Connect to external Azure DevOps with personal access token”
+    export AZURE_DEVOPS_EXT_PAT=${{ parameters.TargetOrgPAT }}
+    echo $AZURE_DEVOPS_EXT_PAT | az devops login —-org ${{ parameters.TargetOrg }}
+    echo “Publish Artifact to external organization”
+    az artifacts universal publish —-organization “${{ parameters.TargetOrg }}” —-feed “${{ parameters.TargetFeed }}” —-name “HitachiQA" —-version “$(name)” —-description “$(ArtifactDescription)” —-path “$(artifactPath)”
+    echo “Done”
+  displayName: 'Run a multi-line script'
