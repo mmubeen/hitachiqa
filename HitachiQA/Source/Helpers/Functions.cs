@@ -26,7 +26,6 @@ namespace HitachiQA.Helpers
 
         public string GetRandomVIN()
         {
-            throw new NotImplementedException("Need to be implemented non-statically");
             //grabs random vin via randomvin.com
             string vin;
             try

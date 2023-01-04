@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Bibliography;
 using HitachiQA.Helpers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -22,7 +23,8 @@ namespace HitachiQA.Hooks
     [Binding]
     public class DriverManager : HookBase
     {
-       
+        public static List<String>? optionsList;
+
         public BrowserIndicator BrowserIndicator;
 
         public DriverManager(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
@@ -34,13 +36,19 @@ namespace HitachiQA.Hooks
         [BeforeScenario(Order = 2)]
         public void invokeDriver(FeatureContext FT, ScenarioContext SC, ObjectContainer oc)
         {
+
             BrowserIndicator = new BrowserIndicator();
             if (!FT.FeatureInfo.Tags.Contains("NoBrowser") && !SC.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
                 BrowserIndicator.isNoBrowserFeature = false;
                 
-                string browser = oc.Resolve<IConfiguration>()["BROWSER"];
+                var config = oc.Resolve<IConfiguration>();
+                var browser = config.GetVariable("BROWSER");                                 
+
                 invokeNewDriver(oc, browser);
+                
+
+
             }
             else
             {
@@ -87,14 +95,31 @@ namespace HitachiQA.Hooks
         public static void invokeNewDriver(ObjectContainer oc, string browser)
         {
             IWebDriver driver;
+            List<string> optionsList= new List<string>();
+            String? options = Main.Configuration.GetVariable("OPTIONS", true);
+
+            if (options != null)
+            {
+                String[] listArray = options.Split('\x3B');
+
+                foreach (String str in listArray)
+                {
+                    str.Trim();
+                    optionsList.Add(str);
+                }
+            }
 
             switch (browser?.ToLower())
             {
                 case "chrome":
                     _ = new NetDriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
                     var cOptions = new ChromeOptions();
-                    cOptions.AddArgument("--window-size=1920,1080");
+
+
+                    cOptions.AddArgument("--start-maximized");
                     cOptions.AddArgument("--no-sandbox"); // Bypass OS security model
+                    cOptions.AddUserProfilePreference("profile.cookie_controls_mode", 0);
+                    cOptions.AddArguments(optionsList);                    
 
                     driver = new ChromeDriver(cOptions);
                     break;
@@ -120,7 +145,6 @@ namespace HitachiQA.Hooks
                     }
                     throw new NotImplementedException($"Environment variable BROWSER value={browser} is not supported");
             }
-            driver.Manage().Window.Maximize();
             driver.Navigate().GoToUrl(Main.Configuration.GetVariable("HOST"));
             oc.RegisterInstanceAs<IWebDriver>(driver);
             

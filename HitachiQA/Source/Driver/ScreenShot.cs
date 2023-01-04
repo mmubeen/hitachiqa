@@ -6,15 +6,18 @@ using TechTalk.SpecFlow;
 using HitachiQA.Driver;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HitachiQA
 {
     public class ScreenShot
     {
         IWebDriver Driver;
-        public ScreenShot(IWebDriver driver)
+        TestContext TestContext;
+        public ScreenShot(IWebDriver driver, TestContext testContext)
         {
             Driver = driver;
+            TestContext = testContext;
         }
         public void Info(String filename = null) => Take(Severity.INFO, filename!);
         public void Debug(String filename = null) => Take(Severity.DEBUG, filename!);
@@ -47,6 +50,7 @@ namespace HitachiQA
                 string pageSource = Driver.PageSource;
                 string sourceFilePath = Path.Combine(artifactDirectory, fileNameBase + "_source.html");
                 File.WriteAllText(sourceFilePath, pageSource, Encoding.UTF8);
+                this.TestContext.AddResultFile(sourceFilePath);
                 Console.WriteLine($"\nPage Source: {new Uri(sourceFilePath)}\n");
 
 
@@ -76,6 +80,7 @@ namespace HitachiQA
                     resultBitMap.Dispose();
 
                     Console.WriteLine($"\nScreenshot: {new Uri(screenshotFilePath)}\n");
+                    this.TestContext.AddResultFile(screenshotFilePath);
 
                 }
             }

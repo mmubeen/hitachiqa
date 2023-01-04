@@ -21,3 +21,14 @@ Examples:
 Scenario: Navigating to a site
 	Given Browser is up
 	Then user should land on HSAL homepage
+
+@NoBrowser
+Scenario: Browser options can be set
+	Given user loads option "<Options>" into the browser
+	When "Chrome" is invoked
+	Then "<Options>" should be set to the browser
+Examples: 
+	| Options               |
+	| --start-maximized     |
+	| --window-size=840,640 |
+	

@@ -1,14 +1,12 @@
 using BoDi;
 using HitachiQA.Driver;
-using System;
-using TechTalk.SpecFlow;
 using HitachiQA.Hooks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using DocumentFormat.OpenXml.Bibliography;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
-using WebDriverManager.DriverConfigs.Impl;
+using HitachiQA.Helpers;
+using FluentAssertions.Extensions;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {
@@ -34,6 +32,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         public void ThenUserShouldLandOnHSALHomepage()
         {
             new Element(By.XPath("//*[contains(text(), 'Hitachi Solutions')]"), UserActions).assertElementIsPresent();
+            this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }
 
 
@@ -79,7 +78,38 @@ namespace HitachiQA.UnitTests.StepDefinitions
            
         }
 
-      
+        [Given(@"user loads option ""([^""]*)"" into the browser")]
+        public void GivenUserLoadsOptionIntoTheBrowser(string option)
+        {
+            Main.Configuration["OPTIONS"] = Main.Configuration["OPTIONS"] + $"; {option}";
+        }
+
+        [Then(@"""([^""]*)"" should be set to the browser")]
+        public void ThenShouldBeSet(string option)
+        {
+            var js = ObjectContainer.Resolve<JSExecutor>();
+
+            switch (option)
+            {
+                case "--start-maximized":
+                    var fullScreenEnabled = (bool)js.execute("return document.fullscreenEnabled");
+                    fullScreenEnabled.Should().BeTrue();    
+                    break;
+     
+                case "--window-size=840,640":
+                    var height = (long)js.execute("return window.outerHeight");
+                    var width = (long)js.execute("return window.outerWidth");
+                    height.Should().Be(640);
+                    width.Should().Be(840);
+                    break;
+                default: throw new NotImplementedException(option);
+            }
+            ObjectContainer.Resolve<IWebDriver>().Dispose();
+
+        }
+
+
+
 
 
     }

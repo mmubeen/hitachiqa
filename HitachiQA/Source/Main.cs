@@ -57,7 +57,7 @@ namespace HitachiQA
             Console.WriteLine("BUILDING CONFIG");
             var builder = new ConfigurationBuilder()
                            .SetBasePath(BasePath)
-                           .AddJsonFile("appsettings.json")
+                           .AddJsonFile("appsettings.json", true)
                            .AddEnvironmentVariables()
                            .AddUserSecrets(ExecutingAssembly);
                            

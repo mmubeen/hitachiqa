@@ -201,7 +201,8 @@ namespace HitachiQA.Helpers
             if(!response.IsSuccessStatusCode)
             {
                 Log.Critical(processURL(URL));
-                Log.Critical(body); 
+                Log.Critical(body);
+                Log.Critical(response.Content.ReadAsStringAsync().Result);
             }
             response.EnsureSuccessStatusCode();
             String dataObjects = response.Content.ReadAsStringAsync().Result;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HitachiQA.Helpers;
+using Microsoft.Azure.Cosmos.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,17 +51,19 @@ namespace HitachiQA
                 }
                 else if(text is IEnumerable<String> || text is IEnumerable<string>)
                 {
-                    
                     Log.Write(severity, string.Join(", \n", (IEnumerable<String>)text ));
                 }
                 else if(text is IEnumerable)
                 {
-                    var str = new List<string>();
-                    foreach(var item in (IEnumerable)text)
+                    var result = new List<string>();
+
+                    foreach (var item in (IEnumerable)text)
                     {
-                        str.Add(item.ToString());
+                        var str = item?.ToString();
+                        str ??= "NULL";
+                        result.Add(str);
                     }
-                    Log.Write(severity, string.Join(", \n", str ));
+                    Log.Write(severity, result);
                 }
                 else
                 {
@@ -82,7 +86,8 @@ namespace HitachiQA
                 }
                 if(parameter.value != null && !(parameter.value is string) && !(parameter.value is String))
                 {
-                    text = text.Replace(parameter.key, parameter.value.ToString());
+                    var paramValue = parameter.value as string;
+                    text = text.Replace(parameter.key, paramValue);
                 }
                 else
                 {
