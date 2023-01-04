@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace HitachiQA
@@ -44,79 +45,69 @@ namespace HitachiQA
             }
             else if (severity.Level <= currentSev)
             {
-                if (text is Dictionary<string, string>  || text is Dictionary<String, String>)
-                {
-                    Log.Write(severity, ((Dictionary<String, String>)text).Select(entry => $"{entry.Key}:{entry.Value}"));
-                   
-                }
-                else if(text is IEnumerable<String> || text is IEnumerable<string>)
-                {
-                    Log.Write(severity, string.Join(", \n", (IEnumerable<String>)text ));
-                }
-                else if(text is IEnumerable)
-                {
-                    var result = new List<string>();
+                var str = stringify(text);
+                str = str.Replace($"\n", $"\n[{severity.Name}] ");
+                Console.WriteLine($"[{severity.Name}] {str}");
+            }
+        }
 
-                    foreach (var item in (IEnumerable)text)
-                    {
-                        var str = item?.ToString();
-                        str ??= "NULL";
-                        result.Add(str);
-                    }
-                    Log.Write(severity, result);
-                }
-                else
+        private static string stringify(object text)
+        {
+            if (text is Dictionary<string, string> || text is Dictionary<String, String>)
+            {
+                return stringify(((Dictionary<String, String>)text).Select(entry => $"[{entry.Key}={entry.Value}]"));
+
+            }
+            else if (text is IEnumerable<String> || text is IEnumerable<string>)
+            {
+                var enumStr = (IEnumerable<String>)text;
+                var countEnum = enumStr.Select(it => it.Count());
+                var sumChar = countEnum.Sum();
+                var avgStrSize = countEnum.Average();
+                var maxStrSize = countEnum.Max();
+
+                if (avgStrSize > 35)
                 {
-                    Console.WriteLine($"[{severity.Name}] {text}");
+                    return string.Join(",\n", enumStr);
+
                 }
+                var padded = enumStr.Select(it => $"{it}, ".PadRight(maxStrSize));
+                return string.Join("", padded);
+            }
+            else if (text is IEnumerable @enumerable)
+            {
+                var result = new List<string>();
+
+                foreach (var item in @enumerable)
+                {
+                    var str = stringify(item);
+                    str ??= "NULL";
+                    result.Add(str);
+                }
+                return stringify(result);
+            }
+            else if (text is string @string)
+            {
+                return @string;
+            }
+            else
+            {
+                return text?.ToString() ?? "NULL";
             }
         }
 
         public static void Write(Severity severity, string text, params (string key, dynamic value)[] parameters)
         {
+            string parsed="";
             foreach(var parameter in parameters)
             {
-                if(!parameter.key.StartsWith('@'))
-                {
-                    throw new Exception($"Parameter key: {parameter.key} should start with @");
-                }
-                if (parameter.value is IEnumerable)
-                {
-                    text = text.Replace(parameter.key, EnumerableToHumanReadable((IEnumerable)parameter.value));
-                }
-                if(parameter.value != null && !(parameter.value is string) && !(parameter.value is String))
-                {
-                    var paramValue = parameter.value as string;
-                    text = text.Replace(parameter.key, paramValue);
-                }
-                else
-                {
-                    text = text.Replace(parameter.key, parameter.value);
-                }
+                parsed = text.Replace(parameter.key, parameter.value);
             }
 
-            var currentSev = Severity.parseLevel(Main.Configuration.GetSection("Logging").GetSection("LogLevel")["Default"]).Level;
-
-            if (currentSev == 0)
-            {
-                return;
-            }
-            else if (severity.Level <= currentSev)
-            {
-
-                Console.WriteLine($"[{severity.Name}] {text}");
-            }
+            Log.Write(severity, parsed);
+        
         }
 
-        public static string EnumerableToHumanReadable(IEnumerable list)
-        {
-            var str = new StringBuilder();
-            foreach(var item in list)
-            {
-                str.Append("\n"+item+", ");
-            }
-            
-            return "\n[" + str.ToString().Trim().Trim(',') + "]\n";
-        }
+
     }
 }

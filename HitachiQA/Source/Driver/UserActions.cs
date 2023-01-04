@@ -8,6 +8,12 @@ using System.Linq;
 using OpenQA.Selenium.Interactions;
 using Microsoft.Extensions.Configuration;
 using BoDi;
+using By = HitachiQA.Driver.By;
+using HtmlAgilityPack;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Runtime.CompilerServices;
+using DocumentFormat.OpenXml.Bibliography;
+using OpenQA.Selenium.DevTools.V103.IndexedDB;
 
 namespace HitachiQA.Driver
 {
@@ -27,13 +33,13 @@ namespace HitachiQA.Driver
             var highlight = configKeys.FirstOrDefault(it => it.Key == "HIGHLIGHT_ON");
             var loadingXPath = configKeys.FirstOrDefault(it => it.Key == "LOADING_SCREEN_XPATH");
 
-            if(wait!= null){
+            if (wait != null) {
                 DEFAULT_WAIT_SECONDS = int.Parse(wait.Value);
             }
-            if (highlight != null){
+            if (highlight != null) {
                 HIGHLIGHT_ON = bool.Parse(highlight.Value);
             }
-            if (loadingXPath != null){
+            if (loadingXPath != null) {
                 LOADING_SCREEN_XPATH = loadingXPath.Value;
             }
         }
@@ -50,7 +56,7 @@ namespace HitachiQA.Driver
 
         public void waitForPageLoad()
         {
-            if(!string.IsNullOrWhiteSpace(LOADING_SCREEN_XPATH))
+            if (!string.IsNullOrWhiteSpace(LOADING_SCREEN_XPATH))
             {
                 By locator = By.XPath(LOADING_SCREEN_XPATH);
                 //this is optional
@@ -59,13 +65,13 @@ namespace HitachiQA.Driver
                     FindElementWaitUntilVisible(locator, 1);
                     WaitForElementToDisappear(locator, 120);
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     //do nothing
                 }
             }
         }
-  
+
 
         public void Navigate(string URL_OR_PATH, params (string key, string value)[] parameters)
         {
@@ -74,13 +80,13 @@ namespace HitachiQA.Driver
 
             Navigate(URL);
         }
-        
+
         public void Navigate(string URL_OR_PATH)
         {
             var URL = Functions.ParseURL(URL_OR_PATH);
             Log.Info("Navigate to: " + URL);
-           
-            this.WebDriver.Navigate().GoToUrl(URL);           
+
+            this.WebDriver.Navigate().GoToUrl(URL);
         }
 
         public string GetCurrentURL()
@@ -130,7 +136,7 @@ namespace HitachiQA.Driver
 
                     FindElementWaitUntilClickable(ElementLocator, ProcessWaitParam(wait_Seconds)).Click();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw ex;
                 }
@@ -192,107 +198,136 @@ namespace HitachiQA.Driver
             return FindElementWaitUntilClickable(ElementLocator).GetAttribute(attributeName);
         }
 
-        public IWebElement FindElementWaitUntilVisible(By by, int? wait_Seconds = null)
+        private void switchToIFrame(By by)
         {
-            WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
-            IWebElement target;
-
-            try
+            if (by.IFrameLocator == null)
             {
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
+                this.WebDriver.SwitchTo().DefaultContent();
             }
-            catch (StaleElementReferenceException)
+            else
             {
-                Thread.Sleep(5000);
+                var frameElement = this.FindElementWaitUntilPresent(by.IFrameLocator);
+                this.WebDriver.SwitchTo().Frame(frameElement);
 
-                //retry finding the element
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
-            }
-            catch (ElementClickInterceptedException)
-            {
-                Thread.Sleep(2000);
-
-                //retry finding the element
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
             }
 
-            ScrollIntoView(target);
-            if(HIGHLIGHT_ON)
-                highlight(target);
-
-            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
-            return target;
         }
-
-        public List<IWebElement> FindElementsWaitUntilVisible(By by, int? wait_Seconds = null)
-        {
-            WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
-            IWebElement target;
-
-            try
-            {
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
-            }
-            catch (StaleElementReferenceException)
-            {
-                Thread.Sleep(5000);
-
-                //retry finding the element
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
-            }
-            catch (ElementClickInterceptedException)
-            {
-                Thread.Sleep(2000);
-
-                //retry finding the element
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
-            }
-
-            return this.WebDriver.FindElements(by).ToList();
-        }
-
         //Find Element - Wait until element is present (different from vissible)
         public IWebElement FindElementWaitUntilPresent(By by, int? wait_Seconds = null)
         {
+            this.switchToIFrame(by);
+            var locator = by.Locator;
+            return this.FindElementWaitUntilPresent(locator);
+
+        }
+
+        public IWebElement FindElementWaitUntilPresent(OpenQA.Selenium.By locator, int? wait_Seconds = null)
+        {
             WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
             IWebElement target;
 
             try
             {
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(by));
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
             }
             catch (StaleElementReferenceException)
             {
                 Thread.Sleep(5000);
 
                 //retry finding the element
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(by));
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
             }
             catch (ElementClickInterceptedException)
             {
                 Thread.Sleep(2000);
 
                 //retry finding the element
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(by));
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
             }
 
             ScrollIntoView(target);
             if (HIGHLIGHT_ON)
                 highlight(target);
-            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(by));
+            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
             return target;
+        }
+
+        public IWebElement FindElementWaitUntilVisible(By by, int? wait_Seconds = null)
+        {
+            switchToIFrame(by);
+            var locator = by.Locator;
+            WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
+
+            IWebElement target;
+
+            try
+            {
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            }
+            catch (StaleElementReferenceException)
+            {
+                Thread.Sleep(5000);
+
+                //retry finding the element
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            }
+            catch (ElementClickInterceptedException)
+            {
+                Thread.Sleep(2000);
+
+                //retry finding the element
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            }
+
+            ScrollIntoView(target);
+            if (HIGHLIGHT_ON)
+                highlight(target);
+
+            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            return target;
+        }
+
+        public List<IWebElement> FindElementsWaitUntilVisible(By by, int? wait_Seconds = null)
+        {
+            switchToIFrame(by);
+            var locator = by.Locator;
+            WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
+            IWebElement target;
+
+            try
+            {
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            }
+            catch (StaleElementReferenceException)
+            {
+                Thread.Sleep(5000);
+
+                //retry finding the element
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            }
+            catch (ElementClickInterceptedException)
+            {
+                Thread.Sleep(2000);
+
+                //retry finding the element
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
+            }
+
+            return this.WebDriver.FindElements(locator).ToList();
         }
 
         //Find Element - Wait Until Clickable
         public IWebElement FindElementWaitUntilClickable(By by, int? wait_Seconds = null)
         {
+            switchToIFrame(by);
+            var locator = by.Locator;
             WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
             IWebElement target;
 
-          
-            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(by));
+
+            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
             ScrollIntoView(target);
-            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(by));
+            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
             ScrollIntoView(target);
 
             if (HIGHLIGHT_ON)
@@ -303,21 +338,24 @@ namespace HitachiQA.Driver
             try
             {
                 //upon scroll and highlight to the element, the element would become stale for clicking
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(by));
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
             }
-            catch(Exception ex)
+            catch (Exception)
             {
-                Log.Error($"Locator: {by}");
-                throw ex;
+                Log.Error($"Locator: {locator}");
+                throw;
             }
 
             return target;
         }
         public void WaitForElementToDisappear(By by, int? wait_Seconds = null)
         {
+            this.switchToIFrame(by);
+            var locator = by.Locator;
+
             WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
 
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(by));            
+            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(locator));
         }
 
         //
@@ -336,7 +374,7 @@ namespace HitachiQA.Driver
         public string getTextFieldText(By TextFieldLocator, int? wait_Seconds = null)
         {
             var textField = FindElementWaitUntilVisible(TextFieldLocator, ProcessWaitParam(wait_Seconds));
-            return textField.GetAttribute("value"); 
+            return textField.GetAttribute("value");
         }
 
         public void clearTextField(By TextFieldLocator, int? wait_Seconds = null)
@@ -373,11 +411,11 @@ namespace HitachiQA.Driver
             try
             {
                 WaitForElementToDisappear(By.XPath("//mat-option[descendant::*[normalize-space(text())= 'Searching...']]"));
-            }catch(Exception)
+            } catch (Exception)
             {
             }
             var options = FindElementsWaitUntilVisible(By.XPath($"//mat-option"));
-            selectionDisplayName = string.Join("", this.WebDriver.FindElements(By.XPath($"(//mat-option)[{LogicalIndex + 1}]/descendant::*")).Select(it => it.Text.Trim()).Distinct());
+            selectionDisplayName = string.Join("", this.WebDriver.FindElements(By.XPath($"(//mat-option)[{LogicalIndex + 1}]/descendant::*").Locator).Select(it => it.Text.Trim()).Distinct());
             Click(By.XPath($"//mat-option[{LogicalIndex + 1}]"));
         }
 
@@ -388,7 +426,7 @@ namespace HitachiQA.Driver
             var options = FindElementsWaitUntilVisible(By.XPath($"//mat-option"));
 
             int currentOption = 1;
-            foreach(var option in options)
+            foreach (var option in options)
             {
                 List<string> innerText = FindElementsWaitUntilVisible(By.XPath($"(//mat-option)[{currentOption}]/descendant::*")).Select(it => it.Text.Trim()).Distinct().ToList();
                 currentOption++;
@@ -402,7 +440,7 @@ namespace HitachiQA.Driver
 
         public bool IsRadioButtonSelected(By RadioButtonLocator)
         {
-            var radioButton =FindElementWaitUntilPresent(RadioButtonLocator);
+            var radioButton = FindElementWaitUntilPresent(RadioButtonLocator);
 
             return radioButton.Selected;
         }
@@ -444,7 +482,7 @@ namespace HitachiQA.Driver
 
         public void ScrollToBottom()
         {
-            new Actions(this.WebDriver).SendKeys(Keys.End).Build().Perform();  
+            new Actions(this.WebDriver).SendKeys(Keys.End).Build().Perform();
         }
 
         public void ScrollToTop()
@@ -476,26 +514,26 @@ namespace HitachiQA.Driver
             WebDriverWait waitAppear = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(5));
             WebDriverWait waitDisappear = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(DEFAULT_WAIT_SECONDS));
 
-            By spinnerBy = By.XPath("//bh-mat-spinner-overlay");
+            var spinnerLocator = By.XPath("//bh-mat-spinner-overlay").Locator;
 
             //wait until visible, need try in case spinner doesn't appear
             try
             {
-                waitAppear.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(spinnerBy));
+                waitAppear.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(spinnerLocator));
             }
             catch { return; }
 
             //at this point, spinner appeared, wait until invisible
-            waitDisappear.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(spinnerBy));
+            waitDisappear.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(spinnerLocator));
 
         }
 
         public IEnumerable<Dictionary<String, String>> parseUITable(string datatableXpath)
         {
             FindElementWaitUntilPresent(By.XPath(datatableXpath));
-            List<String> columnNames = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-header-cell//span[contains(@class,'datatable-header-cell-label')]")).Select(element => element.Text).ToList<String>();
+            List<String> columnNames = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-header-cell//span[contains(@class,'datatable-header-cell-label')]").Locator).Select(element => element.Text).ToList<String>();
 
-            int rowCount = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-body-row")).Count;
+            int rowCount = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-body-row").Locator).Count;
             for (int rowIndex = 1; rowIndex <= rowCount; rowIndex++)
             {
                 var rowDict = new Dictionary<String, String>();
@@ -504,12 +542,271 @@ namespace HitachiQA.Driver
                 {
                     // String cellText = string.Join("", cells[i].FindElements(By.XPath("/descendant::*"))
                     String cellText = string.Join("", this.WebDriver
-                                                      .FindElements(By.XPath($"(({datatableXpath} //datatable-body-row)[{rowIndex}] //datatable-body-cell)[{i + 1}]/descendant::*"))
+                                                      .FindElements(By.XPath($"(({datatableXpath} //datatable-body-row)[{rowIndex}] //datatable-body-cell)[{i + 1}]/descendant::*").Locator)
                                                       .Select(child => child.Text).Distinct());
 
                     rowDict.Add(columnNames[i], cellText.Trim());
                 }
                 yield return rowDict;
+            }
+        }
+
+        private const string HORIZONTAL_SCROLL_BAR = "//div[@class='ag-body-horizontal-scroll'] //div[@ref='eViewport']";
+        private object GRID_SCROLL_JS_EXEC(By gridLocator, string command)
+        {
+            var scrollBarLoc = $"{gridLocator.Locator.Criteria} {HORIZONTAL_SCROLL_BAR}";
+            var element = this.FindElementWaitUntilPresent(By.XPath(scrollBarLoc));
+            return JSExecutor.execute(command, element);
+        }
+
+        private object GRID_SCROLL_LEFT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(-400, 0);");
+        private object GRID_SCROLL_ALL_RIGHT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(12000, 0);");
+        private object GRID_QUERY_HOW_MUCH_UNTIL_RESET(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollLeft;");
+
+       
+
+
+        public Dictionary<int, string?> GetGridHeaders(By by)
+        {
+            this.WaitForTransaction();
+
+            string gridCellXPath = $"//*[@role='columnheader']";
+
+            Dictionary<int, string?> result = new Dictionary<int, string?>();
+
+
+            GRID_SCROLL_ALL_RIGHT_COMMAND(by);
+            do
+            {
+                var gridElement = this.FindElementWaitUntilPresent(by);
+                var gridDoc = new HtmlDocument();
+                gridDoc.LoadHtml(gridElement.GetAttribute("innerHTML"));
+
+                var headers = gridDoc.DocumentNode.SelectNodes(gridCellXPath);
+
+                foreach (var header in headers)
+                {
+                    var index = int.Parse(header.GetAttributeValue("aria-colindex", null));
+                    var displayText = header.GetAttributeValue("title", null);
+
+                    //PCF grids have title in a child node
+                    if (displayText == null)
+                    {
+                        var rowDoc = new HtmlDocument();
+                        rowDoc.LoadHtml(header.InnerHtml);
+
+                        displayText = rowDoc.DocumentNode.SelectSingleNode("//*[@title]")?.InnerText;
+                    }
+
+
+                    if (!result.ContainsKey(index))
+                    {
+                        result.Add(index, displayText);
+                    }
+                }
+
+                GRID_SCROLL_LEFT_COMMAND(by);
+            }
+            while (Convert.ToDouble(GRID_QUERY_HOW_MUCH_UNTIL_RESET(by)) != 0);
+
+            return result;
+        }
+
+        public List<Dictionary<string, string?>> GetGridItems(By by)
+        {
+            this.WaitForTransaction();
+           
+
+            var headers = this.GetGridHeaders(by);
+            var results = new List<Dictionary<string, string?>>();
+
+            var rowXPath = $"//*[@role='row' and descendant::*[@aria-colindex] ]";
+
+            GRID_SCROLL_ALL_RIGHT_COMMAND(by);
+            do
+            {
+                var gridElement = this.FindElementWaitUntilPresent(by);
+                var gridDoc = new HtmlDocument();
+                gridDoc.LoadHtml(gridElement.GetAttribute("innerHTML"));
+
+                var rows = gridDoc.DocumentNode.SelectNodes(rowXPath);
+                //remove header (1st row)
+                rows.RemoveAt(0);
+                foreach(var rowNode in rows)
+                {
+                    var rowHTML = rowNode.InnerHtml; 
+                    var rowDoc = new HtmlDocument();
+                    rowDoc.LoadHtml(rowHTML);
+                    var row = rowDoc.DocumentNode;
+                    var index = rowNode.GetAttributeValue<string?>("aria-rowindex", null);
+                    index.NullGuard();
+                    //because we ignore the header
+                    index = (int.Parse(index) - 1).ToString();
+
+                    var rowDict = results.GetDictionaryByIndex(index);
+                    if (rowDict == null)
+                    {
+                        rowDict = new Dictionary<string, string?>();
+                        rowDict.Add("index", index);
+                        results.Add(rowDict);
+                    }
+
+                    foreach (var header in headers)
+                    {
+                        var headerIndex = header.Key;
+                        var headerName = header.Value ?? header.Key.ToString();
+                        string? cellValue = null;
+
+                        var xpaths_and_atts = new Dictionary<string, string>()
+                        {
+                            {$"//*[@aria-colindex='{headerIndex}' and @col-id]  //*[@aria-label]", "aria-label" },
+                             {$"//*[@aria-colindex='{headerIndex}' and @title]", "title" },
+
+                        };
+
+                        foreach(var item in xpaths_and_atts)
+                        {
+                            var xpath = item.Key;
+                            var attr = item.Value;
+                            var cellNodes = row.SelectNodes(xpath);
+                            HtmlNode? cellNode = null;
+                            if(cellNodes?.Count > 1)
+                            {
+                                cellNode = cellNodes.FirstOrDefault(it => it.GetAttributeValue<string?>("type", null) == "button");
+
+                                if(cellNode == null)
+                                    throw new NotImplementedException($"Found 2 cells with @aria-label attribute using the following xpath: {by.Locator.Criteria+rowXPath+xpath}");
+                            }
+                            else if (cellNodes?.Count == 1){
+                                cellNode = cellNodes[0];
+                            }
+
+
+                            if (cellNode != null)
+                            {
+                                cellValue = cellNode.GetAttributeValue(attr, null);
+                                break;
+                            }
+
+                        }
+
+                     
+                        if (rowDict.GetValueOrDefault(headerName) == null || !string.IsNullOrWhiteSpace(cellValue))
+                        {
+                            rowDict[headerName] = cellValue;
+                        }
+                        
+                    }
+
+
+
+                }
+
+                GRID_SCROLL_LEFT_COMMAND(by);
+            }
+            while (Convert.ToDouble(GRID_QUERY_HOW_MUCH_UNTIL_RESET(by)) != 0);
+
+
+            return results;
+        }
+
+        public void OpenGridRecord(By by, string columnName, string value)
+        {
+            var gridItems = this.GetGridItems(by);
+
+            var matchingRow = gridItems.FirstOrDefault(row=> row.TryGetValue(columnName, out var colVal) && colVal == value);
+
+            if(matchingRow==null)
+            {
+                throw new NotFoundException($"Couldn't find row matching {columnName}={value}");
+            }
+
+            var index = matchingRow["index"];
+
+            var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index)+1} and descendant::*[@aria-colindex=1] ]");
+            this.DoubleClick(checkBoxLoc);
+
+            //var EditButtonLoc = By.XPath("((//div[@id='mainContent'] //*[contains(@data-id, 'Command')])[1] | //*[@data-id='OverflowFlyout']) //button[*//text()='Edit']");
+
+            //this.FindElementWaitUntilClickable(by).Click();
+            this.WaitForTransaction();
+
+        }
+
+        public void SetFieldValue(By by, string value) {
+            this.WaitForTransaction();
+
+            var fieldElement = this.FindElementWaitUntilPresent(by);
+            var fieldDoc = new HtmlDocument();
+            fieldDoc.LoadHtml(fieldElement.GetAttribute("innerHTML"));
+
+
+            var knownXPaths = new Dictionary<string, string> {
+                { "//select[contains(@data-id, 'option-set-select')]", "dropdown" },
+                { "//input[@type='text' and contains(@data-id, 'text-box-text')]", "textfield" },
+                { "//input[@type='text' and contains(@data-id, 'text-input')]", "textfield" },
+                { "//input[@type='text' and contains(@data-id, 'textInputBox_with_filter')]", "lookup" }
+
+            };
+
+            HtmlNode? node =null;
+            KeyValuePair<string, string>? matchingPair = null;
+
+            foreach(var pair in knownXPaths)
+            {
+                var xpath = pair.Key;
+                var type = pair.Value;
+                var tempNode = fieldDoc.DocumentNode.SelectSingleNode(xpath);
+                if (tempNode != null)
+                {
+                    node = tempNode;
+                    matchingPair = pair;
+                    break;
+                }
+                
+            }
+
+            if(node==null )
+            {
+                throw new NotImplementedException($"Couldn't find a a match on any of the following xpaths: {knownXPaths.Select(it => $"\n{by.Locator} {it.Key}")}");
+            }
+
+            matchingPair.NullGuard();
+            var autoGeneratedLocator = By.XPath($"{by.Locator.Criteria} {matchingPair.Value.Key}");
+
+            switch(matchingPair.Value.Value)
+            {
+                case "dropdown":
+                    throw new NotImplementedException();
+                    break;
+                case "textfield":
+                    this.setText(autoGeneratedLocator, value);
+                    break;
+                case "lookup":
+                    this.setText(autoGeneratedLocator, value);
+                    var searchButton = By.XPath(autoGeneratedLocator.Locator.Criteria + "/following-sibling::button");
+                    this.FindElementWaitUntilClickable(searchButton).Click();
+                    var itemLocator = By.XPath("//ul[@aria-label='Lookup results'] //li[@aria-label]");
+                    this.FindElementWaitUntilClickable(itemLocator).Click();
+
+                    
+                    break;
+            }
+        }
+
+        public bool WaitForTransaction(int? wait_Seconds = null)
+        {
+            bool result = false;
+            WebDriverWait webDriverWait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
+            webDriverWait.IgnoreExceptionTypes(typeof(TimeoutException), typeof(NullReferenceException));
+            try
+            {
+                result = webDriverWait.Until((IWebDriver d) => (bool)JSExecutor.execute("return window.UCWorkBlockTracker.isAppIdle()"));
+                return result;
+            }
+            catch (Exception)
+            {
+                return result;
             }
         }
     }
