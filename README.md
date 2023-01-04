@@ -2,24 +2,18 @@
  
 ## **Getting Started on implementing projects**
 
-Example [Here](https://github.com/Hitachi-SolutionsQA/Demo)
+The objective is to create another project and then use HitachiQA as a nuget package. Example [Here](https://github.com/Hitachi-SolutionsQA/Demo)
 1. Download `Visual Studio 2022`
 2. Install `Specflow for visual Studio` extension
 3. Create a new specflow project for *.NET6 using MSTest* 
-4. Add a `"specflow.json"` file with the following content:
-	```
-	{
-		"stepAssemblies": [
-				{
-				"assembly": "HitachiQA"
-				}
-			]
-	} 
-	```
-5. create and **select** a `.runsettings` (Eg. `"qa.runsettings"`) file which at a minimal should have all the required variables from the Known Variables [table](#known-variables) (environment specific)
-6. (optional) create an `"appsettings.json"` file which by design should house settings that persist across environments
-7. Add HitachiQA reference to the project file (Example [Here](https://github.com/Hitachi-SolutionsQA/Demo/blob/main/Demo/Demo.csproj))
-8. Follow either approach from [Running any implementing project](#running-any-implementing-project) (preferably Approach 2)
+4. download the following [specflow.json](README_FILES\specflow.json) file to the project folder
+5. download the following [default.runsettings](README_FILES\default.runsettings) file to the project folder and modify it to your projects specifics 
+	* It is recommend to rename it to the environment is pointing to like `qa.runsettings` 
+	* at a minimal should have all the required variables from the Known Variables [table](#known-variables) (environment specific)
+6. **select** a `.runsettings` (Eg. `"default.runsettings"`) file from step 5.
+7. (optional) create an `"appsettings.json"` file which by design should house settings that persist across environments
+8. Add HitachiQA reference to the project file (Example [Here](https://github.com/Hitachi-SolutionsQA/Demo/blob/main/Demo/Demo.csproj))
+9. Follow either approach from [Running any implementing project](#running-any-implementing-project) (preferably Approach 2)
 >**`Important!` Make sure to set every newly created file to copy to the output directory:** \*Right click file\*-> Properties->Copy to Output Directory=`"Copy Always"`
 
 </br></br>
@@ -33,11 +27,11 @@ Example [Here](https://github.com/Hitachi-SolutionsQA/Demo)
 >2. Make sure user has contributor access to the [Fuctional Testing](https://dev.azure.com/HitachiQA/Functional%20Testing) project in ADO
 >3. Add the HitachiQA feed to Visual Studio, instructions [here](https://dev.azure.com/HitachiQA/Functional%20Testing/_artifacts/feed/HitachiQA/connect/visual%20studio) (Options > NuGet Package Manager > Package Sources)
 
-> **Approach 2 (external):** In order to push binaries to other projects, we use the following [Pipeline](https://dev.azure.com/HitachiQA/Functional%20Testing/_build?definitionId=2)
+> **Approach 2 (external):** In order to push binaries to other projects, we use the following [Pipeline](https://dev.azure.com/HitachiQA/Functional%20Testing/_build?definitionId=4)
 >1. On the other project, check if a feed already exists, if not create a Feed (preferably named `HitachiQA` or `HitachiTest`), it's url will be used in step 3.
 >2. [retrieve a PAT](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticat)
->3. create a new Service Connection with the follwing naming convention "<Project>_<your name>_ServiceConnection", instructions [Here](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/nuget#:~:text=To%20publish%20a%20package%20to,Save%20when%20you%20are%20done.)
->4. Edit HitachiQA.ExternalOrgPush pipeline here add the newly created Service Connection name URL found [Here](https://github.com/Hitachi-SolutionsQA/Hitachi-QA/blob/master/azure-pipelines-external-push.yml)
+>3. create a new Service Connection with the follwing naming convention ```<Project>_<your name>_ServiceConnection```, instructions [Here](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/nuget#:~:text=To%20publish%20a%20package%20to,Save%20when%20you%20are%20done.)
+>4. Edit HitachiQA.ExternalOrgPush pipeline here add the newly created Service Connection name URL found [Here](https://dev.azure.com/HitachiQA/Functional%20Testing/_git/HitachiQA?path=/azure-pipelines-external-push.yml)
 >5. kick off the pipeline with the three arguments above
 >6. Add the feed on step 1 to Visual Studio (Options > NuGet Package Manager > Package Sources, similar to Approach 1->Step 3)
 
