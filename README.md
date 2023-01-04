@@ -29,7 +29,7 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 
 > **Approach 2 (external):** In order to push binaries to other projects, we use the following [Pipeline](https://dev.azure.com/HitachiQA/Functional%20Testing/_build?definitionId=4)
 >1. On the other project, check if a feed already exists, if not create a Feed (preferably named `HitachiQA` or `HitachiTest`), it's url will be used in step 3.
->2. [retrieve a PAT](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticat)
+>2. [retrieve a PAT](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate)
 >3. create a new Service Connection with the follwing naming convention ```<Project>_<your name>_ServiceConnection```, instructions [Here](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/nuget#:~:text=To%20publish%20a%20package%20to,Save%20when%20you%20are%20done.)
 >4. Edit HitachiQA.ExternalOrgPush pipeline here add the newly created Service Connection name URL found [Here](https://dev.azure.com/HitachiQA/Functional%20Testing/_git/HitachiQA?path=/azure-pipelines-external-push.yml)
 >5. kick off the pipeline with the three arguments above
