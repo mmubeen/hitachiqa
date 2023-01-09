@@ -40,6 +40,10 @@ namespace HitachiQA.UnitTests.StepDefinitions
             this.Page.SubmitButton.Click();
 
             //Yes (stay signed in)
+            if(this.Page.SubmitButton.GetAttribute("value")=="Sign in")
+            {
+                throw new Exception($"Sign In Failed, UI Message: {this.Page.Element("//*[@id='passwordError']").GetElementText()}");
+            }
             this.Page.SubmitButton.Click();
 
         }
