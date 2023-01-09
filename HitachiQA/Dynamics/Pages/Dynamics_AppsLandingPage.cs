@@ -18,6 +18,7 @@ namespace HitachiQA.Dynamics.Pages
 
         public Element GetModuleCard(string title) => Element($"//*[@title='{title}']");
 
+
         
 
     }

@@ -58,7 +58,7 @@ namespace HitachiQA.Hooks
 
         }
 
-        [AfterScenario]
+        [AfterScenario(Order =1)]
         public void handleScreenshot(ScenarioContext SC)
         {
             if (!BrowserIndicator.isNoBrowserFeature && SC.TestError != null)
