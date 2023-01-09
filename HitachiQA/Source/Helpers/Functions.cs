@@ -12,6 +12,9 @@ using CsvHelper.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using BoDi;
 using OpenQA.Selenium.DevTools;
+using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium;
+using System.Runtime.CompilerServices;
 
 namespace HitachiQA.Helpers
 {
@@ -232,10 +235,10 @@ namespace HitachiQA.Helpers
                 {
                     dict.Add(header[i], extractCellText(workbookPart, cell));
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     Log.Debug($"File-> {filePath}");
-                    throw ex;
+                    throw;
                 }
             }
             return dict;
@@ -404,5 +407,7 @@ namespace HitachiQA.Helpers
             return (1.0M - ((decimal)distance / (decimal)Math.Max(s.Length, t.Length)));
 
         }
+
+       
     }
 }

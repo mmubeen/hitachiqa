@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Diagnostics.CodeAnalysis;
-
+using System.Runtime.CompilerServices;
 
 namespace HitachiQA.Helpers
 {
@@ -22,6 +22,17 @@ namespace HitachiQA.Helpers
 
             }
             return JToken.FromObject(obj).ToObject<T>() ?? throw new NullReferenceException();
+        }
+
+        public static Dictionary<string, string?>? GetDictionaryByIndex(this List<Dictionary<string, string?>> dictionaryListWithIndexKey, int index)
+        {
+            return dictionaryListWithIndexKey.GetDictionaryByIndex(index.ToString());
+
+        }
+        public static Dictionary<string, string?>? GetDictionaryByIndex(this List<Dictionary<string, string?>> dictionaryListWithIndexKey, string index)
+        {
+            return dictionaryListWithIndexKey.FirstOrDefault(dict => dict.TryGetValue("index", out string? k) && k == index);
+
         }
     }
 }

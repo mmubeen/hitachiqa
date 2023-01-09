@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenQA.Selenium;
 using HitachiQA.Helpers;
 using System.Linq;
 using FluentAssertions;
+using HitachiQA.Driver;
 
 namespace HitachiQA.Driver
 {
@@ -16,12 +16,18 @@ namespace HitachiQA.Driver
             this.UserActions = userActions;
             this.locator = By.XPath(xpath);
         }
+        public Element(OpenQA.Selenium.By locator, UserActions userActions)
+        {
+            this.UserActions = userActions;
+            this.locator = new By(locator);
+        }
+
         public Element(By locator, UserActions userActions)
         {
             this.UserActions = userActions;
             this.locator = locator;
         }
-        
+
         public override string ToString()
         {
             return this.locator.ToString();
@@ -217,11 +223,12 @@ namespace HitachiQA.Driver
             }
         }
 
-        public IWebElement WaitUntilClickable(int? wait_Seconds = null, bool optional = false)
+        public OpenQA.Selenium.IWebElement WaitUntilClickable(int? wait_Seconds = null, bool optional = false)
         {
             return UserActions.FindElementWaitUntilClickable(locator, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
+        [Obsolete("please use SetFieldValue(string value) instead")]
         public void setValue(string fieldType, string value)
         {
             switch (fieldType.ToLower())
@@ -236,6 +243,11 @@ namespace HitachiQA.Driver
                     Functions.handleFailure(new NotImplementedException($"Field type: {fieldType} is not implemented"));
                     break; 
             }
+        }
+
+        public void SetFieldValue(string value)
+        {
+           UserActions.SetFieldValue(locator, value);
         }
 
         //
@@ -358,6 +370,19 @@ namespace HitachiQA.Driver
         public IEnumerable<Dictionary<String, String>> parseUITable()
         {
             return UserActions.parseUITable(this.Xpath);
+        }
+
+        public List<Dictionary<String, String?>> GetGridItems()
+        {
+            return UserActions.GetGridItems(locator);
+        }
+        /// <summary>
+        /// Opens first record found with a matching column name or value.
+        /// Fails if no record found
+        /// </summary>
+        public void OpenGridRecord(string columnName, string value)
+        {
+            UserActions.OpenGridRecord(locator, columnName, value); 
         }
     }
 }

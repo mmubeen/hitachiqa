@@ -13,7 +13,8 @@ namespace HitachiQA
     [Binding]
     public static class Main
     {
-        public static readonly IConfiguration Configuration = BuildConfig();
+        private static IConfiguration _Config;
+        public static IConfiguration Configuration { get { return _Config ??= BuildConfig(); } }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static ObjectContainer ObjectContainer;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -33,10 +34,18 @@ namespace HitachiQA
         public static string? GetVariable(this IConfiguration config, string VariableName, bool optional)
         {
             var VarName = config.GetChildren().FirstOrDefault(it => it.Key == VariableName + "_VARNAME")?.Value;
+
             if (IsValid(VarName))
             {
                 VarName.NullGuard();
-                return config.GetVariable(VarName);
+                try
+                {
+                    return config.GetVariable(VarName);
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception($"Error retireving variable {VarName}", ex);
+                }
             }
             if(optional)
             {
@@ -60,6 +69,7 @@ namespace HitachiQA
                            .AddJsonFile("appsettings.json", true)
                            .AddEnvironmentVariables()
                            .AddUserSecrets(ExecutingAssembly);
+                           
                            
 
             var config = builder.Build();
@@ -121,7 +131,7 @@ namespace HitachiQA
         }
 
 
-        private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
+        private static Assembly ExecutingAssembly => Assembly.LoadFrom("HitachiQA.UnitTests.dll");
         private static string BasePath
         {
             get {

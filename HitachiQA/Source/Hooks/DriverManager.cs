@@ -58,7 +58,7 @@ namespace HitachiQA.Hooks
 
         }
 
-        [AfterScenario]
+        [AfterScenario(Order =1)]
         public void handleScreenshot(ScenarioContext SC)
         {
             if (!BrowserIndicator.isNoBrowserFeature && SC.TestError != null)
@@ -105,7 +105,8 @@ namespace HitachiQA.Hooks
                 foreach (String str in listArray)
                 {
                     str.Trim();
-                    optionsList.Add(str);
+                    if(!string.IsNullOrEmpty(str))
+                        optionsList.Add(str);
                 }
             }
 
@@ -118,7 +119,7 @@ namespace HitachiQA.Hooks
 
                     cOptions.AddArgument("--start-maximized");
                     cOptions.AddArgument("--no-sandbox"); // Bypass OS security model
-                    cOptions.AddUserProfilePreference("profile.cookie_controls_mode", 0);
+                    cOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
                     cOptions.AddArguments(optionsList);                    
 
                     driver = new ChromeDriver(cOptions);

@@ -1,7 +1,6 @@
 using BoDi;
 using HitachiQA.Driver;
 using HitachiQA.Hooks;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
@@ -25,7 +24,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Given(@"Browser is up")]
         public void GivenBrowserIsUp()
         {
-            this.ObjectContainer.Resolve<IWebDriver>().Should().NotBeNull();
+            this.ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Should().NotBeNull();
         }
 
         [Then(@"user should land on HSAL homepage")]
@@ -53,7 +52,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Then(@"verify ""([^""]*)"" is open")]
         public void ThenVerifyIsOpen(string browser)
         {
-            var driver = ObjectContainer.Resolve<IWebDriver>();
+            var driver = ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>();
             switch (browser?.ToLower())
             {
                 case "chrome":
@@ -81,7 +80,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Given(@"user loads option ""([^""]*)"" into the browser")]
         public void GivenUserLoadsOptionIntoTheBrowser(string option)
         {
-            Main.Configuration["OPTIONS"] = Main.Configuration["OPTIONS"] + $"; {option}";
+            Main.Configuration["OPTIONS"] = (Main.Configuration["OPTIONS"] + $"; {option}").Trim(';');
         }
 
         [Then(@"""([^""]*)"" should be set to the browser")]
@@ -104,7 +103,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
                     break;
                 default: throw new NotImplementedException(option);
             }
-            ObjectContainer.Resolve<IWebDriver>().Dispose();
+            ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Dispose();
 
         }
 
