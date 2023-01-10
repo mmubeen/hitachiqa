@@ -18,13 +18,21 @@ namespace HitachiQA.Helpers
 
         }
 
-        public void SendMessage(object message)
+        public static class Queues
+        {
+            public const string Materializaiton = "bill-processing-materialization";
+            public const string BillProcessingPrint = "bill-processing-print";
+
+
+        }
+
+        public void SendMessage(object message, string queueName, string contentType = "application/json")
         {
             var client = new ServiceBusClient(NameSpaceConnectionString);
-            var sender = client.CreateSender("bill-processing-materialization");
+            var sender = client.CreateSender(queueName);
 
             var msg = new ServiceBusMessage(message.ToObject<string>());
-            msg.ContentType = "application/json";
+            msg.ContentType = contentType;
             sender.SendMessageAsync(msg).Wait();
         }
     }
