@@ -69,8 +69,13 @@ namespace HitachiQA
                            .AddJsonFile("appsettings.json", true)
                            .AddEnvironmentVariables()
                            .AddUserSecrets(ExecutingAssembly);
-                           
-                           
+
+            var callingA = Assembly.GetCallingAssembly().GetName().Name;
+            var entryA = Assembly.GetEntryAssembly().GetName().Name;
+            var ExecutionA = Assembly.GetExecutingAssembly().GetName().Name;
+            Console.WriteLine($"{nameof(callingA)} = {callingA}");
+            Console.WriteLine($"{nameof(entryA)} = {entryA}");
+            Console.WriteLine($"{nameof(ExecutionA)} = {ExecutionA}");
 
             var config = builder.Build();
 
@@ -131,7 +136,7 @@ namespace HitachiQA
         }
 
 
-        private static Assembly ExecutingAssembly => Assembly.LoadFrom("HitachiQA.UnitTests.dll");
+        private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly().GetName()?.Name?.Contains("HitachiQA") ?? throw new NullReferenceException() ? Assembly.LoadFrom("HitachiQA.UnitTests.dll"): Assembly.GetExecutingAssembly();
         private static string BasePath
         {
             get {

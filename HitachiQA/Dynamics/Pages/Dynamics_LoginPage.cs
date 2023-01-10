@@ -14,6 +14,7 @@ namespace HitachiQA.Dynamics.Pages
         public Dynamics_LoginPage(ObjectContainer ObjectContainer) : base(ObjectContainer)
         {
         }
+        
         //'Next' & 'Sign in' buttons are both Submit
         public Element SubmitButton => Element("//input[@type='submit']");
         public Element UsernameTextField => Element("//input[@name='loginfmt']");
