@@ -23,7 +23,7 @@ namespace HitachiQA.Helpers
             var sender = client.CreateSender("bill-processing-materialization");
 
             var msg = new ServiceBusMessage(message.ToString(Newtonsoft.Json.Formatting.None));
-            sender.SendMessageAsync(msg);
+            sender.SendMessageAsync(msg).Wait();
         }
     }
 }

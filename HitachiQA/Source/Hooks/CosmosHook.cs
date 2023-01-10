@@ -1,5 +1,4 @@
 ﻿using BoDi;
-using DocumentFormat.OpenXml.Bibliography;
 using HitachiQA.Helpers;
 using Microsoft.Extensions.Configuration;
 using TechTalk.SpecFlow;
