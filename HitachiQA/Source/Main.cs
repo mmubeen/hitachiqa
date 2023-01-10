@@ -69,8 +69,13 @@ namespace HitachiQA
                            .AddJsonFile("appsettings.json", true)
                            .AddEnvironmentVariables()
                            .AddUserSecrets(ExecutingAssembly);
-                           
-                           
+
+            var callingA = Assembly.GetCallingAssembly().GetName().Name;
+            var entryA = Assembly.GetEntryAssembly().GetName().Name;
+            var ExecutionA = Assembly.GetExecutingAssembly().GetName().Name;
+            Console.WriteLine($"{nameof(callingA)} = {callingA}");
+            Console.WriteLine($"{nameof(entryA)} = {entryA}");
+            Console.WriteLine($"{nameof(ExecutionA)} = {ExecutionA}");
 
             var config = builder.Build();
 
