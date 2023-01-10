@@ -7,6 +7,7 @@ using BoDi;
 using Microsoft.Extensions.Azure;
 using HitachiQA.Helpers;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace HitachiQA
 {
@@ -19,7 +20,7 @@ namespace HitachiQA
         public static ObjectContainer ObjectContainer;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        [BeforeScenario(Order =1)]
+        [BeforeScenario(Order = 1)]
         public static void LoadConfig(ObjectContainer oc)
         {
             oc.RegisterInstanceAs<IConfiguration>(Configuration);
@@ -42,12 +43,12 @@ namespace HitachiQA
                 {
                     return config.GetVariable(VarName);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception($"Error retireving variable {VarName}", ex);
                 }
             }
-            if(optional)
+            if (optional)
             {
                 var val = config.GetChildren().FirstOrDefault(it => it.Key == VariableName)?.Value;
                 return val;
@@ -63,19 +64,17 @@ namespace HitachiQA
 
         public static IConfiguration BuildConfig()
         {
+
             Console.WriteLine("BUILDING CONFIG");
+
             var builder = new ConfigurationBuilder()
                            .SetBasePath(BasePath)
                            .AddJsonFile("appsettings.json", true)
                            .AddEnvironmentVariables()
                            .AddUserSecrets(ExecutingAssembly);
+            Console.WriteLine("Executing Assembly:" + ExecutingAssembly.FullName);
 
-            var callingA = Assembly.GetCallingAssembly().GetName().Name;
-            var entryA = Assembly.GetEntryAssembly().GetName().Name;
-            var ExecutionA = Assembly.GetExecutingAssembly().GetName().Name;
-            Console.WriteLine($"{nameof(callingA)} = {callingA}");
-            Console.WriteLine($"{nameof(entryA)} = {entryA}");
-            Console.WriteLine($"{nameof(ExecutionA)} = {ExecutionA}");
+
 
             var config = builder.Build();
 
@@ -85,7 +84,7 @@ namespace HitachiQA
 
             var AUTappConfigUri = config.GetVariable("AUT_APP_CONFIG_URI", true);
             var AUTkeyVaultUri = config.GetVariable("AUT_KEYVAULT_URI", true);
- 
+
             attemptLoadAppConfig(builder, appConfigUri, "App Config");
             attemptLoadKeyVault(builder, keyVaultUri, "Keyvalut");
 
@@ -121,7 +120,7 @@ namespace HitachiQA
         }
         private static void attemptLoadAppConfig(IConfigurationBuilder builder, string? appConfigUri, string displayName)
         {
-            if (IsValid(appConfigUri)){
+            if (IsValid(appConfigUri)) {
                 Console.WriteLine($"LOADING {displayName}: {appConfigUri}");
                 appConfigUri.NullGuard();
                 builder.AddAzureAppConfiguration(options =>
@@ -130,13 +129,29 @@ namespace HitachiQA
                 });
                 Console.WriteLine($"LOADED {displayName} SUCCESSFULLY: {appConfigUri}");
             }
-            else{
+            else {
                 Console.WriteLine($"No {displayName} Loaded");
             }
         }
 
 
-        private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly().GetName()?.Name?.Contains("HitachiQA") ?? throw new NullReferenceException() ? Assembly.LoadFrom("HitachiQA.UnitTests.dll"): Assembly.GetExecutingAssembly();
+        private static Assembly ExecutingAssembly
+        {
+            get {
+                StackFrame[] frames = new StackTrace().GetFrames();
+                var executingAssemblyList = (from f in frames
+                                             select f.GetMethod().ReflectedType.Assembly
+                                         )
+                                         .Where(it =>
+                                             it.GetName().Name != "HitachiQA"
+                                             && !it.GetName().Name.Contains("System")
+                                             && !it.GetName().Name.Contains("SpecFlow")
+                                             && !it.GetName().Name.Contains("Microsoft")
+                                             )
+                                         .Distinct();
+                return executingAssemblyList.First();
+            }
+        }
         private static string BasePath
         {
             get {
