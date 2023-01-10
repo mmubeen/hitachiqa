@@ -30,7 +30,7 @@ stages:
 
         - task: FileTransform@1
           inputs:
-            folderPath: '$(System.DefaultWorkingDirectory)/**/*.zip'
+            folderPath: '$(System.DefaultWorkingDirectory)'
             fileType: 'json'
             targetFiles: '/HitachiQA/appsettings.json'
             enableXmlTransform: false
