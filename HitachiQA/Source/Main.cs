@@ -131,7 +131,7 @@ namespace HitachiQA
         }
 
 
-        private static Assembly ExecutingAssembly => Assembly.LoadFrom("HitachiQA.UnitTests.dll");
+        private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly().GetName()?.Name?.Contains("HitachiQA") ?? throw new NullReferenceException() ? Assembly.LoadFrom("HitachiQA.UnitTests.dll"): Assembly.GetExecutingAssembly();
         private static string BasePath
         {
             get {
