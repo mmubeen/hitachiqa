@@ -28,6 +28,11 @@ stages:
 
         - script: echo '$(Build.BuildNumber)' # outputs customized build number like 20200828.1
 
+        - task: FileTransform@2
+          inputs:
+            folderPath: '$(System.DefaultWorkingDirectory)'
+            jsonTargetFiles: '/HitachiQA/appsettings.json'
+
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
@@ -63,6 +68,7 @@ stages:
             downloadType: 'single'
             artifactName: 'drop'
             downloadPath: '$(System.DefaultWorkingDirectory)'
+
         - task: DotNetCoreCLI@2
           inputs:
             command: 'test'
