@@ -16,6 +16,10 @@ namespace HitachiQA.Helpers
 
         public static T ToObject<T>(this object obj)
         {
+            if (obj.GetType()==typeof(T))
+            {
+                return (T)obj;
+            }
             if (typeof(T) == typeof(string))
             {
                 return (T)(object)JToken.FromObject(obj).ToString();

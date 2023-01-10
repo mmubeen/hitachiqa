@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using Azure.Core;
+using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,12 +18,13 @@ namespace HitachiQA.Helpers
 
         }
 
-        public void SendMessage(JToken message)
+        public void SendMessage(object message)
         {
             var client = new ServiceBusClient(NameSpaceConnectionString);
             var sender = client.CreateSender("bill-processing-materialization");
 
-            var msg = new ServiceBusMessage(message.ToString(Newtonsoft.Json.Formatting.None));
+            var msg = new ServiceBusMessage(message.ToObject<string>());
+            msg.ContentType = "application/json";
             sender.SendMessageAsync(msg).Wait();
         }
     }
