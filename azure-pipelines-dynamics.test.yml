@@ -1,0 +1,73 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- master
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  project: '**/*.csproj'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  name: $(Date:yyyyMMdd)$(Rev:.r)
+
+stages:
+  - stage: Build
+    jobs:
+     - job:
+       steps:
+        # The first task is the dotnet command build, pointing to our csproj file
+        - task: UseDotNet@2
+          inputs:
+            version: 6.0.x
+
+        - script: echo '$(Build.BuildNumber)' # outputs customized build number like 20200828.1
+
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            arguments: '--configuration $(buildConfiguration)'
+            projects: '$(project)'
+          displayName: 'dotnet build $(buildConfiguration)'
+          
+        - task: DotNetCoreCLI@2
+          displayName: 'pack'
+          inputs:
+            command: 'pack'
+            projects: '$(solution)'
+            searchPatternPack: '$(project)'
+            nobuild: true
+            outputDir: '$(System.DefaultWorkingDirectory)'
+            versioningScheme: 'byPrereleaseNumber'
+            majorVersion: '1'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            pathToPublish: '$(System.DefaultWorkingDirectory)'
+            artifactName: drop
+            
+  - stage: Test
+    pool: 
+      vmImage: 'windows-latest'
+    jobs:
+      - job: 
+        steps:
+        - checkout: none
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.DefaultWorkingDirectory)'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: '**/HitachiQA.UnitTests.dll'
+            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.runsettings --no-build --filter TestCategory=Dynamics'
+            testRunTitle: 'HitachiQA Unit Tests'
