@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Features\Dynamics\" />
+    <Folder Include="StepDefinitions\Dynamics\" />
   </ItemGroup>
 
   <ItemGroup>

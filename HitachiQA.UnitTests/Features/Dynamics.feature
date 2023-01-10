@@ -1,4 +1,4 @@
-﻿@Dynamics @ignore
+﻿@Dynamics
 Feature: Dynamics
 Tests the dynamics functionality of the IConfiguration object
 

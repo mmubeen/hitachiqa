@@ -39,7 +39,7 @@ namespace HitachiQA
         {
             var currentSev = Severity.parseLevel(Main.Configuration.GetSection("Logging").GetSection("LogLevel")["Default"]).Level;
 
-            if(currentSev == 0)
+            if (currentSev == 0)
             {
                 return;
             }
@@ -61,6 +61,10 @@ namespace HitachiQA
             else if (text is IEnumerable<String> || text is IEnumerable<string>)
             {
                 var enumStr = (IEnumerable<String>)text;
+                if(enumStr.Count()==0)
+                {
+                    return "";
+                }
                 var countEnum = enumStr.Select(it => it.Count());
                 var sumChar = countEnum.Sum();
                 var avgStrSize = countEnum.Average();
@@ -77,7 +81,6 @@ namespace HitachiQA
             else if (text is IEnumerable @enumerable)
             {
                 var result = new List<string>();
-
                 foreach (var item in @enumerable)
                 {
                     var str = stringify(item);
@@ -104,7 +107,7 @@ namespace HitachiQA
                 parsed = text.Replace(parameter.key, parameter.value);
             }
 
-            Log.Write(severity, parsed);
+            Log.Write(severity, (object)parsed);
         
         }
 
