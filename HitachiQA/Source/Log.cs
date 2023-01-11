@@ -1,5 +1,7 @@
-﻿using HitachiQA.Helpers;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using HitachiQA.Helpers;
 using Microsoft.Azure.Cosmos.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,54 +48,21 @@ namespace HitachiQA
             else if (severity.Level <= currentSev)
             {
                 var str = stringify(text);
-                str = str.Replace($"\n", $"\n[{severity.Name}] ");
                 Console.WriteLine($"[{severity.Name}] {str}");
             }
         }
 
-        private static string stringify(object text)
+        public static string stringify(object text)
         {
-            if (text is Dictionary<string, string> || text is Dictionary<String, String>)
+            try
             {
-                return stringify(((Dictionary<String, String>)text).Select(entry => $"[{entry.Key}={entry.Value}]"));
-
-            }
-            else if (text is IEnumerable<String> || text is IEnumerable<string>)
-            {
-                var enumStr = (IEnumerable<String>)text;
-                if(enumStr.Count()==0)
+                if(text==null)
                 {
-                    return "";
+                    return "NULL";
                 }
-                var countEnum = enumStr.Select(it => it.Count());
-                var sumChar = countEnum.Sum();
-                var avgStrSize = countEnum.Average();
-                var maxStrSize = countEnum.Max();
-
-                if (avgStrSize > 35)
-                {
-                    return string.Join(",\n", enumStr);
-
-                }
-                var padded = enumStr.Select(it => $"{it}, ".PadRight(maxStrSize));
-                return string.Join("", padded);
+                return text.ToObject<string>();
             }
-            else if (text is IEnumerable @enumerable)
-            {
-                var result = new List<string>();
-                foreach (var item in @enumerable)
-                {
-                    var str = stringify(item);
-                    str ??= "NULL";
-                    result.Add(str);
-                }
-                return stringify(result);
-            }
-            else if (text is string @string)
-            {
-                return @string;
-            }
-            else
+            catch(Exception)
             {
                 return text?.ToString() ?? "NULL";
             }
@@ -101,13 +70,12 @@ namespace HitachiQA
 
         public static void Write(Severity severity, string text, params (string key, dynamic value)[] parameters)
         {
-            string parsed="";
             foreach(var parameter in parameters)
             {
-                parsed = text.Replace(parameter.key, parameter.value);
+                text = text.Replace(parameter.key, parameter.value);
             }
 
-            Log.Write(severity, (object)parsed);
+            Log.Write(severity, (object)text);
         
         }
 
