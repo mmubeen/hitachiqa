@@ -17,6 +17,7 @@ parameters:
     default: Biberk_MA_ServiceConnection
     values:
     - Biberk_MA_ServiceConnection
+    - CPI_SV_ServiceConnection
 
 # variables:
 #   solution: '**/*.sln'
