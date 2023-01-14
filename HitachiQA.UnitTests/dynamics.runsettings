@@ -2,7 +2,8 @@
 <RunSettings>
 	<RunConfiguration>
 		<EnvironmentVariables>
-			<HOST>Https://Hslsr2prsdev.crm7.dynamics.com</HOST>
+			<!--<HOST>Https://Hslsr2prsdev.crm7.dynamics.com</HOST>-->
+			<HOST>https://org54c44211.crm.dynamics.com/</HOST>
 			<SERVER_HOST>TBD</SERVER_HOST>
 			<BROWSER>Chrome</BROWSER>
 		</EnvironmentVariables>

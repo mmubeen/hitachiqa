@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
     <Folder Include="Features\Dynamics\" />
     <Folder Include="StepDefinitions\Dynamics\" />
   </ItemGroup>
@@ -28,12 +27,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\DynamicSources\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="dynamics.runsettings">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="default.runsettings">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </None>	  
   </ItemGroup>
-
 </Project>

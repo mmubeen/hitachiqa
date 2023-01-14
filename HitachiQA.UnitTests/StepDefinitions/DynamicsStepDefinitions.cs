@@ -1,6 +1,10 @@
+using HitachiQA.Driver;
 using HitachiQA.Dynamics.Pages;
+using HitachiQA.Helpers;
 using HitachiQA.Source.Helpers;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
 using TechTalk.SpecFlow;
 
@@ -79,22 +83,30 @@ namespace HitachiQA.UnitTests.StepDefinitions
         public void WhenUserNavigatesToPage(string pageName)
         {
             this.Page.GetLeftPaneSiteMapButton(pageName).Click();
-            this.Page.Grid.OpenGridRecord("Customer Name", "lentil");
+            this.Page.Grid.OpenGridRecord("Account Name", "Miguel");
+            //this.Page.GetGrid("Time Entry").GetGridItems();
+            //this.Page.GetGrid("Time Entry").OpenGridRecord("column name", "col val");
+            //this.Page.GetGrid("Time Entry").OpenGridRecordLink("link header name", "column name", "col val")
 
 
+            //customer form
             this.Page.Element("//*[@data-id=\"name\"]").SetFieldValue("Miguel");
             this.Page.Element("//*[@data-id=\"telephone1\"]").SetFieldValue("201 790 0720");
             this.Page.Element("//*[@data-id=\"fax\"]").SetFieldValue("2017900720");
             this.Page.Element("//*[@data-id=\"websiteurl\"]").SetFieldValue("miguel.com");
-            this.Page.Element("//*[@data-id=\"parentaccountid\"]").SetFieldValue("abc");
+            this.Page.Element("//*[@data-id=\"parentaccountid\"]").SetFieldValue("fourth coffee");
+
+            this.Page.Element("//*[@data-id=\"address1_line1\"]").SetFieldValue("151 fair st paterson nj 07501");
+
+            this.Page.GetEntityTab("Details").Click();
+            this.Page.Element("//*[@data-id=\"industrycode\"]").SetFieldValue("Financial");
+
 
             //this.Page.GetEntityTab("Servicing").Click();
             //Log.Info(this.Page.GetGrid("WORK ORDERS").GetGridItems());
 
             //Log.Info(this.Page.Grid.GetGridItems());
         }
-
-
 
     }
 }

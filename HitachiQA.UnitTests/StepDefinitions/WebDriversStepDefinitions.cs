@@ -6,6 +6,7 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using HitachiQA.Helpers;
 using FluentAssertions.Extensions;
+using HitachiQA.Source.Helpers;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {

@@ -16,3 +16,4 @@ Scenario: Get Grid Items
 	Given user is signed in
 	When user navigates to 'Dynamics 365 — custom' app
 	And user navigates to 'Accounts' page
+
