@@ -377,6 +377,7 @@ namespace HitachiQA.Driver
             return UserActions.GetGridItems(locator);
         }
         /// <summary>
+        /// To be executed on a Grid element
         /// Opens first record found with a matching column name or value.
         /// Fails if no record found
         /// </summary>
