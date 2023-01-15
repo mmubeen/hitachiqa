@@ -86,13 +86,13 @@ stages:
           projects: '$(solution)'
           searchPatternPack: '$(project)'
           nobuild: true
-          outputDir: '$(System.DefaultWorkingDirectory)/PackOutput'
+          outputDir: '$(System.DefaultWorkingDirectory)'
           versioningScheme: 'byPrereleaseNumber'
           majorVersion: '1'
           
       - task: PublishBuildArtifacts@1
         inputs:
-          pathToPublish: '$(System.DefaultWorkingDirectory)/PackOutput'
+          pathToPublish: '$(System.DefaultWorkingDirectory)'
           artifactName: drop
 
      
