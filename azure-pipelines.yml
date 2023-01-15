@@ -33,6 +33,19 @@ stages:
       - job:
         steps:
         - checkout: none
+        - task: PowerShell@2
+          displayName: 'Get Build Id'
+          inputs:
+            targetType: 'inline'
+            script: |
+              $personalAccessToken = "${{ System.AccessToken }}"
+              $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
+              $projectName = "Functional%20Testing"
+              $sourceVersion = "$(Build.SourceVersion)"
+              $buildsUrl = "https://dev.azure.com/$projectName/_apis/build/builds?sourceVersion=$sourceVersion&api-version=5.1"
+              $builds = Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}
+              $buildId = $builds.value[0].id
+              Write-Host "##vso[task.setvariable variable=buildId]$buildId"
 
         - task: DownloadBuildArtifacts@1
           inputs:
