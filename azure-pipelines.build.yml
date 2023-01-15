@@ -12,7 +12,7 @@ trigger:
     - '*.yml'
     
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
   solution: '**/*.sln'
@@ -24,6 +24,8 @@ stages:
   - stage: Build
     jobs:
     - job: Build
+      pool:
+        vmImage: 'ubuntu-latest'
       displayName: 'Build job'
       steps:
         # The first task is the dotnet command build, pointing to our csproj file
@@ -39,26 +41,55 @@ stages:
             arguments: '--configuration $(buildConfiguration)'
             projects: '$(project)'
           displayName: 'dotnet build $(buildConfiguration)'
-
-        - task: DotNetCoreCLI@2
-          displayName: "Unit Tests"
-          inputs:
-            command: 'test'
-            projects: '**/HitachiQA.UnitTests.dll'
-            arguments: '--no-logo --settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
-            testRunTitle: 'HitachiQA Unit Tests'
-        - task: DotNetCoreCLI@2
-          displayName: 'pack'
-          inputs:
-            command: 'pack'
-            projects: '$(solution)'
-            searchPatternPack: '$(project)'
-            nobuild: true
-            outputDir: '$(System.DefaultWorkingDirectory)'
-            versioningScheme: 'byPrereleaseNumber'
-            majorVersion: '1'
+        
         - task: PublishBuildArtifacts@1
           inputs:
             pathToPublish: '$(System.DefaultWorkingDirectory)'
             artifactName: drop
-      
+    - job: Test
+      dependsOn: Build
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(System.DefaultWorkingDirectory)'
+      - task: DotNetCoreCLI@2
+        displayName: "Unit Tests"
+        inputs:
+          command: 'test'
+          projects: '**/HitachiQA.UnitTests.dll'
+          arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
+          testRunTitle: 'HitachiQA Unit Tests'
+
+    - job: publishNugetFiles
+      dependsOn: Test
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(System.DefaultWorkingDirectory)'
+      - task: DotNetCoreCLI@2
+        displayName: 'pack'
+        inputs:
+          command: 'pack'
+          projects: '$(solution)'
+          searchPatternPack: '$(project)'
+          nobuild: true
+          outputDir: '$(System.DefaultWorkingDirectory)/PackOutput'
+          versioningScheme: 'byPrereleaseNumber'
+          majorVersion: '1'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(System.DefaultWorkingDirectory)/PackOutput'
+          artifactName: drop
+
+     
