@@ -33,8 +33,6 @@ stages:
           inputs:
             version: 6.0.x
 
-        - script: echo '$(Build.BuildNumber)' # outputs customized build number like 20200828.1
-
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
@@ -75,12 +73,13 @@ stages:
       - task: UseDotNet@2
         inputs:
           version: 6.0.x
-      - task: DownloadBuildArtifacts@0
+      - task: DotNetCoreCLI@2
         inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(System.DefaultWorkingDirectory)'
+          command: 'build'
+          arguments: '--configuration $(buildConfiguration)'
+          projects: '$(project)'
+        displayName: 'dotnet build $(buildConfiguration)'
+        
       - task: DotNetCoreCLI@2
         displayName: 'pack'
         inputs:
