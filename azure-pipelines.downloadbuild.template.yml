@@ -1,7 +1,11 @@
 #azure-pipelines-downloadbuild.template.yml
-variables:
-  projectName: 'Functional Testing'
-  definitionId: '6'
+parameters:
+  - name: projectName
+    type: string
+    default: 'Functional Testing'
+  - name: definitionId
+    type: string
+    default: '6'
 
 
 jobs:
