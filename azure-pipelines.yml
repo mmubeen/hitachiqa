@@ -44,8 +44,6 @@ stages:
             artifactName: 'drop'
             pipelineResource: 'BuildPipeline'
             branchName: '$(Build.SourceBranch)'
-            buildType: specific
-            buildVersionToDownload: specific
             downloadPath: '$(System.DefaultWorkingDirectory)'
 
         - task: DotNetCoreCLI@2
