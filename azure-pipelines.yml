@@ -38,7 +38,7 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-              $personalAccessToken = "${{ System.AccessToken }}"
+              $personalAccessToken = "$(System.AccessToken)"
               $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
               $projectName = "Functional%20Testing"
               $sourceVersion = "$(Build.SourceVersion)"
