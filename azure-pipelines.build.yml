@@ -51,6 +51,7 @@ stages:
       pool:
         vmImage: 'windows-latest'
       steps:
+      - checkout: none
       - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'
