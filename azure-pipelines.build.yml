@@ -39,7 +39,14 @@ stages:
             arguments: '--configuration $(buildConfiguration)'
             projects: '$(project)'
           displayName: 'dotnet build $(buildConfiguration)'
-          
+
+        - task: DotNetCoreCLI@2
+          displayName: "Unit Tests"
+          inputs:
+            command: 'test'
+            projects: '**/HitachiQA.UnitTests.dll'
+            arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
+            testRunTitle: 'HitachiQA Unit Tests'
         - task: DotNetCoreCLI@2
           displayName: 'pack'
           inputs:
@@ -54,14 +61,4 @@ stages:
           inputs:
             pathToPublish: '$(System.DefaultWorkingDirectory)'
             artifactName: drop
-    - job: Test
-      displayName: 'Unit Test job'
-      dependsOn: Build
-      steps:
-      - checkout: none
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'test'
-          projects: '**/HitachiQA.UnitTests.dll'
-          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
-          testRunTitle: 'HitachiQA Unit Tests'
+      
