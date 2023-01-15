@@ -54,7 +54,7 @@ stages:
             pipeline: '6'
             specificBuildWithTriggering: true
             buildVersionToDownload: specific
-            buildId: $(Build.SourceVersion)
+            buildId: $(buildId)
             branchName: '$(Build.SourceBranch)'
             downloadType: 'single'
             artifactName: 'drop'
