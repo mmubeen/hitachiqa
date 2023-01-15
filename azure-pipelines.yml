@@ -38,8 +38,10 @@ stages:
             artifactName: 'drop'
             pipelineResource: 'BuildPipeline'
             branchName: '$(Build.SourceBranch)'
+            buildNumber: '$(Build.SourceVersion)'
             downloadPath: '$(System.DefaultWorkingDirectory)'
-          
+          condition: succeeded('BuildPipeline')
+
         - task: DotNetCoreCLI@2
           inputs:
             command: 'push'
