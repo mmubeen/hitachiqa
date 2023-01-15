@@ -56,6 +56,7 @@ stages:
             artifactName: drop
     - job: 
       displayName: 'Unit Test job'
+      dependsOn: Build
       steps:
       - checkout: none
       - task: DotNetCoreCLI@2
