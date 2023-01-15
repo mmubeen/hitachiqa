@@ -23,8 +23,9 @@ variables:
 stages:
   - stage: Build
     jobs:
-     - job:
-       steps:
+    - job:
+      displayName: 'Build job'
+      steps:
         # The first task is the dotnet command build, pointing to our csproj file
         - task: UseDotNet@2
           inputs:
@@ -53,19 +54,13 @@ stages:
           inputs:
             pathToPublish: '$(System.DefaultWorkingDirectory)'
             artifactName: drop
-
-  - stage: Test
-    pool: 
-      vmImage: 'windows-latest'
-    jobs:
-      - template: azure-pipelines.downloadbuild.template.yml
-
-      - job: 
-        steps:
-        - checkout: none
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'test'
-            projects: '**/HitachiQA.UnitTests.dll'
-            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
-            testRunTitle: 'HitachiQA Unit Tests'
+    - job: 
+      displayName: 'Unit Test job'
+      steps:
+      - checkout: none
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '**/HitachiQA.UnitTests.dll'
+          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
+          testRunTitle: 'HitachiQA Unit Tests'
