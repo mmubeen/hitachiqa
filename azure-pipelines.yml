@@ -18,11 +18,6 @@ variables:
   buildConfiguration: 'Release'
   name: $(Date:yyyyMMdd)$(Rev:.r)
 
-resources:
-  pipelines:
-  - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
-    source: "HitachiQA.Build"
-
 stages:
   - stage: NugetPush
     jobs:
@@ -39,12 +34,18 @@ stages:
         steps:
         - checkout: none
 
-        - task: DownloadPipelineArtifact@2
-          displayName: 'Download Artifact'
+
+        - task: DownloadBuildArtifacts@1
           inputs:
-            pipeline: 'BuildPipeline'
-            artifact: 'drop'
+            buildType: 'specific'
+            pipeline: '6'
+            specificBuildWithTriggering: true
+            buildVersionToDownload: specific
+            buildId: $(Build.SourceVersion)
             branchName: '$(Build.SourceBranch)'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.DefaultWorkingDirectory)'
 
         - task: DotNetCoreCLI@2
           inputs:
