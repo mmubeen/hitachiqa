@@ -28,12 +28,10 @@ stages:
             deploy:
               steps: 
                 - download: none
-
-      - template: azure-pipelines.downloadbuild.template.yml
-      
       - job:
         steps:
         - checkout: none
+        - template: azure-pipelines.downloadbuild.template.yml
         - task: DotNetCoreCLI@2
           inputs:
             command: 'push'
