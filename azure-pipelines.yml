@@ -42,7 +42,7 @@ stages:
               $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
               $projectName = "Functional%20Testing"
               $sourceVersion = "$(Build.SourceVersion)"
-              $buildsUrl = "https://dev.azure.com/$projectName/_apis/build/builds?sourceVersion=$sourceVersion&api-version=5.1"
+              $buildsUrl = "https://dev.azure.com/HitachiQA/$projectName/_apis/build/builds?sourceVersion=$sourceVersion&definitions=6&api-version=7.0"
               $builds = Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}
               $buildId = $builds.value[0].id
               Write-Host "##vso[task.setvariable variable=buildId]$buildId"
