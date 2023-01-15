@@ -53,4 +53,19 @@ stages:
           inputs:
             pathToPublish: '$(System.DefaultWorkingDirectory)'
             artifactName: drop
-      
+
+ - stage: Test
+    pool: 
+      vmImage: 'windows-latest'
+    jobs:
+      - template: azure-pipelines.downloadbuild.template.yml
+
+      - job: 
+        steps:
+        - checkout: none
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: '**/HitachiQA.UnitTests.dll'
+            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=Dynamics'
+            testRunTitle: 'HitachiQA Unit Tests'

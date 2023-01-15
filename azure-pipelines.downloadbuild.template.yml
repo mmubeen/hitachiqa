@@ -15,7 +15,7 @@ jobs:
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
         $buildsUrl = "https://dev.azure.com/HitachiQA/$(projectName)/_apis/build/builds?definitions=$(definitionId)&api-version=7.0"
         $builds = (Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}).value
-        $filteredBuilds = $builds | Where-Object { $_.sourceVersion -eq "$(Build.SourceVersion)" }
+        $filteredBuilds = $builds | Where-Object { ($_.sourceVersion -eq "$(Build.SourceVersion)") -and ($_.status -eq 'complete') }
         $buildId = $filteredBuilds[0].id
         Write-Host "##vso[task.setvariable variable=buildId]$buildId"
         Write-Host "requested Uri: $buildsUrl"

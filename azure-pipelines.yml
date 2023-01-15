@@ -28,7 +28,9 @@ stages:
             deploy:
               steps: 
                 - download: none
+
       - template: azure-pipelines.downloadbuild.template.yml
+      
       - job:
         steps:
         - checkout: none

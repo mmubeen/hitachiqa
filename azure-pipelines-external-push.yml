@@ -14,24 +14,18 @@ parameters:
     - Biberk_MA_ServiceConnection
     - CPI_SV_ServiceConnection
 
-resources:
-  pipelines:
-  - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
-    source: "HitachiQA.Build"
 
+ jobs:
+  - template: azure-pipelines.downloadbuild.template.yml
+  - job: 
+      steps:
+      - task: NuGetAuthenticate@1
+        inputs:
+          nuGetServiceConnections: ${{ parameters.TargetServiceConnection }}
 
-steps:
-
-- download: BuildPipeline 
-  artifact: drop
-
-- task: NuGetAuthenticate@1
-  inputs:
-    nuGetServiceConnections: ${{ parameters.TargetServiceConnection }}
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
-    nuGetFeedType: 'external'
-    publishFeedCredentials: ${{ parameters.TargetServiceConnection }}
+      - task: NuGetCommand@2
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: ${{ parameters.TargetServiceConnection }}

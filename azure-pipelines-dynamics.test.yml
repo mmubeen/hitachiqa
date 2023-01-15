@@ -8,36 +8,14 @@ pr: none
 
 pool:
   vmImage: 'ubuntu-latest'
-
-variables:
-  solution: '**/*.sln'
-  project: '**/*.csproj'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  name: $(Date:yyyyMMdd)$(Rev:.r)
-
-resources:
-  pipelines:
-  - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
-    source: "HitachiQA.Build"
     
 stages:
-  - download: BuildPipeline 
-    artifact: drop 
-
   - stage: Test
     pool: 
       vmImage: 'windows-latest'
     jobs:
-      - job: 
-        steps:
-        - checkout: none
-        - task: DownloadBuildArtifacts@0
-          inputs:
-            buildType: 'current'
-            downloadType: 'single'
-            artifactName: 'drop'
-            downloadPath: '$(System.DefaultWorkingDirectory)'
+      - template: azure-pipelines.downloadbuild.template.yml
+     
 
         - task: DotNetCoreCLI@2
           inputs:
