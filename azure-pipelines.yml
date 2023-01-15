@@ -40,7 +40,7 @@ stages:
         steps:
         - checkout: none
 
-        - downloadBuild: string # identifier for the resource from which to download artifacts
+        - downloadBuild: BuildPipeline # identifier for the resource from which to download artifacts
           artifact: drop
 
         - task: DotNetCoreCLI@2
