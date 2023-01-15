@@ -3,8 +3,7 @@
 # Add steps that publish symbols, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 
-trigger:
-- master
+trigger: none
 
 pr: none
 
@@ -29,40 +28,10 @@ stages:
             deploy:
               steps: 
                 - download: none
-
+      - template: azure-pipelines.downloadbuild.template.yml
       - job:
         steps:
         - checkout: none
-        - task: PowerShell@2
-          displayName: 'Get Build Id'
-          inputs:
-            targetType: 'inline'
-            script: |
-              $personalAccessToken = "$(System.AccessToken)"
-              $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
-              $projectName = "Functional%20Testing"
-              $sourceVersion = "$(Build.SourceVersion)"
-              $buildsUrl = "https://dev.azure.com/HitachiQA/$projectName/_apis/build/builds?definitions=6&api-version=7.0"
-              $builds = (Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}).value
-              $filteredBuilds = $builds | Where-Object { $_.sourceVersion -eq $sourceVersion }
-              $buildId = $filteredBuilds[0].id
-              Write-Host "##vso[task.setvariable variable=buildId]$buildId"
-              Write-Host "requested Uri: $buildsUrl"
-              Write-Host "result buildId: $buildId"
-
-        - task: DownloadBuildArtifacts@1
-          inputs:
-            buildType: 'specific'
-            project: 'b9f1ebb9-5ad2-4343-9fb3-f0521fcff956'
-            pipeline: '6'
-            specificBuildWithTriggering: true
-            buildVersionToDownload: specific
-            buildId: $(buildId)
-            branchName: '$(Build.SourceBranch)'
-            downloadType: 'single'
-            artifactName: 'drop'
-            downloadPath: '$(System.DefaultWorkingDirectory)'
-
         - task: DotNetCoreCLI@2
           inputs:
             command: 'push'
