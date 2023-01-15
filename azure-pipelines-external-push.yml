@@ -16,9 +16,9 @@ parameters:
 
 
 jobs:
-  - template: azure-pipelines.downloadbuild.template.yml
   - job: 
     steps:
+    - template: azure-pipelines.downloadbuild.template.yml
     - task: NuGetAuthenticate@1
       inputs:
         nuGetServiceConnections: ${{ parameters.TargetServiceConnection }}
