@@ -69,7 +69,6 @@ stages:
       pool:
         vmImage: 'ubuntu-latest'
       steps:
-      - checkout: none
       - task: UseDotNet@2
         inputs:
           version: 6.0.x
