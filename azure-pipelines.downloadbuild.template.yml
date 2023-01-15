@@ -1,51 +1,35 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
-
-trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
-  solution: '**/*.sln'
-  project: '**/*.csproj'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  projectName: 'Functional Testing'
+  definitionId: '6'
 
-stages:
-  - stage: Build
-    jobs:
-     - job:
-       steps:
-        # The first task is the dotnet command build, pointing to our csproj file
-        - task: UseDotNet@2
-          inputs:
-            version: 6.0.x
 
-        - script: echo '$(Build.BuildNumber)' # outputs customized build number like 20200828.1
-
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'build'
-            arguments: '--configuration $(buildConfiguration)'
-            projects: '$(project)'
-          displayName: 'dotnet build $(buildConfiguration)'
-          
-        - task: DotNetCoreCLI@2
-          displayName: 'pack'
-          inputs:
-            command: 'pack'
-            projects: '$(solution)'
-            searchPatternPack: '$(project)'
-            nobuild: true
-            outputDir: '$(System.DefaultWorkingDirectory)'
-            versioningScheme: 'byPrereleaseNumber'
-            majorVersion: '1'
-        - task: PublishBuildArtifacts@1
-          inputs:
-            pathToPublish: '$(System.DefaultWorkingDirectory)'
-            artifactName: drop
-      
+jobs:
+- job: GetBuildId
+  steps:
+  - task: PowerShell@2
+    displayName: 'Get Build Id'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $personalAccessToken = "$(System.AccessToken)"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
+        $buildsUrl = "https://dev.azure.com/HitachiQA/$(projectName)/_apis/build/builds?definitions=$(definitionId)&api-version=7.0"
+        $builds = (Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}).value
+        $filteredBuilds = $builds | Where-Object { $_.sourceVersion -eq "$(Build.SourceVersion)" }
+        $buildId = $filteredBuilds[0].id
+        Write-Host "##vso[task.setvariable variable=buildId]$buildId"
+        Write-Host "requested Uri: $buildsUrl"
+        Write-Host "result buildId: $buildId"
+        
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: 'b9f1ebb9-5ad2-4343-9fb3-f0521fcff956'
+      pipeline: $(definitionId)
+      specificBuildWithTriggering: true
+      buildVersionToDownload: specific
+      buildId: $(buildId)
+      branchName: '$(Build.SourceBranch)'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(System.DefaultWorkingDirectory)'
