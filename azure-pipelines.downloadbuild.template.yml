@@ -8,34 +8,33 @@ parameters:
   default: '6'
 
 
-jobs:
-- job: DownloadArtifacts
-  steps:
-  - task: PowerShell@2
-    displayName: 'Get Build Id'
-    inputs:
-      targetType: 'inline'
-      script: |
-        $personalAccessToken = "$(System.AccessToken)"
-        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
-        $buildsUrl = "https://dev.azure.com/HitachiQA/$(parameters.projectName)/_apis/build/builds?definitions=$(parameters.definitionId)&api-version=7.0"
-        $builds = (Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}).value
-        $filteredBuilds = $builds | Where-Object { ($_.sourceVersion -eq "$(Build.SourceVersion)") -and ($_.status -eq 'complete') }
-        $buildId = $filteredBuilds[0].id
-        Write-Host "##vso[task.setvariable variable=buildId]$buildId"
-        Write-Host "requested Uri: $buildsUrl"
-        Write-Host "result buildId: $buildId"
-        
-  - task: DownloadBuildArtifacts@1
-    displayName: 'Download artifact'
-    inputs:
-      buildType: 'specific'
-      project: 'b9f1ebb9-5ad2-4343-9fb3-f0521fcff956'
-      pipeline: $(definitionId)
-      specificBuildWithTriggering: true
-      buildVersionToDownload: specific
-      buildId: $(buildId)
-      branchName: '$(Build.SourceBranch)'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(System.DefaultWorkingDirectory)'
+
+steps:
+- task: PowerShell@2
+  displayName: 'Get Build Id'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $personalAccessToken = "$(System.AccessToken)"
+      $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
+      $buildsUrl = "https://dev.azure.com/HitachiQA/$(parameters.projectName)/_apis/build/builds?definitions=$(parameters.definitionId)&api-version=7.0"
+      $builds = (Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}).value
+      $filteredBuilds = $builds | Where-Object { ($_.sourceVersion -eq "$(Build.SourceVersion)") -and ($_.status -eq 'complete') }
+      $buildId = $filteredBuilds[0].id
+      Write-Host "##vso[task.setvariable variable=buildId]$buildId"
+      Write-Host "requested Uri: $buildsUrl"
+      Write-Host "result buildId: $buildId"
+      
+- task: DownloadBuildArtifacts@1
+  displayName: 'Download artifact'
+  inputs:
+    buildType: 'specific'
+    project: 'b9f1ebb9-5ad2-4343-9fb3-f0521fcff956'
+    pipeline: $(definitionId)
+    specificBuildWithTriggering: true
+    buildVersionToDownload: specific
+    buildId: $(buildId)
+    branchName: '$(Build.SourceBranch)'
+    downloadType: 'single'
+    artifactName: 'drop'
+    downloadPath: '$(System.DefaultWorkingDirectory)'
