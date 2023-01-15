@@ -48,7 +48,7 @@ stages:
               $buildId = $filteredBuilds[0].id
               Write-Host "##vso[task.setvariable variable=buildId]$buildId"
               Write-Host "requested Uri: $buildsUrl"
-              Write-Host "result buildId: $buildId "
+              Write-Host "result buildId: $buildId"
 
         - task: DownloadBuildArtifacts@1
           inputs:
