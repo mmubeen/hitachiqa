@@ -54,7 +54,7 @@ stages:
             pathToPublish: '$(System.DefaultWorkingDirectory)'
             artifactName: drop
 
- - stage: Test
+  - stage: Test
     pool: 
       vmImage: 'windows-latest'
     jobs:
