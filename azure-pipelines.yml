@@ -22,6 +22,7 @@ resources:
   pipelines:
   - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
     source: "HitachiQA.Build"
+    branch: '$(Build.SourceBranch)'
 
 stages:
   - stage: NugetPush
@@ -39,12 +40,8 @@ stages:
         steps:
         - checkout: none
 
-        - task: DownloadPipelineArtifact@2
-          inputs:
-            artifactName: 'drop'
-            pipelineResource: 'BuildPipeline'
-            branchName: '$(Build.SourceBranch)'
-            downloadPath: '$(System.DefaultWorkingDirectory)'
+        - downloadBuild: string # identifier for the resource from which to download artifacts
+          artifact: drop
 
         - task: DotNetCoreCLI@2
           inputs:
