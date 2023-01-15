@@ -20,10 +20,10 @@ resources:
   pipelines:
   - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
     source: "HitachiQA.Build"
-    
+
 stages:
   - download: BuildPipeline 
-    artifact: drop 
+    artifact: drop
 
   - stage: Test
     pool: 
@@ -43,5 +43,5 @@ stages:
           inputs:
             command: 'test'
             projects: '**/HitachiQA.UnitTests.dll'
-            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.runsettings --no-build --filter TestCategory=Dynamics'
+            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.runsettings --no-build --filter TestCategory!=Dynamics'
             testRunTitle: 'HitachiQA Unit Tests'

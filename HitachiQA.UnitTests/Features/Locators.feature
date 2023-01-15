@@ -15,3 +15,5 @@ Scenario: Test Known Field Locators
 	| lookup_with_selection  |
 	| textfield              |
 	| textfield_autocomplete |
+	| switch                 |
+	| lookup_with_table      |

@@ -7,16 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HitachiQA.Dynamics.Pages
+namespace HitachiQA.Dynamics.FS.Pages
 {
-    public class Dynamics_BasePage : BasePage
+    public class Dyn_BasePage : BasePage
     {
         private const string COMMAND_BAR_XPATH = "((//div[@id='mainContent'] //*[contains(@data-id, 'Command')])[1] | //*[@data-id='OverflowFlyout'])";
 
         public readonly GlobalCommandBar GlobalCommandBar;
-        public Dynamics_BasePage(ObjectContainer ObjectContainer) : base(ObjectContainer)
+        public Dyn_BasePage(ObjectContainer ObjectContainer) : base(ObjectContainer)
         {
             this.GlobalCommandBar = ObjectContainer.Resolve<GlobalCommandBar>();
+
+            this.KnownFieldXPaths.Add("//*[@data-id='{input}']");
+        }
+
+        public new Element GetField(string DisplayText_Or_LogicalName)
+        {
+            return base.GetField(DisplayText_Or_LogicalName);
         }
 
         public Element GetLeftPaneSiteMapButton(string title) => Element($"//*[@data-id='navbar-container'] //li[@aria-label='{title}']");
@@ -35,6 +42,7 @@ namespace HitachiQA.Dynamics.Pages
 
         public Element GetGrid(string sectionName) => Element($"//section[@aria-label='{sectionName}' and {Grid.locator.Locator.Criteria}] ");
     }
+
 
     public class GlobalCommandBar : BasePage
     {

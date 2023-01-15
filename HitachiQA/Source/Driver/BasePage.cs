@@ -39,6 +39,8 @@ namespace HitachiQA.Driver
             UserActions.ScrollToBottom();
         }
 
+       
+
         public void ScrollToTop()
         {
             UserActions.ScrollToTop();
@@ -80,5 +82,12 @@ namespace HitachiQA.Driver
         }
         public string IFrameTitle;
         public string IFrameId;
+
+        public List<string> KnownFieldXPaths = new List<string>()
+        {
+            "//label[text()='{input}']/..",
+            "//button[text()='{input}']"
+        };
+        public Element GetField(string displayText) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Select(it=> it.Replace("{input}", displayText)))})");
     }
 }

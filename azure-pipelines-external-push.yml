@@ -5,11 +5,6 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
-resources:
-  pipelines:
-  - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
-    source: "HitachiQA.NugetPush"
-
 parameters:
   - name: TargetServiceConnection
     displayName: Target Service Connection
@@ -19,13 +14,11 @@ parameters:
     - Biberk_MA_ServiceConnection
     - CPI_SV_ServiceConnection
 
-# variables:
-#   solution: '**/*.sln'
-#   project: '**/*.csproj'
-#   buildPlatform: 'Any CPU'
-#   buildConfiguration: 'Release'
-#   name: $(Date:yyyyMMdd)$(Rev:.r)
-#   artifactPath: $(Build.ArtifactStagingDirectory)/*.nupkg
+resources:
+  pipelines:
+  - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
+    source: "HitachiQA.Build"
+
 
 steps:
 

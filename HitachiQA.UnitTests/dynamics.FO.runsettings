@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+	<RunConfiguration>
+		<EnvironmentVariables>
+			<!--<HOST>Https://Hslsr2prsdev.crm7.dynamics.com</HOST>-->
+			<HOST>https://mddev7a29df073d88851fdevaos.cloudax.dynamics.com/</HOST>
+			<SERVER_HOST>TBD</SERVER_HOST>
+			<BROWSER>Chrome</BROWSER>
+		</EnvironmentVariables>
+	</RunConfiguration>
+</RunSettings>

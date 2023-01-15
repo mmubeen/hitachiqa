@@ -27,7 +27,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         public void GivenSystemLoadsKnownHtmlsForFieldType(string fieldTypeName)
         {
             this.SharedData.SetValue("knownField", "typeName", fieldTypeName);
-            string filePath = $"./Data/DynamicSources/{fieldTypeName}.json";
+            string filePath = $"./Data/FieldsHTML/{fieldTypeName}.json";
 
             if (!File.Exists(filePath))
             {
