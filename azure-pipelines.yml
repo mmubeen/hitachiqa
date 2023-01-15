@@ -34,10 +34,10 @@ stages:
         steps:
         - checkout: none
 
-
         - task: DownloadBuildArtifacts@1
           inputs:
             buildType: 'specific'
+            project: 'b9f1ebb9-5ad2-4343-9fb3-f0521fcff956'
             pipeline: '6'
             specificBuildWithTriggering: true
             buildVersionToDownload: specific
