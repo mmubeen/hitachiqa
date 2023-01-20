@@ -11,12 +11,9 @@ namespace HitachiQA.UnitTests.StepDefinitions
     [Binding]
     public class ExcelStepDefinitions
     {
-        
-        private IEnumerable<Dictionary<String, String>> excelResult;
-        private HashSet<String> keys = new HashSet<String>();
-        private HashSet<String> values = new HashSet<String>();
-
-
+        private IEnumerable<Dictionary<String, String>>? excelResult;
+        private readonly HashSet<String> keys = new();
+        private readonly HashSet<String> values = new();
 
         [Given(@"User parses the input Excel file from Data folder")]
         public void GivenUserParsesTheInputExcelFileFromDataFolder()
@@ -28,7 +25,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [When(@"User gets the data present in the Excel sheet")]
         public void WhenUserGetsTheDataPresentInTheExcelSheet()
         {
-            IEnumerable<Dictionary<String, String>> collection = excelResult;
+            var collection = excelResult;
             for (int i = 0; i < collection.Count(); i++)
             {
                 Dictionary<String, String> dict = collection.ElementAt(i);
@@ -56,13 +53,9 @@ namespace HitachiQA.UnitTests.StepDefinitions
                 "USA"    , "Washington DC"
             };
 
-
             (Inputkeys.Intersect(keys).Count() == Inputkeys.Count).Should().BeTrue();
 
-            
-
             (InputValues.Intersect(values).Count() == InputValues.Count).Should().BeTrue();
-
         }
     }
 }
