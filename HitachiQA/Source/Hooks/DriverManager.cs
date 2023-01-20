@@ -38,7 +38,7 @@ namespace HitachiQA.Hooks
         {
 
             BrowserIndicator = new BrowserIndicator();
-            if (FT.FeatureInfo.Tags.Contains("NoBrowser") && SC.ScenarioInfo.Tags.Contains("NoBrowser"))
+            if (FT.FeatureInfo.Tags.Contains("NoBrowser") || SC.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
                 BrowserIndicator.isNoBrowserFeature = true;
             }

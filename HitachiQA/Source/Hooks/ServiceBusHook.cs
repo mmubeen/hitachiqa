@@ -16,7 +16,7 @@ namespace HitachiQA.Hooks
         }
 
         [BeforeFeature]
-        public void initialize()
+        public static void initialize(IObjectContainer ObjectContainer, IConfiguration Configuration)
         {
             Console.WriteLine("Attempting to load Service Bus Client");
             var SrvcBusUri = Configuration.GetVariable("SERVICE_BUS_NAMESPACE_URI", true);
@@ -32,9 +32,9 @@ namespace HitachiQA.Hooks
         }
 
         [AfterFeature]
-        public void tearDown()
+        public static void tearDown(IObjectContainer ObjectContainer)
         {
-            if(ObjectContainer.IsRegistered<ServiceBus>())
+            if (ObjectContainer.IsRegistered<ServiceBus>())
             {
                 //ObjectContainer.Resolve<ServiceBus>().Dispose();
             }
