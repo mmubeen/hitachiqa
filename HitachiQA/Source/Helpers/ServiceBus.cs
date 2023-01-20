@@ -18,13 +18,7 @@ namespace HitachiQA.Helpers
 
         }
 
-        public static class Queues
-        {
-            public const string Materializaiton = "bill-processing-materialization";
-            public const string BillProcessingPrint = "bill-processing-print";
-
-
-        }
+        
 
         public void SendMessage(object message, string queueName, string contentType = "application/json")
         {

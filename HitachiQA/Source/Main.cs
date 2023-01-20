@@ -17,17 +17,17 @@ namespace HitachiQA
         private static IConfiguration _Config;
         public static IConfiguration Configuration { get { return _Config ??= BuildConfig(); } }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public static ObjectContainer ObjectContainer;
+        public static IObjectContainer ObjectContainer;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        [BeforeScenario(Order = 1)]
-        public static void LoadConfig(ObjectContainer oc)
+        [BeforeFeature(Order = 1)]
+        public static void LoadConfig(IObjectContainer oc)
         {
             oc.RegisterInstanceAs<IConfiguration>(Configuration);
         }
 
         [BeforeScenario(Order = 1)]
-        public static void LoadObjectContainer(ObjectContainer oc)
+        public static void LoadObjectContainer(IObjectContainer oc)
         {
             ObjectContainer = oc;
         }
@@ -78,18 +78,25 @@ namespace HitachiQA
 
             var config = builder.Build();
 
+            if (config.GetVariable("DISABLE_AZURE_AUTHENTICATION", true) is String disabled && disabled != null && disabled.ToLower() == "true")
+            {
+                //disabled
+            }
+            else
+            {
+                var appConfigUri = config.GetVariable("APP_CONFIG_URI", true);
+                var keyVaultUri = config.GetVariable("KEYVAULT_URI", true);
 
-            var appConfigUri = config.GetVariable("APP_CONFIG_URI", true);
-            var keyVaultUri = config.GetVariable("KEYVAULT_URI", true);
+                var AUTappConfigUri = config.GetVariable("AUT_APP_CONFIG_URI", true);
+                var AUTkeyVaultUri = config.GetVariable("AUT_KEYVAULT_URI", true);
 
-            var AUTappConfigUri = config.GetVariable("AUT_APP_CONFIG_URI", true);
-            var AUTkeyVaultUri = config.GetVariable("AUT_KEYVAULT_URI", true);
+                attemptLoadAppConfig(builder, appConfigUri, "App Config");
+                attemptLoadKeyVault(builder, keyVaultUri, "Keyvalut");
 
-            attemptLoadAppConfig(builder, appConfigUri, "App Config");
-            attemptLoadKeyVault(builder, keyVaultUri, "Keyvalut");
+                attemptLoadAppConfig(builder, AUTappConfigUri, "AUT App Config");
+                attemptLoadKeyVault(builder, AUTkeyVaultUri, "AUT Keyvault");
 
-            attemptLoadAppConfig(builder, AUTappConfigUri, "AUT App Config");
-            attemptLoadKeyVault(builder, AUTkeyVaultUri, "AUT Keyvault");
+            }
 
             config = builder.Build();
             Console.WriteLine("BUILT CONFIG SUCCESSFULLY");

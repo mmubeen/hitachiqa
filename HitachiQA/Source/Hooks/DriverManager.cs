@@ -38,21 +38,18 @@ namespace HitachiQA.Hooks
         {
 
             BrowserIndicator = new BrowserIndicator();
-            if (!FT.FeatureInfo.Tags.Contains("NoBrowser") && !SC.ScenarioInfo.Tags.Contains("NoBrowser"))
+            if (FT.FeatureInfo.Tags.Contains("NoBrowser") && SC.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
-                BrowserIndicator.isNoBrowserFeature = false;
-                
-                var config = oc.Resolve<IConfiguration>();
-                var browser = config.GetVariable("BROWSER");                                 
-
-                invokeNewDriver(oc, browser);
-                
-
-
+                BrowserIndicator.isNoBrowserFeature = true;
             }
             else
             {
-                BrowserIndicator.isNoBrowserFeature = true;
+                BrowserIndicator.isNoBrowserFeature = false;
+
+                var config = oc.Resolve<IConfiguration>();
+                var browser = config.GetVariable("BROWSER");
+
+                invokeNewDriver(oc, browser);
             }
             oc.RegisterInstanceAs<BrowserIndicator>(BrowserIndicator);
 
@@ -92,6 +89,10 @@ namespace HitachiQA.Hooks
             throw new NotImplementedException();
         }
 
+        public static ChromeOptions? ChromeOptions;
+        public static FirefoxOptions? FirefoxOptions;
+        public static EdgeOptions? EdgeOptions;
+
         public static void invokeNewDriver(ObjectContainer oc, string browser)
         {
             IWebDriver driver;
@@ -100,6 +101,7 @@ namespace HitachiQA.Hooks
 
             if (options != null)
             {
+                //separator is ;
                 String[] listArray = options.Split('\x3B');
 
                 foreach (String str in listArray)
@@ -114,29 +116,41 @@ namespace HitachiQA.Hooks
             {
                 case "chrome":
                     _ = new NetDriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
-                    var cOptions = new ChromeOptions();
 
+                    if (ChromeOptions == null)
+                    {
+                        ChromeOptions = new ChromeOptions();
+                        ChromeOptions.AddArgument("--start-maximized");
+                        ChromeOptions.AddArgument("--no-sandbox"); // Bypass OS security model
+                        ChromeOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
+                        ChromeOptions.AddArguments(optionsList);
+                    }
 
-                    cOptions.AddArgument("--start-maximized");
-                    cOptions.AddArgument("--no-sandbox"); // Bypass OS security model
-                    cOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
-                    cOptions.AddArguments(optionsList);                    
-
-                    driver = new ChromeDriver(cOptions);
+                    driver = new ChromeDriver(ChromeOptions);
                     break;
 
                 case "firefox":
                     _ = new NetDriverManager().SetUpDriver(new FirefoxConfig(), VersionResolveStrategy.Latest);
-                    var fOptions = new FirefoxOptions();
-                    fOptions.AddArgument("--no-sandbox");
-                    driver = new FirefoxDriver(fOptions);
+                    if(FirefoxOptions == null)
+                    {
+                        FirefoxOptions = new FirefoxOptions();
+                        FirefoxOptions.AddArgument("--no-sandbox");
+                        FirefoxOptions.AddArguments(optionsList);
+                    }
+
+                    driver = new FirefoxDriver(FirefoxOptions);
                     break;
 
                 case "edge":
                     _ = new NetDriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
-                    EdgeOptions edgeOptions = new EdgeOptions();
-                    edgeOptions.AddArgument("--no-sandbox");
-                    driver = new EdgeDriver(edgeOptions);
+                    if(EdgeOptions==null)
+                    {
+                        EdgeOptions = new EdgeOptions();
+                        EdgeOptions.AddArgument("--no-sandbox");
+                        EdgeOptions.AddArguments(optionsList);
+                    }
+
+                    driver = new EdgeDriver(EdgeOptions);
                     break;
 
                 default:

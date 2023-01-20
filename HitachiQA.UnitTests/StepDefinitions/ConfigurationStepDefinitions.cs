@@ -40,6 +40,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         {
             //given the known name for the variable
             this.result = this.Config.GetVariable(knownName, false);
+            
         }
 
         [Then(@"the system should look for the varname provided")]

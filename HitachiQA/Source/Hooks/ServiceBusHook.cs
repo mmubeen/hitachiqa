@@ -15,7 +15,7 @@ namespace HitachiQA.Hooks
 
         }
 
-        [BeforeScenario]
+        [BeforeFeature]
         public void initialize()
         {
             Console.WriteLine("Attempting to load Service Bus Client");
@@ -31,12 +31,12 @@ namespace HitachiQA.Hooks
 
         }
 
-        [AfterScenario]
+        [AfterFeature]
         public void tearDown()
         {
-            if(ObjectContainer.IsRegistered<Cosmos>())
+            if(ObjectContainer.IsRegistered<ServiceBus>())
             {
-                ObjectContainer.Resolve<Cosmos>().Dispose();
+                //ObjectContainer.Resolve<ServiceBus>().Dispose();
             }
             
         }

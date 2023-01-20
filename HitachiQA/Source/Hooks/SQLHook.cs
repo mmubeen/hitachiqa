@@ -15,8 +15,8 @@ namespace HitachiQA.Hooks
 
         }
 
-        [BeforeScenario]
-        public void initialize()
+        [BeforeFeature]
+        public static void initialize(IObjectContainer ObjectContainer, IConfiguration Configuration)
         {
             Console.WriteLine("Attempting to load SQL Client");
             var connectionString = Configuration.GetVariable("SQL_CONNECTION_STRING", true);
@@ -33,8 +33,8 @@ namespace HitachiQA.Hooks
 
         }
 
-        [AfterScenario]
-        public void tearDown()
+        [AfterFeature]
+        public static void tearDown(IObjectContainer ObjectContainer)
         {
             if(ObjectContainer.IsRegistered<SQL>())
             {

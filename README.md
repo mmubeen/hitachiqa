@@ -50,6 +50,10 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 | HOST								| (required) URL for app under test for UI tests (Eg. https://www.hitachi.us)									|
 | BROWSER		   					| (required) supported: `Chrome`, `Firefox`, `Edge`   															|
 | 									| 																												|
+| OPTIONS      						| (optional) comma separated options to pass to the browser (E.g. --incognito;--no-sandbox)						|
+| 									| 																												|
+| DISABLE_AZURE_AUTHENTICATION      | (optional) If true, keyvault & appconfigs will be disabled even if the URI is provided  						|
+| 									| 																												|
 | SERVER_HOST   					| (optional) URL required for for RestAPI communication			  												|
 | API_TENANT_ID   					| (optional) if a `NoBrowser` tag found, this will be required for RestAPI authentication						|
 | API_CLIENT_ID   					| (optional) if a `NoBrowser` tag found, this will be required for RestAPI authentication						|
@@ -67,11 +71,98 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 | COSMOS_DATABASE_NAME  			| (optional) Cosmos Database Name (Required if COSMOS_URI is provided)											|
 | 									| 																												|
 | SQL_CONNECTION_STRING 			| (optional) SQL SERVER CONNECTION STRING																		|
+| 									| 																												|
+| SERVICE_BUS_NAMESPACE_URI			| (optional) Service Bus namespace URI 																			|
 
 
 </br></br>
 </br></br>
 
+# UI Automation:
+## Locators
+* we recommend creating a Pages package in your project level to add each page (Eg. [here](https://github.com/Hitachi-SolutionsQA/Demo/blob/main/Demo/Pages/HsalHome.cs))
+* We have created the HitachiQA.Driver.BasePage with the goal for it to be inherited in a BasePage of your own like this
+	```
+	//sample class
+	public class HitachiBasePage : BasePage
+	{
+		public HitachiBasePage(ObjectContainer OC) : base(OC)
+		{
+		}
+	}
+	```
+	>this will allow you to implement all functions that will be shared across every other page in your project. </br>
+	>Here's an example of a very powerful function to get just about anyfield in dynamics using its logical name.
+	```
+	 public Element GetField(string fieldLogicalName) => Element("//*[@data-id='customer_name']")
+	```
+	>Please note: ideally, every other class in pages should inherit HitachiBasePage
+## Actions
+
+* As we attempt to innovate, we ambition any value setting be done through a single function called SetFieldValue
+  HitachiQA.Driver.Element.SetFieldValue(string value) should work for setting any field value (Textfield, Dropdown, Checkbox)
+
+	```
+	//sample step definition using the above class & SetFieldValue
+	public class HomePageStepDefinitions{
+
+        private HitachiBasePage HitachiBasePage { get; }
+
+        public HomePageStepDefinitions(HitachiBasePage hbp){
+            this.HitachiBasePage = hbp;
+        }
+
+		[When(@"user sets '([^']*)' field value to '([^']*)'")]
+        public void WhenUserSetsFieldValueTo(string fieldLogicalName, string value)
+        {
+            this.HitachiBasePage.GetField(fieldLogicalName).SetFieldValue(value);
+        }
+
+	}
+	```
+
+	>The way it works is by getting the inner html of the provided field and trying all the known xpaths in HitachiQA.Driver.UserActions.KnownXPaths. </br>
+	>Once it finds a match then it looks on the corresponding entry value which is handled by a switch having the implementation for any type of field. </br>
+	>if you need to add a known xpath we recommend adding it directly to the KnownXPaths dictionary along with unit tests for it but here's a quick why of doing it in implementing projects.
+	```
+	//add the following hook(hook) in a class preferably in a hooks folder
+	[BeforeTestRun]
+	public static void AddingXPathsHook()
+	{
+		HitachiQA.Driver.UserActions.KnownXPaths.Add("//input[@type='text' and contains(@data-id, 'text-input')]", "textfield")
+	}
+	```
+## IFrames implicit handling!
+* we recommend creating a class in the Pages package from Locators for each iframe to be handled</br>
+  then load the IFrame by providing any of these property values 
+  - IFrame (By)
+  - IFrameTitle (string)
+  - IFrameId (string)
+	```
+	//initializing a class with an IFrame
+	public class AppLandingPage : HitachiBasePage
+	{
+		public AppLandingPage(ObjectContainer OC) : base(OC){
+			this.IFrame = By.XPath("//*[@id='AppLanding']")
+		}
+        public Element GetModuleCard(string title) => Element($"//*[@title='{title}']");
+	}
+	```
+	step definition:
+	```
+	[When(@"user clicks on '([^']*)' Module Card")]
+	public void WhenUserSetsFieldValueTo(string title)
+	{
+		this.AppLandingPage.GetField("searchField").SetFieldValue(title)
+		this.AppLandingPage.GetModuleCard(title).Click();
+	}
+	```
+	**Note: both actions, SetFieldValue and Click will switch to the AppLanding IFrame before making the relevant action**
+
+	>The way it works is that every element can possibly have a relevant IFrame and there is <br>
+	>embeded functionality that attaches the loaded IFrame into every object initialized as part of a given object
+	
+	
 # More Info:
 ## **RunSettings:**
 
