@@ -16,7 +16,7 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 9. Follow either approach from [Running any implementing project](#running-any-implementing-project) (preferably Approach 2)
 >**`Important!` Make sure to set every newly created file to copy to the output directory:** \*Right click file\*-> Properties->Copy to Output Directory=`"Copy Always"`
 
-</br></br>
+<br /><br />
 
 ## **Running any implementing project**
 
@@ -36,8 +36,8 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 >6. Add the feed on step 1 to Visual Studio (Options > NuGet Package Manager > Package Sources, similar to Approach 1->Step 3)
 
 
-</br></br>
-</br></br>
+<br /><br />
+<br /><br />
 
 
 
@@ -75,8 +75,8 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 | SERVICE_BUS_NAMESPACE_URI			| (optional) Service Bus namespace URI 																			|
 
 
-</br></br>
-</br></br>
+<br /><br />
+<br /><br />
 
 # UI Automation:
 ## Locators
@@ -91,7 +91,7 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 		}
 	}
 	```
-	>this will allow you to implement all functions that will be shared across every other page in your project. </br>
+	>this will allow you to implement all functions that will be shared across every other page in your project. <br />
 	>Here's an example of a very powerful function to get just about anyfield in dynamics using its logical name.
 	```
 	 public Element GetField(string fieldLogicalName) => Element("//*[@data-id='customer_name']")
@@ -121,8 +121,8 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 	}
 	```
 
-	>The way it works is by getting the inner html of the provided field and trying all the known xpaths in HitachiQA.Driver.UserActions.KnownXPaths. </br>
-	>Once it finds a match then it looks on the corresponding entry value which is handled by a switch having the implementation for any type of field. </br>
+	>The way it works is by getting the inner html of the provided field and trying all the known xpaths in HitachiQA.Driver.UserActions.KnownXPaths. <br />
+	>Once it finds a match then it looks on the corresponding entry value which is handled by a switch having the implementation for any type of field. <br />
 	>if you need to add a known xpath we recommend adding it directly to the KnownXPaths dictionary along with unit tests for it but here's a quick why of doing it in implementing projects.
 	```
 	//add the following hook(hook) in a class preferably in a hooks folder
@@ -133,7 +133,7 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 	}
 	```
 ## IFrames implicit handling!
-* we recommend creating a class in the Pages package from Locators for each iframe to be handled</br>
+* we recommend creating a class in the Pages package from Locators for each iframe to be handled<br />
   then load the IFrame by providing any of these property values 
   - IFrame (By)
   - IFrameTitle (string)
@@ -159,7 +159,7 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 	```
 	**Note: both actions, SetFieldValue and Click will switch to the AppLanding IFrame before making the relevant action**
 
-	>The way it works is that every element can possibly have a relevant IFrame and there is <br>
+	>The way it works is that every element can possibly have a relevant IFrame and there is <br />
 	>embeded functionality that attaches the loaded IFrame into every object initialized as part of a given object
 	
 	
