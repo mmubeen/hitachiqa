@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HitachiQA.Helpers;
+using HitachiQA.UnitTests.Data;
 using Microsoft.Extensions.Configuration;
 
 namespace HitachiQA.UnitTests.StepDefinitions
@@ -26,36 +27,27 @@ namespace HitachiQA.UnitTests.StepDefinitions
         public void WhenUserGetsTheDataPresentInTheExcelSheet()
         {
             var collection = excelResult;
-            for (int i = 0; i < collection.Count(); i++)
+            if (collection != null)
             {
-                Dictionary<String, String> dict = collection.ElementAt(i);
-                foreach (KeyValuePair<String, String> kvp in dict)
+                for (int i = 0; i < collection.Count(); i++)
                 {
-                    Console.WriteLine("Key: {0}, Value: {1}", kvp.Key, kvp.Value);
-                    keys.Add(kvp.Key);
-                    values.Add(kvp.Value);
+                    Dictionary<String, String> dict = collection.ElementAt(i);
+                    foreach (KeyValuePair<String, String> kvp in dict)
+                    {
+                        Console.WriteLine("Key: {0}, Value: {1}", kvp.Key, kvp.Value);
+                        keys.Add(kvp.Key);
+                        values.Add(kvp.Value);
+                    }
                 }
             }
         }
 
-        [Then(@"User validates the data is parsed correctly")]
+        [Then(@"User validates the data is parsed correctly from the Excel")]
         public void ThenUserValidatesTheDataIsParsedCorrectly()
         {
-            HashSet<String> Inputkeys = new HashSet<String>()
-            {
-                "Country","Capital"
-            };
+            (keys.Intersect(InputData.ExcelInputKeys).Count() == keys.Count).Should().BeTrue();
 
-            HashSet<String> InputValues = new HashSet<String>()
-            {
-                "Canada" ,"Ottawa",
-                "India"  , "Delhi",
-                "USA"    , "Washington DC"
-            };
-
-            (Inputkeys.Intersect(keys).Count() == Inputkeys.Count).Should().BeTrue();
-
-            (InputValues.Intersect(values).Count() == InputValues.Count).Should().BeTrue();
+            (values.Intersect(InputData.ExcelInputValues).Count() == values.Count).Should().BeTrue();
         }
     }
 }
