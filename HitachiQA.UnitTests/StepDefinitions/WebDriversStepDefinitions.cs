@@ -81,14 +81,14 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Given(@"user loads option ""([^""]*)"" into the browser")]
         public void GivenUserLoadsOptionIntoTheBrowser(string option)
         {
-            Main.Configuration["OPTIONS"] = (Main.Configuration["OPTIONS"] + $"; {option}").Trim(';');
+            DriverManager.ChromeOptions = new ChromeOptions();
+            DriverManager.ChromeOptions.AddArgument(option);
         }
 
         [Then(@"""([^""]*)"" should be set to the browser")]
         public void ThenShouldBeSet(string option)
         {
             var js = ObjectContainer.Resolve<JSExecutor>();
-
             switch (option)
             {
                 case "--start-maximized":
