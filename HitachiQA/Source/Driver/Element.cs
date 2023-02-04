@@ -69,9 +69,9 @@ namespace HitachiQA.Driver
             return UserActions.Click(locator, UserActions.ProcessWaitParam(wait_Seconds), optional);
         }
 
-        public bool TryClick(int? wait_Seconds = null)
+        public bool TryClick()
         {
-            return this.Click(UserActions.ProcessWaitParam(wait_Seconds), true); 
+            return UserActions.TryClick(locator);
         }
 
         public string GetAttribute(string attributeName)
@@ -249,6 +249,11 @@ namespace HitachiQA.Driver
         {
            UserActions.SetFieldValue(locator, value);
         }
+        public void GetFieldValue()
+        {
+            UserActions.GetFieldValue(locator);
+        }
+
 
         //
         //  Text Fields Actions
@@ -384,6 +389,10 @@ namespace HitachiQA.Driver
         public void OpenGridRecord(string columnName, string value)
         {
             UserActions.OpenGridRecord(locator, columnName, value); 
+        }
+        public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
+        {
+            UserActions.SortGridColumn(columnName, filterByString, ascendingSort, descendingSort, comparisonOperation); 
         }
     }
 }

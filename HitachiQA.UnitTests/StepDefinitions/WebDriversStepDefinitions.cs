@@ -107,10 +107,5 @@ namespace HitachiQA.UnitTests.StepDefinitions
             ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Dispose();
 
         }
-
-
-
-
-
     }
 }
