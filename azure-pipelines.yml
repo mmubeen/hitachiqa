@@ -20,14 +20,6 @@ variables:
 stages:
   - stage: NugetPush
     jobs:
-      - deployment: InternalArtifactPush
-        displayName: 'Nuget - Publish packages to internal feed'
-        environment: InternalArtifactPush
-        strategy:
-          runOnce:
-            deploy:
-              steps: 
-                - download: none
       - job:
         steps:
         - checkout: none
