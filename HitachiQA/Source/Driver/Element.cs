@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using HitachiQA.Helpers;
 using System.Linq;
 using FluentAssertions;
-using HitachiQA.Driver;
 
 namespace HitachiQA.Driver
 {
@@ -389,6 +388,22 @@ namespace HitachiQA.Driver
         public void OpenGridRecord(string columnName, string value)
         {
             UserActions.OpenGridRecord(locator, columnName, value); 
+        }
+        public void OpenGridRecord(int index)
+        {
+            UserActions.OpenGridRecord(locator, "index", index.ToString());
+        }
+        public void SelectGridRecord(string columnName, string value)
+        {
+            UserActions.SelectGridRecord(locator, columnName, value);
+        }
+        public void SelectGridRecord(int index)
+        {
+            UserActions.SelectGridRecord(locator, "index", index.ToString());
+        }
+        public void SelectAllGridRecords()
+        {
+            this.UserActions.SelectAllGridRecords(locator);
         }
         public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
         {

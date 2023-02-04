@@ -763,6 +763,27 @@ namespace HitachiQA.Driver
             this.WaitForTransaction();
 
         }
+        public void SelectGridRecord(By by, string columnName, string value)
+        {
+            var gridItems = this.GetGridItems(by);
+
+            var matchingRow = gridItems.FirstOrDefault(row => row.TryGetValue(columnName, out var colVal) && colVal == value);
+
+            if (matchingRow == null)
+            {
+                throw new NotFoundException($"Couldn't find row matching {columnName}={value}");
+            }
+
+            var index = matchingRow["index"];
+
+            var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index) + 1} and descendant::*[@aria-colindex=1] ]");
+            this.Click(checkBoxLoc);
+        }
+        public void SelectAllGridRecords(By by)
+        {
+            var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={1} and descendant::*[@aria-colindex=1] ]");
+            this.Click(checkBoxLoc);
+        }
 
         public static Dictionary<string, string> KnownXPaths = new Dictionary<string, string> {
                 { "//select[contains(@data-id, 'option-set-select')]", "dropdown" },
