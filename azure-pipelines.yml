@@ -30,3 +30,4 @@ stages:
             packagesToPush: '**/*.nupkg'
             nuGetFeedType: 'internal'
             publishVstsFeed: 'c2ea9fd3-e9a8-4690-bac9-7c3063ac1e20'
+            arguments: '--skip-duplicate'
