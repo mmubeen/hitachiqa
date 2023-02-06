@@ -50,7 +50,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         }
         public void GridSearch(string input)
         {
-            this.Element("//input[@aria-label='Work Order Filter by keyword']").SetFieldValue(input);
+            this.Element("//input[contains(@aria-label, 'Filter by keyword')]").SetFieldValue(input);
             this.PressEnter();
         }
 
