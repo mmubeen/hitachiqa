@@ -27,6 +27,7 @@ stages:
         - task: DotNetCoreCLI@2
           inputs:
             command: 'push'
-            packagesToPush: '**/*.nupkg'
+            packagesToPush: '**/*.nupkg; !**/*.symbols.nupkg;'
             nuGetFeedType: 'internal'
             publishVstsFeed: 'c2ea9fd3-e9a8-4690-bac9-7c3063ac1e20'
+            arguments: '--skip-duplicate'
