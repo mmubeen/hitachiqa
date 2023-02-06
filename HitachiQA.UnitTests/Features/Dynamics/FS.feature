@@ -18,6 +18,14 @@ Scenario: Get Grid Items
 	And user opens left pane 'Accounts' entity
 	And user should be able to get grid items
 
+Scenario: Get SubGrid Items
+	Given user is signed in to 'Dynamics 365'
+	When user navigates to 'Field Service' app
+	And user opens left pane 'Work Orders' entity
+	And user opens grid record having 'Service Account' equals 'Miguel'
+	And user navigates to 'Products' tab
+	And user should be able to get grid items
+
 Scenario: Navigating and performing various actions
 	Given user is signed in to 'Dynamics 365'
 	When user navigates to 'Dynamics 365 — custom' app

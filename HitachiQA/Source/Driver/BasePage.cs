@@ -65,6 +65,10 @@ namespace HitachiQA.Driver
         {
             UserActions.Navigate(PATH_OR_URL);
         }
+        public void PressEnter()
+        {
+            UserActions.SendKeys(Keys.Enter);
+        }
 
         protected OpenQA.Selenium.By? _iFrame;
         public OpenQA.Selenium.By? IFrame
@@ -75,6 +79,8 @@ namespace HitachiQA.Driver
                     this._iFrame = OpenQA.Selenium.By.XPath($"//iframe[@id='{IFrameId}']");
                 else if (!string.IsNullOrWhiteSpace(IFrameTitle))
                     this._iFrame = OpenQA.Selenium.By.XPath($"//iframe[@title='{IFrameTitle}']");
+                else if (!string.IsNullOrWhiteSpace(IFrameName))
+                    this._iFrame = OpenQA.Selenium.By.XPath($"//iframe[@name='{IFrameName}']");
 
                 return _iFrame;
             }
@@ -82,12 +88,18 @@ namespace HitachiQA.Driver
         }
         public string IFrameTitle;
         public string IFrameId;
+        public string IFrameName;
 
         public List<string> KnownFieldXPaths = new List<string>()
         {
             "//label[text()='{input}']/..",
-            "//button[text()='{input}']"
+            "//button[normalize-space(text())='{input}']",
+            "//*[@data-id='{input}']",
+            "//button[.//*[normalize-space(text())='{input}']]",
+            "//a[@title='{input}']",
+            "//button[@data-id='{input}']",
+            "//*[@aria-label='{input}']"
         };
-        public Element GetField(string displayText) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Select(it=> it.Replace("{input}", displayText)))})");
+        public Element GetField(string displayText_or_logicalName) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Select(it=> it.Replace("{input}", displayText_or_logicalName)))})");
     }
 }

@@ -561,26 +561,81 @@ namespace HitachiQA.Driver
 
         public IEnumerable<Dictionary<String, String>> parseUITable(string datatableXpath)
         {
-            FindElementWaitUntilPresent(By.XPath(datatableXpath));
-            List<String> columnNames = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-header-cell//span[contains(@class,'datatable-header-cell-label')]").Locator).Select(element => element.Text).ToList<String>();
-
-            int rowCount = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-body-row").Locator).Count;
-            for (int rowIndex = 1; rowIndex <= rowCount; rowIndex++)
+            var tableElement = FindElementWaitUntilPresent(By.XPath(datatableXpath));
+            //Mat UI bootstrap table
+            if (this.ElementExists(By.XPath(datatableXpath + "//datatable-header-cell")))
             {
-                var rowDict = new Dictionary<String, String>();
 
-                for (int i = 0; i < columnNames.Count(); i++)
+
+                List<String> columnNames = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-header-cell//span[contains(@class,'datatable-header-cell-label')]").Locator).Select(element => element.Text).ToList<String>();
+
+                int rowCount = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-body-row").Locator).Count;
+                for (int rowIndex = 1; rowIndex <= rowCount; rowIndex++)
                 {
-                    // String cellText = string.Join("", cells[i].FindElements(By.XPath("/descendant::*"))
-                    String cellText = string.Join("", this.WebDriver
-                                                      .FindElements(By.XPath($"(({datatableXpath} //datatable-body-row)[{rowIndex}] //datatable-body-cell)[{i + 1}]/descendant::*").Locator)
-                                                      .Select(child => child.Text).Distinct());
+                    var rowDict = new Dictionary<String, String>();
 
-                    rowDict.Add(columnNames[i], cellText.Trim());
+                    for (int i = 0; i < columnNames.Count(); i++)
+                    {
+                        // String cellText = string.Join("", cells[i].FindElements(By.XPath("/descendant::*"))
+                        String cellText = string.Join("", this.WebDriver
+                                                          .FindElements(By.XPath($"(({datatableXpath} //datatable-body-row)[{rowIndex}] //datatable-body-cell)[{i + 1}]/descendant::*").Locator)
+                                                          .Select(child => child.Text).Distinct());
+
+                        rowDict.Add(columnNames[i], cellText.Trim());
+                    }
+                    yield return rowDict;
                 }
-                yield return rowDict;
+            }
+            else if (this.ElementExists(By.XPath(datatableXpath + "//th")))
+            {
+                var headers = this.GetUITableHeaders(By.XPath(datatableXpath));
+
+                var tableDoc = new HtmlDocument();
+                tableDoc.LoadHtml(tableElement.GetAttribute("innerHTML"));
+                var rowsXPath = "//tr";
+                var dataXPath = "//td";
+                var rows = tableDoc.DocumentNode.SelectNodes(rowsXPath);
+                foreach(var rowNode in rows)
+                {
+                    var rowDict = new Dictionary<string, string>();
+                    var rowHTML = rowNode.InnerHtml;
+                    var rowDoc = new HtmlDocument();
+                    rowDoc.LoadHtml(rowHTML);
+                    var row = rowDoc.DocumentNode;
+                    var cells = row.SelectNodes(dataXPath);
+                    var index = 0;
+                    foreach(var cell in cells)
+                    {
+                        rowDict.Add(headers[index++]?? throw new NullReferenceException(), cell.InnerText);
+                    }
+                    yield return rowDict;
+                }
+            }
+            else
+            {
+                throw new NotImplementedException(datatableXpath);
             }
         }
+        public Dictionary<int, string?> GetUITableHeaders(By table)
+        {
+            Dictionary<int, string?> result = new Dictionary<int, string?>();
+
+            var tableElement = FindElementWaitUntilPresent(table);
+
+            var tableDoc = new HtmlDocument();
+            tableDoc.LoadHtml(tableElement.GetAttribute("innerHTML"));
+            var headersXPath = "//th";
+            var headers = tableDoc.DocumentNode.SelectNodes(headersXPath);
+            var index = 0;
+            foreach (var header in headers)
+            {
+                result.Add(index, header.InnerText.Trim());
+                index++;
+            }
+            return result;
+
+        }
+
 
         private const string HORIZONTAL_SCROLL_BAR = "//div[@class='ag-body-horizontal-scroll'] //div[@ref='eViewport']";
         private object GRID_SCROLL_JS_EXEC(By gridLocator, string command)
@@ -793,7 +848,9 @@ namespace HitachiQA.Driver
                 { "//input[@type='text' and contains(@data-id, 'textInputBox_with_filter')]", "lookup" },
                 { "//*[@role='link' and contains(@id, 'selected_tag')]", "lookup_with_selection" },
                 { "//*[@role='switch']", "switch" },
-                { "//input[@type='text' and following-sibling::*[contains(@data-dyn-bind, 'Lookup')]]", "lookup_with_table" }
+                { "//input[@type='text' and following-sibling::*[contains(@data-dyn-bind, 'Lookup')]]", "lookup_with_table" },
+                { "//following-sibling::*/select", "dropdown"},
+                { "//input[@type='checkbox']", "checkbox" }
             };
 
         public void SetFieldValue(By by, string value) {
@@ -801,7 +858,7 @@ namespace HitachiQA.Driver
 
             var fieldElement = this.FindElementWaitUntilPresent(by);
             var fieldDoc = new HtmlDocument();
-            fieldDoc.LoadHtml(fieldElement.GetAttribute("innerHTML"));
+            fieldDoc.LoadHtml(fieldElement.GetAttribute("outerHTML"));
 
 
             KeyValuePair<string, string> matchingPair = FindKnownXPathMatchingPair(fieldDoc, out HtmlNode? node); 
@@ -809,6 +866,10 @@ namespace HitachiQA.Driver
             matchingPair.NullGuard();
 
             var autoGeneratedLocator = By.XPath($"{by.Locator.Criteria} {matchingPair.Key}", by.IFrameLocator );
+            if (fieldDoc.DocumentNode.SelectSingleNode(autoGeneratedLocator.Locator.Criteria) == null)
+            {
+                autoGeneratedLocator = By.XPath($"{by.Locator.Criteria}", by.IFrameLocator);
+            }
 
             try
             {
@@ -851,7 +912,13 @@ namespace HitachiQA.Driver
                         this.setText(autoGeneratedLocator, value);
                         //index=1 is the header and index=2 is the first row
                         this.Click(By.XPath("//form[contains(@class, 'lookup-popup active-form')]//*[@role='row' and @aria-rowindex='2']"));
-
+                        break;
+                    case "checkbox":
+                        var checkboxVal = parseStrIntoBool(value);
+                        if(checkboxVal != this.GetCheckboxState(autoGeneratedLocator))
+                        {
+                            Click(autoGeneratedLocator);
+                        }
 
                         break;
                     default: throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
@@ -869,7 +936,7 @@ namespace HitachiQA.Driver
 
             var fieldElement = this.FindElementWaitUntilPresent(by);
             var fieldDoc = new HtmlDocument();
-            fieldDoc.LoadHtml(fieldElement.GetAttribute("innerHTML"));
+            fieldDoc.LoadHtml(fieldElement.GetAttribute("outerHTML"));
 
 
             KeyValuePair<string, string> matchingPair = FindKnownXPathMatchingPair(fieldDoc, out HtmlNode? node);
@@ -877,6 +944,10 @@ namespace HitachiQA.Driver
             matchingPair.NullGuard();
 
             var autoGeneratedLocator = By.XPath($"{by.Locator.Criteria} {matchingPair.Key}", by.IFrameLocator);
+            if (fieldDoc.DocumentNode.SelectSingleNode(autoGeneratedLocator.Locator.Criteria) == null)
+            {
+                autoGeneratedLocator = By.XPath($"{by.Locator.Criteria}", by.IFrameLocator);
+            }
             String fieldValue = null;
             switch (matchingPair.Value)
             {
@@ -914,6 +985,9 @@ namespace HitachiQA.Driver
                     var currentValContainer = By.XPath($"{autoGeneratedLocator.Locator.Criteria} //*[contains(@class, 'mat-select-value')]//*[text()]", autoGeneratedLocator.IFrameLocator);
                     fieldValue = FindElementWaitUntilVisible(currentValContainer).Text;
                     break;
+                case "checkbox":
+                    fieldValue = this.GetCheckboxState(autoGeneratedLocator).ToString();
+                    break;
                 default: throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
             }
 
@@ -922,6 +996,59 @@ namespace HitachiQA.Driver
                 throw new Exception($"error while getting field value of field located by {by.Locator}");
             }
             return fieldValue;
+        }
+        public List<string> GetFieldOptions(By by)
+        {
+            this.WaitForTransaction();
+
+            var fieldElement = this.FindElementWaitUntilPresent(by);
+            var fieldDoc = new HtmlDocument();
+            fieldDoc.LoadHtml(fieldElement.GetAttribute("outerHTML"));
+
+
+            KeyValuePair<string, string> matchingPair = FindKnownXPathMatchingPair(fieldDoc, out HtmlNode? node);
+
+            matchingPair.NullGuard();
+
+            var autoGeneratedLocator = By.XPath($"{by.Locator.Criteria} {matchingPair.Key}", by.IFrameLocator);
+
+            if(fieldDoc.DocumentNode.SelectSingleNode(autoGeneratedLocator.Locator.Criteria)==null)
+            {
+                autoGeneratedLocator = By.XPath($"{by.Locator.Criteria}", by.IFrameLocator);
+            }
+
+            List<string> options = null;
+            switch (matchingPair.Value)
+            {
+                case "dropdown":
+                    options = GetDropdownOptionsText(autoGeneratedLocator);
+                    break;
+                case "textfield_autocomplete":
+                    throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+                    break;
+                case "mat-autocomplete":
+                    throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+                    break;
+                case "lookup_with_selection":
+                    throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+                    break;
+                case "lookup":
+                    throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+                    break;
+                case "lookup_with_table":
+                    throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+                    break;
+                case "mat-select":
+                    options = this.GetAllMatDropdownOptions(autoGeneratedLocator).ToList();
+                    break;
+                default: throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+            }
+
+            if (options == null)
+            {
+                throw new Exception($"error while getting field value of field located by {by.Locator}");
+            }
+            return options;
         }
 
         public string GetSelectedDropdownValue(By selectLocator)
@@ -1012,6 +1139,12 @@ namespace HitachiQA.Driver
 
             FindElementWaitUntilPresent(optionXPath).Click();
             
+        }
+        public List<string> GetDropdownOptionsText(By selectLocator) {
+            var element = this.FindElementWaitUntilPresent(selectLocator);
+            var select = new SelectElement(element);
+            return select.Options.Select(it => it.Text).ToList();
+
         }
         public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
         {
@@ -1380,6 +1513,11 @@ namespace HitachiQA.Driver
             var element = this.FindElementWaitUntilPresent(locator);
             this.WebDriver.Hover(element);
 
+        }
+        public void SendKeys(string key)
+        {
+            Actions action = new Actions(WebDriver);
+            action.SendKeys(Keys.Enter).Build().Perform();
         }
 
 

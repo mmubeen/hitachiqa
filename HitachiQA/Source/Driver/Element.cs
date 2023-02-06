@@ -53,6 +53,7 @@ namespace HitachiQA.Driver
         //  General Element Actions
         //
 
+        public void ElementExists() => UserActions.ElementExists(locator);
         public void Click()
         {
             UserActions.Click(locator);
@@ -79,6 +80,8 @@ namespace HitachiQA.Driver
         }
 
         public bool IsDisabled => UserActions.GetIsDisabled(locator);
+
+        public string Text => GetElementText();
 
         public string GetElementText()
         {
@@ -248,9 +251,9 @@ namespace HitachiQA.Driver
         {
            UserActions.SetFieldValue(locator, value);
         }
-        public void GetFieldValue()
+        public string GetFieldValue()
         {
-            UserActions.GetFieldValue(locator);
+            return UserActions.GetFieldValue(locator);
         }
 
 
@@ -407,7 +410,8 @@ namespace HitachiQA.Driver
         }
         public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
         {
-            UserActions.SortGridColumn(columnName, filterByString, ascendingSort, descendingSort, comparisonOperation); 
+            this.UserActions.SortGridColumn(columnName, filterByString, ascendingSort, descendingSort, comparisonOperation); 
         }
+
     }
 }

@@ -40,10 +40,21 @@ namespace HitachiQA.Dynamics.FS.Pages
 
         public Element Grid => Element("( //div[contains(@id, '-pcf_grid_control_container')] //*[@data-id='grid-container']  | //*[@data-id='data-set-body-container' and //*[@class='wj-cells'] ] )");
 
-        public Element GetGrid(string sectionName) => Element($"//section[@aria-label='{sectionName}' and {Grid.locator.Locator.Criteria}] ");
+        public Element GetGrid(string gridName_or_logicalName) => Element($"//*[ (@aria-label='{gridName_or_logicalName}' or @data-control-name='{gridName_or_logicalName}') and {Grid.locator.Locator.Criteria}] ");
+
+        public Element GetGridCommandBarButton(string gridName_or_logicalName, string displayName) => Element($"{this.GetGrid(gridName_or_logicalName).locator.Locator} {this.GetField(displayName).locator.Locator}");
+        public void SaveForm()
+        {
+            this.GetCommandBarButton("Save").Click();
+            this.Element("//span[text()='Saving...']").assertElementIsPresent();
+        }
+        public void GridSearch(string input)
+        {
+            this.Element("//input[@aria-label='Work Order Filter by keyword']").SetFieldValue(input);
+            this.PressEnter();
+        }
+
     }
-
-
     public class GlobalCommandBar : BasePage
     {
         public GlobalCommandBar(ObjectContainer ObjectContainer) : base(ObjectContainer) { }
