@@ -31,20 +31,20 @@ namespace HitachiQA.Driver
         {
             return this.locator.ToString();
         }
-        
+
         public string Xpath
         {
             get
             {
                 string loc = locator.ToString();
-                if(loc.Contains("By.XPath:"))
+                if (loc.Contains("By.XPath:"))
                 {
                     return loc.Substring(10);
                 }
                 else
                 {
                     throw Functions.handleFailure(new NotImplementedException($"Locator string [{loc}] xpath conversion not built"));
-                }     
+                }
             }
         }
 
@@ -53,7 +53,7 @@ namespace HitachiQA.Driver
         //  General Element Actions
         //
 
-        public void ElementExists() => UserActions.ElementExists(locator);
+        public bool ElementExists() => UserActions.ElementExists(locator);
         public void Click()
         {
             UserActions.Click(locator);
@@ -64,7 +64,7 @@ namespace HitachiQA.Driver
             UserActions.DoubleClick(locator);
         }
 
-        public bool Click(int? wait_Seconds = null, bool optional =false)
+        public bool Click(int? wait_Seconds = null, bool optional = false)
         {
             return UserActions.Click(locator, UserActions.ProcessWaitParam(wait_Seconds), optional);
         }
@@ -208,16 +208,16 @@ namespace HitachiQA.Driver
             return false;
         }
 
-        public bool AssertRadioButtonState(bool state, bool optional=false)
+        public bool AssertRadioButtonState(bool state, bool optional = false)
         {
             bool isSelected = this.IsRadioButtonSelected();
             if (optional)
             {
-                return (state == isSelected )? true : false;
+                return (state == isSelected) ? true : false;
             }
             else if (state != isSelected)
             {
-                throw Functions.handleFailure($"Radio Button state did not match expected {state} \n {this}");                      
+                throw Functions.handleFailure($"Radio Button state did not match expected {state} \n {this}");
             }
             else
             {
@@ -243,17 +243,21 @@ namespace HitachiQA.Driver
                     break;
                 default:
                     Functions.handleFailure(new NotImplementedException($"Field type: {fieldType} is not implemented"));
-                    break; 
+                    break;
             }
         }
 
         public void SetFieldValue(string value)
         {
-           UserActions.SetFieldValue(locator, value);
+            UserActions.SetFieldValue(locator, value);
         }
         public string GetFieldValue()
         {
             return UserActions.GetFieldValue(locator);
+        }
+        public List<string> GetFieldOptions()
+        {
+            return UserActions.GetFieldOptions(locator);
         }
 
 
