@@ -90,7 +90,7 @@ namespace HitachiQA.Driver
         public string IFrameId;
         public string IFrameName;
 
-        public List<string> KnownFieldXPaths = new List<string>()
+        public static List<string> KnownFieldXPaths = new List<string>()
         {
             "//label[text()='{input}']/..",
             "//button[normalize-space(text())='{input}']",
@@ -100,6 +100,39 @@ namespace HitachiQA.Driver
             "//button[@data-id='{input}']",
             "//*[@aria-label='{input}']"
         };
+        public static List<string> KnownParents = new List<string>()
+        {
+            "//*[@id='jd-page-{input}']",
+            
+        };
         public Element GetField(string displayText_or_logicalName) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Select(it=> it.Replace("{input}", displayText_or_logicalName)))})");
+
+        public Element GetField(string parentDisplayText_or_logicalName, string displayText_or_logicalName)
+        {
+            List<string> finalXPaths = new List<string>();
+            var xpaths = KnownFieldXPaths.Select(it => it.Replace("{input}", displayText_or_logicalName));
+
+            foreach(var childXPath in xpaths)
+            {
+                var possibleParents = KnownParents.Select(it => it.Replace("{input}", parentDisplayText_or_logicalName));
+                finalXPaths.AddRange(possibleParents.Select(parentXPath => parentXPath + childXPath));
+            }
+
+            return Element(string.Join(" | ", finalXPaths));
+        }
+        public Element GetField(By parent, string fieldDisplayText_or_logicalName)
+        {
+           
+            List<string> finalXPaths = new List<string>();
+            var xpaths = KnownFieldXPaths.Select(it => it.Replace("{input}", fieldDisplayText_or_logicalName));
+
+            foreach(var childXPath in xpaths)
+            {
+                finalXPaths.Add(parent.Locator.Criteria + childXPath);
+            }
+
+            return Element(string.Join(" | ", finalXPaths));
+        }
+
     }
 }

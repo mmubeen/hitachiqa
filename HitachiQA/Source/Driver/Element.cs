@@ -396,17 +396,17 @@ namespace HitachiQA.Driver
         {
             UserActions.OpenGridRecord(locator, columnName, value); 
         }
-        public void OpenGridRecord(int index)
+        public void OpenGridRecord(int LogicalIndex)
         {
-            UserActions.OpenGridRecord(locator, "index", index.ToString());
+            UserActions.OpenGridRecord(locator, "index", (LogicalIndex+1).ToString());
         }
         public void SelectGridRecord(string columnName, string value)
         {
             UserActions.SelectGridRecord(locator, columnName, value);
         }
-        public void SelectGridRecord(int index)
+        public void SelectGridRecord(int LogicalIndex)
         {
-            UserActions.SelectGridRecord(locator, "index", index.ToString());
+            UserActions.SelectGridRecord(locator, "index", (LogicalIndex + 1).ToString());
         }
         public void SelectAllGridRecords()
         {

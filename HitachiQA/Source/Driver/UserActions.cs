@@ -56,15 +56,14 @@ namespace HitachiQA.Driver
         public int ProcessWaitParam(int? wait) => (int)(wait == null ? DEFAULT_WAIT_SECONDS : wait);
 
 
-        public void waitForPageLoad()
+        public void waitForPageLoad(OpenQA.Selenium.By? iframe=null)
         {
             if (!string.IsNullOrWhiteSpace(LOADING_SCREEN_XPATH))
             {
-                By locator = By.XPath(LOADING_SCREEN_XPATH);
+                By locator = By.XPath(LOADING_SCREEN_XPATH,  iframe);
                 //this is optional
                 try
                 {
-                    FindElementWaitUntilVisible(locator, 1);
                     WaitForElementToDisappear(locator, 120);
                 }
                 catch (Exception)
@@ -114,7 +113,7 @@ namespace HitachiQA.Driver
 
         public string getElementText(By ElementLocator, int? wait_Seconds = null)
         {
-            var textField = FindElementWaitUntilVisible(ElementLocator, ProcessWaitParam(wait_Seconds));
+            var textField = FindElementWaitUntilPresent(ElementLocator, ProcessWaitParam(wait_Seconds));
             return textField.Text.Trim();
         }
 
@@ -134,19 +133,23 @@ namespace HitachiQA.Driver
                 }
                 catch (ElementClickInterceptedException)
                 {
-                    waitForPageLoad();
-
+                    waitForPageLoad(ElementLocator.IFrameLocator);
+                    WaitForTransaction();
+                    Thread.Sleep(1000);
                     FindElementWaitUntilClickable(ElementLocator, ProcessWaitParam(wait_Seconds)).Click();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw ex;
+                    throw;
                 }
             }
             catch (Exception ex)
             {
-                Functions.handleFailure($"Locator: {ElementLocator}", ex, optional);
-                return false;
+                if(optional)
+                {
+                    return false;
+                }
+                throw new Exception($"Locator: {ElementLocator}", ex);
             }
             return true;
         }
@@ -202,15 +205,12 @@ namespace HitachiQA.Driver
 
         private void switchToIFrame(By by)
         {
-            if (by.IFrameLocator == null)
-            {
-                this.WebDriver.SwitchTo().DefaultContent();
-            }
-            else
+            this.WebDriver.SwitchTo().DefaultContent();
+
+            if (by.IFrameLocator != null)
             {
                 var frameElement = this.FindElementWaitUntilPresent(by.IFrameLocator);
                 this.WebDriver.SwitchTo().Frame(frameElement);
-
             }
 
         }
@@ -355,11 +355,30 @@ namespace HitachiQA.Driver
             WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
             IWebElement target;
 
+            try
+            {
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
+                ScrollIntoView(target);
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
+                ScrollIntoView(target);
 
-            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
-            ScrollIntoView(target);
-            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
-            ScrollIntoView(target);
+            }
+            catch (StaleElementReferenceException)
+            {
+                Thread.Sleep(2000);
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
+                ScrollIntoView(target);
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
+                ScrollIntoView(target);
+            }
+            catch (ElementClickInterceptedException)
+            {
+                Thread.Sleep(2000);
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
+                ScrollIntoView(target);
+                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
+                ScrollIntoView(target);
+            }
 
             if (HIGHLIGHT_ON)
             {
@@ -647,7 +666,7 @@ namespace HitachiQA.Driver
 
         private object GRID_SCROLL_LEFT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(-400, 0);");
         private object GRID_SCROLL_ALL_RIGHT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(12000, 0);");
-        private object GRID_QUERY_HOW_MUCH_UNTIL_RESET(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollLeft;");
+        private object GRID_QUERY_HOW_MUCH_UNTIL_RESET(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "return arguments[0].scrollLeft;");
 
        
 
@@ -798,6 +817,7 @@ namespace HitachiQA.Driver
 
         public void OpenGridRecord(By by, string columnName, string value)
         {
+            this.WaitForTransaction();
             var gridItems = this.GetGridItems(by);
 
             var matchingRow = gridItems.FirstOrDefault(row=> row.TryGetValue(columnName, out var colVal) && colVal == value);
@@ -844,13 +864,15 @@ namespace HitachiQA.Driver
                 { "//select[contains(@data-id, 'option-set-select')]", "dropdown" },
                 { "//input[@type='text' and contains(@data-id, 'text-box-text')]", "textfield" },
                 { "//input[@type='text' and contains(@data-id, 'text-input')]", "textfield" },
+                { "//input[@type='text' and contains(@data-id, 'quickFind_text')]", "textfield" },
                 { "//textarea[@type='text' and @aria-autocomplete='list'] ", "textfield_autocomplete" },
                 { "//input[@type='text' and contains(@data-id, 'textInputBox_with_filter')]", "lookup" },
                 { "//*[@role='link' and contains(@id, 'selected_tag')]", "lookup_with_selection" },
                 { "//*[@role='switch']", "switch" },
                 { "//input[@type='text' and following-sibling::*[contains(@data-dyn-bind, 'Lookup')]]", "lookup_with_table" },
                 { "//following-sibling::*/select", "dropdown"},
-                { "//input[@type='checkbox']", "checkbox" }
+                { "//input[@type='checkbox']", "checkbox" },
+                { "//select[@class='form-control']", "dropdown"}
             };
 
         public void SetFieldValue(By by, string value) {
@@ -1133,11 +1155,11 @@ namespace HitachiQA.Driver
 
         public void SelectDropdownValue(By selectLocator, string optionText)
         {
-            FindElementWaitUntilClickable(selectLocator).Click();
+            Click(selectLocator);
 
             var optionXPath = By.XPath(selectLocator.Locator.Criteria + $"//option[text()='{optionText}']", selectLocator.IFrameLocator);
 
-            FindElementWaitUntilPresent(optionXPath).Click();
+            Click(optionXPath);
             
         }
         public List<string> GetDropdownOptionsText(By selectLocator) {
@@ -1499,7 +1521,7 @@ namespace HitachiQA.Driver
         public bool TryClick(By locator)
         {
 
-            if (this.ElementExists(locator, out IWebElement? element))
+            if (this.ElementExists(locator, out IWebElement? element) && element.Displayed && element.Enabled)
             {
                 element.NullGuard();
                 element.Click();

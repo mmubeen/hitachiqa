@@ -18,7 +18,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         {
             this.GlobalCommandBar = ObjectContainer.Resolve<GlobalCommandBar>();
 
-            this.KnownFieldXPaths.Add("//*[@data-id='{input}']");
+            BasePage.KnownFieldXPaths.Add("//*[@data-id='{input}']");
         }
 
         public new Element GetField(string DisplayText_Or_LogicalName)
