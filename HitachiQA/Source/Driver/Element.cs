@@ -259,7 +259,25 @@ namespace HitachiQA.Driver
         {
             return UserActions.GetFieldOptions(locator);
         }
-
+        public void OpenFieldValue()
+        {
+            UserActions.OpenFieldValue(locator);
+        }
+        public void AssertFieldIsReadOnly()
+        {
+            new Element(By.XPath(this.locator.Locator.Criteria+"//*[contains(@data-id,'locked-icon')]", this.locator.IFrameLocator), UserActions).assertElementIsPresent();
+        }
+        public void AssertFieldIsNotReadOnly()
+        {
+            //
+            //because we need to add a condition, the xpath on this field might not end with ]. 
+            //so we add //*[(self::<xpath>)] around xpath 
+            //allowing it to end with a condition so we can attach the 2nd condition
+            //
+            var non_readonlyFieldXPath = $"//*[(self::{this.locator.Locator.Criteria.Substring(2)})][not(.//*[contains(@data-id,'locked-icon')])]";
+            
+            new Element(By.XPath(non_readonlyFieldXPath, this.locator.IFrameLocator), UserActions).assertElementIsPresent();
+        }
 
         //
         //  Text Fields Actions
@@ -380,7 +398,7 @@ namespace HitachiQA.Driver
 
         public IEnumerable<Dictionary<String, String>> parseUITable()
         {
-            return UserActions.parseUITable(this.Xpath);
+            return UserActions.parseUITable(locator);
         }
 
         public List<Dictionary<String, String?>> GetGridItems()
@@ -415,6 +433,11 @@ namespace HitachiQA.Driver
         public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
         {
             this.UserActions.SortGridColumn(columnName, filterByString, ascendingSort, descendingSort, comparisonOperation); 
+        }
+
+        public void UploadFile(string filePath)
+        {
+            UserActions.UploadFile(locator, filePath);
         }
 
     }

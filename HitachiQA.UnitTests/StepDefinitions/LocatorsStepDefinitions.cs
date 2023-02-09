@@ -54,7 +54,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             {
                 var fieldDoc = new HtmlDocument();
                 fieldDoc.LoadHtml(knownHTML);
-                KeyValuePair<string, string> matchingPair = UserActions.FindKnownXPathMatchingPair(fieldDoc, out _);
+                KeyValuePair<string, string> matchingPair = UserActions.FindKnownXPathMatchingPair(fieldDoc, out _, By.XPath("unit test placeholder"));
 
                 matchingPairs.Add(matchingPair);
             }

@@ -69,18 +69,23 @@ namespace HitachiQA.Driver
         {
             UserActions.SendKeys(Keys.Enter);
         }
+        public void WaitForPage_And_Transactions()
+        {
+            this.UserActions.WaitForTransaction();
+            this.UserActions.waitForPageLoad(_iFrame);
+        }
 
-        protected OpenQA.Selenium.By? _iFrame;
-        public OpenQA.Selenium.By? IFrame
+        protected By? _iFrame;
+        public By? IFrame
         {
             get
             {
                 if (!string.IsNullOrWhiteSpace(IFrameId))
-                    this._iFrame = OpenQA.Selenium.By.XPath($"//iframe[@id='{IFrameId}']");
+                    this._iFrame = By.XPath($"//iframe[@id='{IFrameId}']");
                 else if (!string.IsNullOrWhiteSpace(IFrameTitle))
-                    this._iFrame = OpenQA.Selenium.By.XPath($"//iframe[@title='{IFrameTitle}']");
+                    this._iFrame = By.XPath($"//iframe[@title='{IFrameTitle}']");
                 else if (!string.IsNullOrWhiteSpace(IFrameName))
-                    this._iFrame = OpenQA.Selenium.By.XPath($"//iframe[@name='{IFrameName}']");
+                    this._iFrame = By.XPath($"//iframe[@name='{IFrameName}']");
 
                 return _iFrame;
             }
@@ -96,16 +101,19 @@ namespace HitachiQA.Driver
             "//button[normalize-space(text())='{input}']",
             "//*[@data-id='{input}']",
             "//button[.//*[normalize-space(text())='{input}']]",
+            "//a[.//*[normalize-space(text())='{input}']]",
+            "//a[normalize-space(text())='{input}']",
             "//a[@title='{input}']",
             "//button[@data-id='{input}']",
-            "//*[@aria-label='{input}']"
+            "//*[@aria-label='{input}']",
+            "//li[@title='{input}']",
+            "//td[@data-hslcolumnname='{input}']"
         };
         public static List<string> KnownParents = new List<string>()
         {
-            "//*[@id='jd-page-{input}']",
-            
+            "//*[@id='jd-page-{input}']"
         };
-        public Element GetField(string displayText_or_logicalName) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Select(it=> it.Replace("{input}", displayText_or_logicalName)))})");
+        public Element GetField(string displayText_or_logicalName) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Distinct().Select(it=> it.Replace("{input}", displayText_or_logicalName)))}) /self::*[not(contains(@style,'display: none'))]");
 
         public Element GetField(string parentDisplayText_or_logicalName, string displayText_or_logicalName)
         {

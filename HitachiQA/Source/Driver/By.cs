@@ -10,14 +10,14 @@ namespace HitachiQA.Driver
 {
     public class By
     {
-        public seleniumBy? IFrameLocator;
+        public By? IFrameLocator;
         public seleniumBy Locator;
 
         public By(seleniumBy locator)
         {
             this.Locator = locator;
         }
-        public By(seleniumBy locator, seleniumBy? iframe) : this(locator)
+        public By(seleniumBy locator, By? iframe) : this(locator)
         {
             this.IFrameLocator = iframe;
         }
@@ -25,15 +25,15 @@ namespace HitachiQA.Driver
         {
             return new By(seleniumBy.XPath(xpathToFind));
         }
-        public static By XPath(string xpathToFind, seleniumBy? iFrameLocator)
+        public static By XPath(string xpathToFind, By? iFrameLocator)
         {
             return new By(seleniumBy.XPath(xpathToFind), iFrameLocator);
         }
-        public static By XPath(seleniumBy locatorToFind, seleniumBy? iFrameLocator)
+        public static By XPath(seleniumBy locatorToFind, By? iFrameLocator)
         {
             return new By(locatorToFind, iFrameLocator);
         }
-        public static By Id(string idToFind, seleniumBy? iFrameLocator)
+        public static By Id(string idToFind, By? iFrameLocator)
         {
             return new By(seleniumBy.XPath(idToFind), iFrameLocator);
         }
