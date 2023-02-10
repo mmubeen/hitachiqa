@@ -85,9 +85,9 @@ namespace HitachiQA.Dynamics.FS.Pages
             }
         }
 
-         public Element GridViewSelector => Element($"//*[contains(@id,'ViewSelector') and contains(@id,'button')]");
+         public Element GridViewSelector => Element($"//*[contains(@id,'ViewSelector') and contains(@id,'button')] | //button[contains(@id,'ViewSelector')]");
 
-        public Element GridViewSelection(string displayText) => Element($"//*[contains(@id,'ViewSelector')]//*[@aria-label='{displayText}']");
+        public Element GridViewSelection(string displayText) => Element($"//*[contains(@id,'ViewSelector')]//*[@aria-label='{displayText}'] | //button[.//*[text()='{displayText}']]");
 
         public void SelectGridView(string displayText)
         {

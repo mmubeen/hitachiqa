@@ -16,11 +16,13 @@ namespace HitachiQA.Dynamics.FS.Pages
             base.IFrameId = iFrameId;
         }
 
-        public Element GetEditButton(int index) => Element($"(//a[@title='Edit'])[{index+1}]");
-        public Element GetOpenButton(int index) => Element($"(//a[@title='Open'])[{index+1}]");
+        public Element GetEditButton(int index) => Element($"(//a[@title='Edit'])[{(index==-1?"last()":index+1)}]");
+        public Element GetOpenButton(int index) => Element($"(//a[@title='Open'])[{(index==-1?"last()":index+1)}]");
+        public Element GetDeleteButton(int index) => Element($"(//a[@title='Delete'])[{(index==-1?"last()":index+1)}]");
+
         public Element SaveRecordButton => Element($"(//td//a[@role='button'])[1]");
 
-        public void SelectRecord(int index) => Element($"(//td//input[@type='checkbox'])[{index}]");
+        public void SelectRecord(int index) => Element($"(//td//input[@type='checkbox'])[{(index==-1?"last()":index+1)}]");
 
         public void SelectRecord(string columnDisplayName, string value)
         {

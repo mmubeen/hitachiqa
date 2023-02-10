@@ -68,14 +68,27 @@ namespace HitachiQA.Hooks
         [AfterScenario(Order =9999)]
         public static void driverCleanup(ObjectContainer oc)
         {
-            if (!oc.Resolve<BrowserIndicator>().isNoBrowserFeature && Severity.parseLevel(oc.Resolve<IConfiguration>().GetSection("Logging").GetSection("LogLevel")["Default"]) != Severity.DEBUG)
+
+            //if no browser feature, return
+            if (oc.Resolve<BrowserIndicator>().isNoBrowserFeature)
+            {
+                return;
+            }
+            Severity currentLogSev;
+            try
+            {
+                currentLogSev = Severity.parseLevel(oc.Resolve<IConfiguration>().GetSection("Logging").GetSection("LogLevel")["Default"]);
+                if (currentLogSev == Severity.DEBUG)
+                {
+                    return;
+                }
+            }
+            finally
             {
                 oc.Resolve<IWebDriver>().Dispose();
             }
+
         }
-        
-
-
 
         [BeforeScenario("newWindow", Order = 1)]
         public static void pre_NewWindow()

@@ -142,5 +142,14 @@ namespace HitachiQA.Driver
             return Element(string.Join(" | ", finalXPaths));
         }
 
+        public void AcceptBrowserAlert()
+        {
+            GetBrowserAlert().Accept();
+        }
+        public IAlert GetBrowserAlert()
+        {
+            return UserActions.GetBrowserAlert();
+        }
+
     }
 }

@@ -531,7 +531,7 @@ namespace HitachiQA.Driver
 
         public bool GetCheckboxState(By CheckBoxInputLocator)
         {
-            var CheckboxInput = FindElementWaitUntilVisible(CheckBoxInputLocator);
+            var CheckboxInput = FindElementWaitUntilPresent(CheckBoxInputLocator);
 
             return CheckboxInput.Selected;
         }
@@ -628,10 +628,9 @@ namespace HitachiQA.Driver
                 var dataXPath = "//td";
                 
               
-                if(!this.ElementExists(By.XPath(datatable.Locator.Criteria + rowsXPath+ $"[count(self::*)>{(headers.Count==1? 0:1)}]", datatable.IFrameLocator)))
+                if(this.FindElementsWaitUntilPresent(By.XPath($"({datatable.Locator.Criteria} {rowsXPath})[1] {dataXPath}", datatable.IFrameLocator)).Count==1 && headers.Count!=1 )
                 {
                     yield return headers.ToDictionary(it=> !string.IsNullOrEmpty(it.Value) ? it.Value : it.Key.ToString(), it=> "");
-                    
                 }
                 else
                 {
@@ -658,8 +657,10 @@ namespace HitachiQA.Driver
                             }
                             var children = cell.ChildNodes.Select(it=> it.InnerText.Trim()).ToList();
                             children.Add(cell.InnerText.Trim());
+                            var cellText = string.Join("", children.Distinct())?? "";
+                            cellText = System.Web.HttpUtility.HtmlDecode(cellText);
 
-                            rowDict.Add(header, string.Join("", children.Distinct()));
+                            rowDict.Add(header, cellText);
                             cellIndex++;
                         }
                         rowIndex++;
@@ -684,7 +685,7 @@ namespace HitachiQA.Driver
             tableDoc.LoadHtml(tableElement.GetAttribute("innerHTML"));
             var headersXPath = "//th[text()]/..//th";
             var headers = tableDoc.DocumentNode.SelectNodes(headersXPath);
-            if(headers.Count==0)
+            if(headers==null || headers.Count==0)
             {
                headers = tableDoc.DocumentNode.SelectNodes("//th");
             }
@@ -694,7 +695,10 @@ namespace HitachiQA.Driver
                 var children = header.ChildNodes.Select(it=> it.InnerText.Trim()).ToList();
                 children.Add(header.InnerText.Trim());
                 
-                result.Add(index, string.Join("", children.Distinct()));
+                var cellText = string.Join("", children.Distinct())?? "";
+                cellText = System.Web.HttpUtility.HtmlDecode(cellText);
+
+                result.Add(index, cellText);
                 index++;
             }
             return result;
@@ -749,6 +753,7 @@ namespace HitachiQA.Driver
                         rowDoc.LoadHtml(header.InnerHtml);
 
                         displayText = rowDoc.DocumentNode.SelectSingleNode("//*[@title]")?.InnerText;
+                        displayText = System.Web.HttpUtility.HtmlDecode(displayText??"");
                     }
 
 
@@ -838,7 +843,7 @@ namespace HitachiQA.Driver
 
                             if (cellNode != null)
                             {
-                                cellValue = cellNode.GetAttributeValue(attr, null);
+                                cellValue = cellNode.GetAttributeValue(attr, "");
                                 break;
                             }
 
@@ -847,6 +852,7 @@ namespace HitachiQA.Driver
                      
                         if (rowDict.GetValueOrDefault(headerName) == null || !string.IsNullOrWhiteSpace(cellValue))
                         {
+                            cellValue = System.Web.HttpUtility.HtmlDecode(cellValue??"");
                             rowDict[headerName] = cellValue;
                         }
                         
@@ -922,17 +928,20 @@ namespace HitachiQA.Driver
                 { "//input[@type='text' and following-sibling::*[contains(@data-dyn-bind, 'Lookup')]]", "lookup_with_table" },
                 { "//following-sibling::*/select", "dropdown"},
                 { "//input[@type='checkbox']", "checkbox" },
-                { "//select[contains(@class, 'form-control')]", "dropdown"},
-                { "//input[contains(@class, 'form-control')]", "textfield"},
                 { "//input[contains(@class, 'editable-lookup') and following-sibling::*[.//*[@class='fa fa-search']]]", "lookup_with_dialog"},
-                { "//*[contains(@data-id, 'fieldControl-datetime') and .//input[contains(@data-id,'date-time')]  and .//input[contains(@aria-label, 'Time of')]   ]", "datetime_input"},
+                { "//*[contains(@data-id, 'fieldControl-datetime') and .//input[contains(@data-id,'date-time')]  and .//input[contains(@aria-label, 'Time of')]   ]", "datepicker"},
                 { "//td[@data-hslcolumnname][.//input[@type='text'] and .//input[@type='submit']]", "effective_grid_lookup"},
                 { "//textarea[not(@type) and not(@aria-autocomplete)]", "textfield"},
                 { "//input[@data-role='numerictextbox']", "numerictextbox"},
-                { "//input[@type='text' and contains(@data-bind,'currency')]", "textfield"}
+                { "//input[@type='text' and contains(@data-bind,'currency')]", "textfield"},
+                { "//div[@role='combobox']", "combobox"},
+                { "//*[contains(@id, 'DatePicker')]", "datepicker"},
+                { "//select", "dropdown"},
+                { "//input", "textfield"},
             };
 
         public void SetFieldValue(By by, string value) {
+            this.waitForPageLoad(by.IFrameLocator);
             this.WaitForTransaction();
 
             var fieldElement = this.FindElementWaitUntilPresent(by);
@@ -999,7 +1008,7 @@ namespace HitachiQA.Driver
                         var checkboxVal = parseStrIntoBool(value);
                         if(checkboxVal != this.GetCheckboxState(autoGeneratedLocator))
                         {
-                            Click(autoGeneratedLocator);
+                            this.FindElementWaitUntilPresent(autoGeneratedLocator).Click();
                         }
                         break;
                     case "effective_grid_lookup":
@@ -1020,7 +1029,64 @@ namespace HitachiQA.Driver
                         numericTextBox.SendKeys(value);
                         // this.JSExecutor.execute($"arguments[0].value={value}", numericTextBox);
                         break;
+                    case "combobox":
+                        this.Click(autoGeneratedLocator);
+                        var targetOption = By.XPath($"//button[contains(@class,'dropdownItem') and .//*[text()='{value}']]");
+                        this.Click(targetOption);
+                        break;
+                    case "datepicker":
+
+                        //
+                        //Date
+                        //
+                        var targetDate = DateTime.Parse(value);
+                        this.Click(autoGeneratedLocator);
+                        var datePickerXPath = "//*[contains(@id, 'DatePicker-Callout')]";
+                        //
+                        //possible display fomats on currentItemButton 
+                        //February 2023  
+                        //2023
+                        //2020-2031
+                        //
+                        var currentItemButtonXPath = $"{datePickerXPath} //button[contains(@class,'currentItemButton') or contains(@aria-label, 'Year picker')]";
+                        var initialMonthYear = this.FindElementWaitUntilPresent(By.XPath(currentItemButtonXPath+"/span")).Text;
+                        
+                        if(!initialMonthYear.EndsWith(targetDate.Year.ToString()))
+                        {
+                            this.Click(By.XPath(currentItemButtonXPath));
+                            this.Click(By.XPath(currentItemButtonXPath));
+                            var yearRange = this.FindElementWaitUntilPresent(By.XPath(currentItemButtonXPath+"/span")).Text;
+                            string[] years = yearRange.Split('-');
+                            int startYear = int.Parse(years[0].Trim());
+                            int endYear = int.Parse(years[1].Trim());
+                            if(targetDate.Year>=startYear && targetDate.Year <= endYear)
+                            {
+                                this.Click(By.XPath($"{datePickerXPath}//button[text()='{targetDate.Year}']"));
+                            }
+                            else
+                            {
+                                throw new NotImplementedException("date picker for selecting year out of range needs to be implemented");
+                            }
+                            this.Click(By.XPath($"{datePickerXPath}//button[@aria-label='{targetDate.ToString("MMMM")}']"));
+                        }
+                        else if(!initialMonthYear.StartsWith(targetDate.ToString("MMMM")))
+                        {
+                            this.Click(By.XPath(currentItemButtonXPath));
+                            this.Click(By.XPath($"{datePickerXPath}//button[@aria-label='{targetDate.ToString("MMMM")}']"));
+                        }   
+                        
+                        this.Click(By.XPath($"{datePickerXPath}//td[.//*[@aria-label='{targetDate.Day}, {targetDate.ToString("MMMM")}, {targetDate.Year}']]"));
+
+                        Thread.Sleep(800);
+                        //
+                        //Time
+                        //
+
+                        this.setText(By.XPath($"({by.Locator.Criteria})//input[contains(@aria-label,'Time')]", by.IFrameLocator), targetDate.ToString("hh:mm tt"));
+
+                        break;
                     default: throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
+                    
                 }
             }
             catch(Exception ex)
@@ -1053,7 +1119,7 @@ namespace HitachiQA.Driver
             switch (matchingPair.Value)
             {
                 case "dropdown":
-                    fieldValue = GetSelectedDropdownValue(by);
+                    fieldValue = GetSelectedDropdownValue(autoGeneratedLocator);
                     break;
                 case "textfield_autocomplete":
                     fieldValue = this.getTextFieldText(autoGeneratedLocator);
@@ -1214,11 +1280,11 @@ namespace HitachiQA.Driver
 
         public string GetSelectedDropdownValue(By selectLocator)
         {
-            FindElementWaitUntilClickable(selectLocator).Click();
+            var element = FindElementWaitUntilPresent(selectLocator);
+            return new SelectElement(element).SelectedOption.Text;
+            // var optionXPath = By.XPath(selectLocator.Locator.Criteria + $"//option[@selected]", selectLocator.IFrameLocator);
 
-            var optionXPath = By.XPath(selectLocator.Locator.Criteria + $"//option[@selected]", selectLocator.IFrameLocator);
-
-            return FindElementWaitUntilPresent(optionXPath).Text;
+            // return FindElementWaitUntilPresent(optionXPath).Text;
 
         }
 
@@ -1296,13 +1362,25 @@ namespace HitachiQA.Driver
 
         public void SelectDropdownValue(By selectLocator, string optionText)
         {
+            var retry = Policy.Handle<Exception>()
+            .WaitAndRetry(new[]
+                    {
+                    TimeSpan.FromSeconds(3),
+                    TimeSpan.FromSeconds(5),
+                    }
+                );
+
             var select = new SelectElement(FindElementWaitUntilPresent(selectLocator));
-            select.SelectByText(optionText);
-            if(select.SelectedOption.Text != optionText)
-            {
-                Thread.Sleep(2000);
+            retry.Execute(()=>{
+
                 select.SelectByText(optionText);
-            }
+                if(select.SelectedOption.Text != optionText)
+                {
+                    Thread.Sleep(2000);
+                    select.SelectByText(optionText);
+                }
+            });
+           
             
         }
         public List<string> GetDropdownOptionsText(By selectLocator) {
@@ -1731,6 +1809,13 @@ namespace HitachiQA.Driver
 
             input.SendKeys(filePath);
         }
+
+        public IAlert GetBrowserAlert()
+        {
+            return this.WebDriver.SwitchTo().Alert();
+        }
+
+
 
 
 
