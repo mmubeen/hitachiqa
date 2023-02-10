@@ -13,7 +13,7 @@ parameters:
     values:
     - Biberk_MA_ServiceConnection
     - CPI_SV_ServiceConnection
-
+    - Deere_MA_ServiceConnection
 
 jobs:
   - job: 
