@@ -107,7 +107,8 @@ namespace HitachiQA.Driver
             "//button[@data-id='{input}']",
             "//*[@aria-label='{input}']",
             "//li[@title='{input}']",
-            "//td[@data-hslcolumnname='{input}']"
+            "//td[@data-hslcolumnname='{input}']",
+            "//button[@id='{input}']"
         };
         public static List<string> KnownParents = new List<string>()
         {

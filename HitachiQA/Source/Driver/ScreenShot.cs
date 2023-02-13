@@ -64,21 +64,25 @@ namespace HitachiQA
                     screenshot.SaveAsFile(screenshotFilePath, ScreenshotImageFormat.Png);
                     
                     var screenshotBitMap = (Bitmap)Image.FromFile(screenshotFilePath);
+                    try{
+                        var resultBitMap = new Bitmap(screenshotBitMap.Width, screenshotBitMap.Height + 30);
 
-                    var resultBitMap = new Bitmap(screenshotBitMap.Width, screenshotBitMap.Height + 30);
+                        using (Graphics g = Graphics.FromImage(resultBitMap))
+                        {
+                            g.DrawString(Driver.Url, new Font("Arial", 15), Brushes.Red, new PointF(0, 0));
+                            g.DrawImageUnscaled(screenshotBitMap, 0, 30);
 
-                    using (Graphics g = Graphics.FromImage(resultBitMap))
-                    {
-                        g.DrawString(Driver.Url, new Font("Arial", 20), Brushes.Red, new PointF(0, 0));
-                        g.DrawImageUnscaled(screenshotBitMap, 0, 30);
+                        }
+                        screenshotBitMap.Dispose();
+                        File.Delete(screenshotFilePath);
 
+                        resultBitMap.Save(screenshotFilePath, ImageFormat.Png);
+                        resultBitMap.Dispose();
                     }
-                    screenshotBitMap.Dispose();
-                    File.Delete(screenshotFilePath);
-
-                    resultBitMap.Save(screenshotFilePath, ImageFormat.Png);
-                    resultBitMap.Dispose();
-
+                    catch(Exception ex)
+                    {
+                        Log.Warn($"error writing url in screenshot\n {ex.Message} \n{ex.StackTrace}");
+                    }
                     Console.WriteLine($"\nScreenshot: {new Uri(screenshotFilePath)}\n");
                     this.TestContext.AddResultFile(screenshotFilePath);
 

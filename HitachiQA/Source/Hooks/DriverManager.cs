@@ -60,7 +60,14 @@ namespace HitachiQA.Hooks
         {
             if (!BrowserIndicator.isNoBrowserFeature && SC.TestError != null)
             {
-               this.ObjectContainer.Resolve<ScreenShot>().Error();
+                try{
+                    this.ObjectContainer.Resolve<ScreenShot>().Error();
+
+                }
+                catch(Exception ex)
+                {
+                    Log.Warn($"error taking screenshot\n {ex.Message} \n{ex.StackTrace}");
+                }
             }
         }
 
