@@ -377,6 +377,8 @@ namespace HitachiQA.Driver
             {
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
                 ScrollIntoView(target);
+                var action = new Actions(this.WebDriver);
+                action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
                 ScrollIntoView(target);
 
@@ -386,6 +388,8 @@ namespace HitachiQA.Driver
                 Thread.Sleep(2000);
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
                 ScrollIntoView(target);
+                var action = new Actions(this.WebDriver);
+                action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
                 ScrollIntoView(target);
             }
@@ -394,6 +398,8 @@ namespace HitachiQA.Driver
                 Thread.Sleep(2000);
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
                 ScrollIntoView(target);
+                var action = new Actions(this.WebDriver);
+                action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
                 ScrollIntoView(target);
             }

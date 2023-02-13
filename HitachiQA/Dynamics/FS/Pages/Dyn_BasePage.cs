@@ -78,10 +78,12 @@ namespace HitachiQA.Dynamics.FS.Pages
         public void CreateLookupFieldRecord(string DisplayText_Or_LogicalName, Table inputs)
         {
             var field = this.GetField(DisplayText_Or_LogicalName);
-            this.Element(field.locator.Locator.Criteria+"//*[@class='fa fa-search']").Click();
+            this.Element(field.locator.Locator.Criteria+ "//*[@class='fa fa-search' or self::button[contains(@aria-label, 'Lookup')]]").Click();
+            Thread.Sleep(500);
+            this.Element("//button[contains(@id,'addNewBtn')]").TryClick();
             foreach(var row in inputs.Rows)
             {
-                this.GetField(row["FieldName"]).SetFieldValue(row["Value"]);
+                this.QuickCreateTab.GetField(row["FieldName"]).SetFieldValue(row["Value"]);
             }
         }
 

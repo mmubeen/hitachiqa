@@ -63,12 +63,14 @@ namespace HitachiQA
 
                     screenshot.SaveAsFile(screenshotFilePath, ScreenshotImageFormat.Png);
                     
-                    var screenshotBitMap = (Bitmap)Image.FromFile(screenshotFilePath);
+                    
                     try{
+                        var screenshotBitMap = (Bitmap)Image.FromFile(screenshotFilePath);
                         var resultBitMap = new Bitmap(screenshotBitMap.Width, screenshotBitMap.Height + 30);
 
                         using (Graphics g = Graphics.FromImage(resultBitMap))
                         {
+                            
                             g.DrawString(Driver.Url, new Font("Arial", 15), Brushes.Red, new PointF(0, 0));
                             g.DrawImageUnscaled(screenshotBitMap, 0, 30);
 
