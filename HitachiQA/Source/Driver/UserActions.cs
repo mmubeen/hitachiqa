@@ -380,7 +380,6 @@ namespace HitachiQA.Driver
                 var action = new Actions(this.WebDriver);
                 action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
-                ScrollIntoView(target);
 
             }
             catch (StaleElementReferenceException)
@@ -391,7 +390,6 @@ namespace HitachiQA.Driver
                 var action = new Actions(this.WebDriver);
                 action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
-                ScrollIntoView(target);
             }
             catch (ElementClickInterceptedException)
             {
@@ -401,7 +399,6 @@ namespace HitachiQA.Driver
                 var action = new Actions(this.WebDriver);
                 action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
-                ScrollIntoView(target);
             }
 
             if (HIGHLIGHT_ON)
@@ -918,7 +915,6 @@ namespace HitachiQA.Driver
             var index = matchingRow["index"];
 
             var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index) + 1} and descendant::*[@aria-colindex=1] ]//i[contains(@data-icon-name, 'Check')]/..");
-            this.Hover(checkBoxLoc);
             this.Click(checkBoxLoc);
         }
         public void SelectAllGridRecords(By by)
@@ -1775,13 +1771,6 @@ namespace HitachiQA.Driver
                 return true;
             }
             return false;        
-        }
-        public void Hover(By locator)
-        {
-            this.switchToIFrame(locator);
-            var element = this.FindElementWaitUntilPresent(locator);
-            this.WebDriver.Hover(element);
-
         }
         public void SendKeys(string key)
         {
