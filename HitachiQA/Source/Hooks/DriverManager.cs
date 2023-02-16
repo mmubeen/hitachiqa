@@ -142,6 +142,7 @@ namespace HitachiQA.Hooks
                         ChromeOptions = new ChromeOptions();
                         ChromeOptions.AddArgument("--start-maximized");
                         ChromeOptions.AddArgument("--no-sandbox"); // Bypass OS security model
+                        ChromeOptions.AddArgument("--disable-dev-shm-usage");
                         ChromeOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
                         ChromeOptions.AddArguments(optionsList);
                     }
@@ -155,6 +156,7 @@ namespace HitachiQA.Hooks
                     {
                         FirefoxOptions = new FirefoxOptions();
                         FirefoxOptions.AddArgument("--no-sandbox");
+                        FirefoxOptions.AddArgument("--start-maximized");
                         FirefoxOptions.AddArguments(optionsList);
                     }
 
@@ -167,6 +169,7 @@ namespace HitachiQA.Hooks
                     {
                         EdgeOptions = new EdgeOptions();
                         EdgeOptions.AddArgument("--no-sandbox");
+                        EdgeOptions.AddArgument("--start-maximized");
                         EdgeOptions.AddArguments(optionsList);
                     }
 
