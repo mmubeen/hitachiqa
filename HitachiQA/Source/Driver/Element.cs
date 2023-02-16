@@ -430,9 +430,9 @@ namespace HitachiQA.Driver
         {
             this.UserActions.SelectAllGridRecords(locator);
         }
-        public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
+        public void SortGridColumn(string columnName, string filterByString = "", bool descendingSort = false, string comparisonOperation = "")
         {
-            this.UserActions.SortGridColumn(columnName, filterByString, ascendingSort, descendingSort, comparisonOperation); 
+            this.UserActions.SortGridColumn(locator, columnName, filterByString, descendingSort, comparisonOperation); 
         }
 
         public void UploadFile(string filePath)

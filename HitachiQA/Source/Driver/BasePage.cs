@@ -110,6 +110,7 @@ namespace HitachiQA.Driver
             "//td[@data-hslcolumnname='{input}']",
             "//button[@id='{input}']",
             "//button[@title='{input}']",
+            "//label[normalize-space(text())='{input}']/following-sibling::input"
         };
         public static List<string> KnownParents = new List<string>()
         {

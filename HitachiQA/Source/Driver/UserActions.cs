@@ -247,7 +247,7 @@ namespace HitachiQA.Driver
 
             try
             {
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
+                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
                 
             }
             catch (StaleElementReferenceException)
@@ -399,6 +399,7 @@ namespace HitachiQA.Driver
                 var action = new Actions(this.WebDriver);
                 action.MoveToElement(target).Build().Perform();
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
+                
             }
 
             if (HIGHLIGHT_ON)
@@ -549,7 +550,7 @@ namespace HitachiQA.Driver
 
         public void ScrollIntoView(IWebElement element)
         {
-            JSExecutor.execute($"arguments[0].scrollIntoView();", element);
+            JSExecutor.execute($"arguments[0].scrollIntoViewIfNeeded();", element);
         }
 
         public void ScrollToBottom()
@@ -922,7 +923,72 @@ namespace HitachiQA.Driver
             var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex=1 and descendant::*[@aria-colindex=1] ]//i[contains(@data-icon-name, 'Check')]/..");
             this.Click(checkBoxLoc);
         }
+        public void SortGridColumn(By by, string columnName, string filterByString = "", bool descendingSort = false, string comparisonOperation = "")
+        {
+            this.WaitForTransaction();
 
+            string gridCellXPath = $"//*[@role='columnheader']";
+            var columnIndex=-1;
+            GRID_SCROLL_ALL_RIGHT_COMMAND(by);
+            do
+            {
+                var gridElement = this.FindElementWaitUntilPresent(by);
+                var gridDoc = new HtmlDocument();
+                gridDoc.LoadHtml(gridElement.GetAttribute("innerHTML"));
+
+                var headers = gridDoc.DocumentNode.SelectNodes(gridCellXPath);
+
+                foreach (var header in headers)
+                {
+                    var index = int.Parse(header.GetAttributeValue("aria-colindex", null));
+                    var displayText = header.GetAttributeValue("title", null);
+
+                    //PCF grids have title in a child node
+                    if (displayText == null)
+                    {
+                        var rowDoc = new HtmlDocument();
+                        rowDoc.LoadHtml(header.InnerHtml);
+
+                        displayText = rowDoc.DocumentNode.SelectSingleNode("//*[@title]")?.InnerText;
+                        displayText = System.Web.HttpUtility.HtmlDecode(displayText??"");
+                    }
+
+                    if(columnName==displayText)
+                    {
+                        columnIndex = index;
+                    }
+                    
+                }
+
+                GRID_SCROLL_LEFT_COMMAND(by);
+            }
+            while (Convert.ToDouble(GRID_QUERY_HOW_MUCH_UNTIL_RESET(by)) != 0 && columnIndex==-1);
+
+            var columnLocator = By.XPath(by.Locator.Criteria+$"//*[@aria-colindex='{columnIndex}' and contains(@class,'header')]//*[@role='button']", by.IFrameLocator);
+            var ascendingButton = By.XPath("//ul[contains(@class,'ContextualMenu-list is-open')]//li//button[@name='Sort A to Z']", by.IFrameLocator);                        
+            var descendingButton = By.XPath("//ul[contains(@class,'ContextualMenu-list is-open')]//li//button[@name='Sort Z to A']", by.IFrameLocator);
+            var filterByButton = By.XPath("//ul[contains(@class,'ContextualMenu-list is-open')]//li//button[@name='Filter by']", by.IFrameLocator);
+            var comparisorOperatorDropdown = By.XPath("//*[contains(@class,'calloutMain')] //div[contains(@id,'Dropdown')]", by.IFrameLocator);
+            var comparisonOperatorButton = By.XPath($"//*[contains(@class,'calloutMain')]//button[.//*[text()='{(comparisonOperation==""?"Equals": comparisonOperation)}']]");
+            var applyButon = By.XPath("//button[.//*[text()='Apply']]", by.IFrameLocator);
+            
+            Click(columnLocator);
+            Click(filterByButton);
+            Click(comparisorOperatorDropdown);
+            Click(comparisonOperatorButton);
+
+            this.SetFieldValue(By.XPath("//*[contains(@class,'calloutMain')]//*[contains(@class,'operatorsDropdownContainer')]/following-sibling::*[1]", by.IFrameLocator), filterByString);
+
+            Click(applyButon);
+
+
+            Click(columnLocator);
+            if(descendingSort)
+                Click(descendingButton);
+            else
+                Click(ascendingButton);
+
+        }
         public static Dictionary<string, string> KnownXPaths = new Dictionary<string, string> {
                 { "//select[contains(@data-id, 'option-set-select')]", "dropdown" },
                 { "//input[@type='text' and contains(@data-id, 'text-box-text')]", "textfield" },
@@ -936,16 +1002,18 @@ namespace HitachiQA.Driver
                 { "//following-sibling::*/select", "dropdown"},
                 { "//input[@type='checkbox']", "checkbox" },
                 { "//input[contains(@class, 'editable-lookup') and following-sibling::*[.//*[@class='fa fa-search']]]", "lookup_with_dialog"},
-                //{ "//*[contains(@data-id, 'fieldControl-datetime') and .//input[contains(@data-id,'date-time')]  and .//input[contains(@aria-label, 'Time of')]]", "datepicker"},
                 { "//td[@data-hslcolumnname][.//input[@type='text'] and .//input[@type='submit']]", "effective_grid_lookup"},
                 { "//textarea[not(@type) and not(@aria-autocomplete)]", "textfield"},
                 { "//input[@data-role='numerictextbox']", "numerictextbox"},
                 { "//input[@type='text' and contains(@data-bind,'currency')]", "textfield"},
                 { "//div[@role='combobox']", "combobox"},
-                { "//*[contains(@id, 'DatePicker')]", "datepicker"},
+                { "//*[contains(@class,'enumValuesDropdown')]//*[@role='combobox']", "enum_combobox"},
+                { "//input[@role='combobox' and not(contains(@id, 'DatePicker'))]", "input_with_combobox"},
+                { "//self::*[.//*[contains(@id, 'DatePicker')]]", "datepicker"},
                 { "//div[contains(@class,'ms-TextField is-disabled')]//button", "textfieldreadonly"},
+                { "//input[@data-role='dropdownlist']/../..", "dropdown_listbox" },
                 { "//select", "dropdown"},
-                { "//input", "textfield"},
+                { "//input", "textfield"}
             };
 
         public void SetFieldValue(By by, string value) {
@@ -1012,11 +1080,11 @@ namespace HitachiQA.Driver
                         if(checkboxVal != this.GetCheckboxState(autoGeneratedLocator))
                         {
                             try{
-                                this.FindElementWaitUntilPresent(autoGeneratedLocator).Click();
+                                Click(autoGeneratedLocator);
                             }
                             catch(ElementClickInterceptedException)
                             {
-                                this.FindElementWaitUntilPresent(By.XPath(autoGeneratedLocator.Locator.Criteria+"/..", autoGeneratedLocator.IFrameLocator)).Click();
+                                Click(By.XPath(autoGeneratedLocator.Locator.Criteria+"/..", autoGeneratedLocator.IFrameLocator));
                             }
                             
                         }
@@ -1062,6 +1130,19 @@ namespace HitachiQA.Driver
                         }
 
                         break;
+                    case "dropdown_listbox":
+                        this.Click(autoGeneratedLocator);
+                        this.Click(By.XPath($"//div[@data-role='popup' and contains(@style,'display: block')]//li[normalize-space()='{value}']", autoGeneratedLocator.IFrameLocator));
+                        break;
+                    case "input_with_combobox":
+                        this.setText(autoGeneratedLocator, value);
+                        this.Click(By.XPath("//*[contains(@class,'suggestions')]//button", autoGeneratedLocator.IFrameLocator));
+                        break;
+                    case "enum_combobox":
+                        this.Click(autoGeneratedLocator);
+                        var option = By.XPath($"//*[contains(@class,'calloutMain')] //input[@type='checkbox' and @title='{value}']/..", autoGeneratedLocator.IFrameLocator);
+                        this.Click(option);
+                        break;
                     default: throw new NotImplementedException($"Method for field type {matchingPair.Value} has not been implemented");
                     
                 }
@@ -1076,7 +1157,7 @@ namespace HitachiQA.Driver
 
         private void SetDatePickerValue(By autoGeneratedLocator, DateTime targetDate)
         {
-            this.Click(autoGeneratedLocator);
+            this.Click(By.XPath($"({autoGeneratedLocator.Locator.Criteria}//input)[1]"));
             var datePickerXPath = "//*[contains(@id, 'DatePicker-Callout')]";
             //
             //possible display fomats on currentItemButton 
@@ -1180,15 +1261,10 @@ namespace HitachiQA.Driver
                     fieldValue = this.GetCheckboxState(autoGeneratedLocator).ToString();
                     break;
                 case "datepicker":
-                    var date = this.getTextFieldText(By.XPath($"({autoGeneratedLocator.Locator.Criteria}//input)[1]",autoGeneratedLocator.IFrameLocator));
-                    var timeElement = By.XPath($"({autoGeneratedLocator.Locator.Criteria}//input)[2]",autoGeneratedLocator.IFrameLocator);
-                    var time = "";
-                    if(ElementExists(timeElement))
-                    {
-                        time = this.getTextFieldText(timeElement);
-                    }
-                    var dateTime = DateTime.Parse(date+" "+time);
-                    fieldValue = dateTime.ToString("O");
+                    fieldValue = GetDatePickerFieldValue(autoGeneratedLocator);
+                    break;
+                case "input_with_combobox":
+                    fieldValue = this.getTextFieldText(autoGeneratedLocator);
                     break;
                 case "textfieldreadonly":
                     fieldValue = this.getTextFieldText(autoGeneratedLocator);
@@ -1201,6 +1277,18 @@ namespace HitachiQA.Driver
                 throw new Exception($"error while getting field value of field located by {by.Locator}");
             }
             return fieldValue;
+        }
+        private string GetDatePickerFieldValue(By autoGeneratedLocator)
+        {
+            var date = this.getTextFieldText(By.XPath($"({autoGeneratedLocator.Locator.Criteria}//input)[1]",autoGeneratedLocator.IFrameLocator));
+            var timeElement = By.XPath($"({autoGeneratedLocator.Locator.Criteria}//input)[2]",autoGeneratedLocator.IFrameLocator);
+            var time = "";
+            if(ElementExists(timeElement))
+            {
+                time = this.getTextFieldText(timeElement);
+            }
+            var dateTime = DateTime.Parse(date+" "+time);
+            return dateTime.ToString("O");
         }
         public List<string> GetFieldOptions(By by)
         {
@@ -1351,7 +1439,7 @@ namespace HitachiQA.Driver
             var autoGeneratedLocator = By.XPath($"({by.Locator.Criteria}) {matchingPair.Key}", by.IFrameLocator );
             if (!this.ElementExists(autoGeneratedLocator))
             {
-                autoGeneratedLocator = By.XPath($"{by.Locator.Criteria}", by.IFrameLocator);
+                autoGeneratedLocator = By.XPath($"({by.Locator.Criteria})", by.IFrameLocator);
             }
             return autoGeneratedLocator;
         }
@@ -1411,336 +1499,7 @@ namespace HitachiQA.Driver
             return select.Options.Select(it => it.Text).ToList();
 
         }
-        public void SortGridColumn(string columnName, string filterByString = "", bool ascendingSort = false, bool descendingSort = false, string comparisonOperation = "")
-        {
-            // IDs
-            string homepageGridID = "entity_control-pcf_grid_control_container";
 
-            // XPath
-            string scrollBarScrollScript = "document.querySelectorAll(\"[id='entity_control-pcf_grid_control_container'] div[class='ag-body-horizontal-scroll'] div[ref='eViewport']\")[0].scrollBy(500, 0);";
-            string scrollBarResetScript = "document.querySelectorAll(\"[id='entity_control-pcf_grid_control_container'] div[class='ag-body-horizontal-scroll'] div[ref='eViewport']\")[0].scrollBy(-5000, 0);";
-            string columnDropDownSelectorXpath = $"//div[contains(@class,'headerTextContainer')]//label[@title='{columnName}']//ancestor::div[@aria-haspopup]//i[@data-icon-name='ChevronDownSmall']";
-            string sortMenuCallOutXpath = "//div[contains(@class,'ContextualMenu-Callout')]";
-            string ascendingSortButtonXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort A to Z']";
-            string descendingSortButtonXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort Z to A']";
-            string ascendingSortButtonNumberXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort smaller to larger']";
-            string descendingSortButtonNumberXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort larger to smaller']";
-            string ascendingSortButtonDateXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort older to newer']";
-            string descendingSortButtonDateXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort newer to older']";
-            string ascendingSortButtonBooleanXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort ascending']";
-            string descendingSortButtonBooleanXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Sort descending']";
-            string filterBySortButtonXpath = "//div[contains(@class,'ContextualMenu-Callout')]//li//button[@name='Filter by']";
-            string progressIndicatorXpath = "//div[@id='progressIndicatorContainer']";
-            string filterByFlyOutContainerXpath = "//div[contains(@class,'ms-Callout')]//div[@role='alertdialog']";
-            string filterByOperatorsContainerXpath = "//div[contains(@class,'operatorsDropdownContainer')]//span";
-            string filterByOperatorsContainerFilledXpath = $"//div[contains(@class,'operatorsDropdownContainer')]//span[text()='{comparisonOperation}']";
-            string operatorDropdownListXpath = $"//div[contains(@class,'dropdownItemsWrapper')]//div[contains(@aria-label,'Filter by operator')]//span[text()='{comparisonOperation}']";
-            string filterByValueInputXpath = "//input[@aria-label='Filter by value' or @aria-label='Filter by Value']";
-            string filterByValueInputInteractedXpath = $"//input[@aria-label='Filter by Value' and @value='{filterByString}']";
-            string applyButtonXpath = "//div[contains(@class,'ms-Callout')]//form//button[@type='submit']";
-            string filterByContainerXpath = "//h3[text()='Filter By']";
-            string unfocusedOperatorsContainerXpath = "//div[contains(@class,'operatorsDropdownContainer')]//following-sibling::div//div[not(contains(@class,'is-active'))]";
-            string picklistSuggestionsContainerXpath = "//div[contains(@class,'Callout')]//div[contains(@class,'valuesTagPicker')]//div[contains(@class,'SelectionZone')]//input";
-            string picklistRequestedSuggestionContainerXpath = $"//div[contains(@class,'ms-Suggestions')]//div[text()='{filterByString}']";
-            string picklistRequestedSuggestionSelectedXpath = "//span[contains(@id,'selected-items')]//span[contains(@class,'TagItem')]";
-            string suggestionContainerInputElementXpath = "//div[@class='ms-SelectionZone']//input[@aria-label='Filter by value']";
-            string optionSetSuggestionsContainerXpath = "//div[contains(@class,'enumValuesDropdownContainer')]//div[@aria-label='Filter by value']//span[contains(@class,'caretDown')]";
-            string optionSetRequestedSuggestionContainerXpath = $"//div[contains(@class,'Callout')]//div[@role='listbox' and @aria-label='Filter by value']//span[text()='{filterByString}']";
-            string optionSetRequestedSuggestionSelectedXpath = $"//div[contains(@class,'Callout')]//div[@role='listbox' and @aria-label='Filter by value']//span[text()='{filterByString}']//parent::label//preceding-sibling::input[@aria-selected='true']";
-            string textboxSuggestionContainerXpath = "//div[contains(@class,'Callout')]//div[contains(@class,'textInputContainer')]";
-            string textboxRequestedContainerXpath = "//div[contains(@class,'Callout')]//div[contains(@class,'textInputContainer')]//input";
-            string textboxRequestedSuggestionSelectedXpath = $"//div[contains(@class,'Callout')]//div[contains(@class,'textInputContainer')]//input[@value='{filterByString}']";
-            string dateFieldFilterContainerXpath = "//div[contains(@class,'Callout')]//div[contains(@class,'datePickerContainer')]";
-            string dateFieldFilterOpenCalendarButtonXpath = "//div[contains(@class,'Callout')]//div[contains(@class,'datePickerContainer')]//i[@data-icon-name='Calendar']";
-            string datePickerCalloutContainerXpath = "//div[contains(@id,'DatePicker-Callout')]";
-            // Requested Date must be in the following format: 'Day, Month, Year'
-            string datePickerRequestedSuggestionXpath = $"//div[contains(@id,'DatePicker-Callout')]//button[@aria-label='[FILTERBYSTRING]']";
-            string previousYearButtonXpath = "//div[contains(@class,'monthPicker')]//button[contains(@class,'navigationButton') and contains(@title,'Previous')]";
-            string nextYearButtonXpath = "//div[contains(@class,'monthPicker')]//button[contains(@class,'navigationButton') and contains(@title,'Next')]";
-            string currentDateElementXpath = "//div[contains(@class,'monthPicker')]//button[contains(@class,'currentItemButton')]";
-            string currentMonthElementXpath = "//div[contains(@class,'monthAndYear')]//span";
-            string requestedMonthButtonXpath = "//div[contains(@class,'monthPicker')]//button[@aria-label='[DATE]']";
-            string datePickerRequestedSuggestionSelectedXpath = "//div[contains(@class,'DatePicker')]//input[@value!='']";
-            string selectedSortItemsXpath = $"//span[contains(@id,'selected-items')]//span[contains(@aria-label,'{filterByString}')]";
-
-            var digits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-            bool scrolled = false;
-
-            try
-            {
-                try
-                {
-                    this.FindElementWaitUntilPresent(By.Id(homepageGridID));
-                }
-                catch(Exception ex)
-                {
-                    throw new Exception(". Failed to locate the homepage grid to sort columns.", ex);
-                }
-                var columnDropDownSelector = this.FindElementsWaitUntilPresent(By.XPath(columnDropDownSelectorXpath)).FirstOrDefault();
-                if (columnDropDownSelector != null)
-                {
-                    //might need to fix scroll if this fails
-                    this.Click(By.XPath(columnDropDownSelectorXpath));
-                   
-                }
-                // if column is not visible, scroll to the column
-                else
-                {
-                    while (!columnDropDownSelector.IsClickable())
-                    {
-                        this.JSExecutor.execute(scrollBarScrollScript);
-                        this.WaitForTransaction();
-                        columnDropDownSelector = this.FindElementsWaitUntilPresent(By.XPath(columnDropDownSelectorXpath)).FirstOrDefault();
-                    }
-                    columnDropDownSelector.Click();
-                    scrolled = true;
-                }
-
-                this.FindElementsWaitUntilPresent(By.XPath(sortMenuCallOutXpath));
-
-                if (ascendingSort)
-                {
-                    if (this.ElementExists(By.XPath(ascendingSortButtonXpath)))
-                        this.Click(By.XPath(ascendingSortButtonXpath));
-                    else if (this.ElementExists(By.XPath(ascendingSortButtonNumberXpath)))
-                        this.Click(By.XPath(ascendingSortButtonNumberXpath));
-                    else if (this.ElementExists(By.XPath(ascendingSortButtonDateXpath)))
-                        this.Click(By.XPath(ascendingSortButtonDateXpath));
-                    else if (this.ElementExists(By.XPath(ascendingSortButtonBooleanXpath)))
-                        this.Click(By.XPath(ascendingSortButtonBooleanXpath));
-                    this.WaitForTransaction();
-                    this.WaitForElementToDisappear(By.XPath(progressIndicatorXpath));
-                }
-                else if (descendingSort)
-                {
-                    if (this.ElementExists(By.XPath(descendingSortButtonXpath)))
-                        this.Click(By.XPath(descendingSortButtonXpath));
-                    else if (this.ElementExists(By.XPath(descendingSortButtonNumberXpath)))
-                        this.Click(By.XPath(descendingSortButtonNumberXpath));
-                    else if (this.ElementExists(By.XPath(descendingSortButtonDateXpath)))
-                        this.Click(By.XPath(descendingSortButtonDateXpath));
-                    else if (this.ElementExists(By.XPath(descendingSortButtonBooleanXpath)))
-                        this.Click(By.XPath(descendingSortButtonBooleanXpath));
-                    this.WaitForTransaction();
-                    this.WaitForElementToDisappear(By.XPath(progressIndicatorXpath));
-                }
-                else if (comparisonOperation != string.Empty && filterByString == string.Empty)
-                {
-                    this.TryClick(By.XPath(filterBySortButtonXpath));
-                    this.FindElementWaitUntilVisible(By.XPath(filterByFlyOutContainerXpath));
-
-                    this.TryClick(By.XPath(filterByContainerXpath));
-                    this.FindElementWaitUntilVisible(By.XPath(unfocusedOperatorsContainerXpath));
-
-                    this.TryClick(By.XPath(filterByOperatorsContainerXpath));
-                    this.FindElementWaitUntilVisible(By.XPath(operatorDropdownListXpath));
-
-                    this.TryClick(By.XPath(operatorDropdownListXpath));
-                    this.FindElementWaitUntilVisible(By.XPath(filterByOperatorsContainerFilledXpath));
-
-
-                    this.TryClick(By.XPath(applyButtonXpath));
-                    this.WaitForTransaction();
-                    this.WaitForElementToDisappear(By.XPath(progressIndicatorXpath));
-
-                    if (scrolled)
-                        this.JSExecutor.execute(scrollBarResetScript);
-                }
-                else if (filterByString != string.Empty)
-                {
-
-                    this.TryClick(By.XPath(filterBySortButtonXpath));
-                    this.FindElementWaitUntilVisible(By.XPath(filterByFlyOutContainerXpath));
-
-                    // Determine what type of control we're using
-                    if (this.ElementExists(By.XPath(picklistSuggestionsContainerXpath)))
-                    {
-                        // PickList Grid Control
-                        if (this.ElementExists(By.XPath(picklistSuggestionsContainerXpath), out var suggestionsContainer))
-                        {
-                            suggestionsContainer.NullGuard();
-                            this.WebDriver.Hover(suggestionsContainer);
-                            this.WaitForTransaction();
-                            suggestionsContainer.Click();
-                            //might need to add 2 second wait here for picklistRequestedSuggestionContainerXpath
-                            if (this.ElementExists(By.XPath(picklistRequestedSuggestionContainerXpath), out var picklistRequestedSuggestionContainer))
-                            {
-                                picklistRequestedSuggestionContainer.NullGuard();
-                                this.setText(By.XPath(suggestionContainerInputElementXpath), filterByString);
-                                this.WaitForTransaction();
-                            }
-
-                            try
-                            {
-                                this.TryClick(By.XPath(picklistRequestedSuggestionContainerXpath));
-                                this.FindElementWaitUntilVisible(By.XPath(picklistRequestedSuggestionSelectedXpath));
-
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new Exception($". Failed to find the requested suggestion '{filterByString}' in picklist container.", ex);
-                            }
-                           
-                        }
-                        else
-                        {
-                            this.TryClick(By.XPath(filterByValueInputXpath));
-                            this.FindElementWaitUntilVisible(By.XPath(filterByValueInputInteractedXpath));
-
-
-                            this.TryClick(By.XPath(filterByContainerXpath));
-                            this.FindElementWaitUntilVisible(By.XPath(unfocusedOperatorsContainerXpath));
-                        }
-                    }
-                    else if (this.ElementExists(By.XPath(optionSetSuggestionsContainerXpath)))
-                    {
-                        // OptionSet Grid Control
-                        if (this.ElementExists(By.XPath(optionSetSuggestionsContainerXpath), out var suggestionsContainer))
-                        {
-                            suggestionsContainer.NullGuard();
-                            this.WebDriver.Hover(suggestionsContainer);
-                            this.WaitForTransaction();
-                            suggestionsContainer.Click();
-
-                            this.FindElementWaitUntilVisible(By.XPath(optionSetRequestedSuggestionContainerXpath));
-                            this.TryClick(By.XPath(optionSetRequestedSuggestionContainerXpath));
-                            this.FindElementWaitUntilVisible(By.XPath(optionSetRequestedSuggestionSelectedXpath));
-                        }
-                        else
-                        {
-                            ElementExists(By.XPath(filterByValueInputXpath), out var filterByValueInput);
-                            if (filterByValueInput != null) filterByValueInput.SendKeys(filterByString);
-                            this.FindElementWaitUntilVisible(By.XPath(filterByValueInputInteractedXpath));
-                        }
-
-                        this.TryClick(By.XPath(filterByContainerXpath));
-                        this.FindElementWaitUntilVisible(By.XPath(unfocusedOperatorsContainerXpath));
-                    }
-                    else if (this.ElementExists(By.XPath(textboxSuggestionContainerXpath)))
-                    {
-                        // TextField Grid Control
-                        if (this.ElementExists(By.XPath(textboxRequestedContainerXpath), out var textBoxContainer))
-                        {
-                            this.WebDriver.Hover(textBoxContainer);
-                            this.WaitForTransaction();
-                            textBoxContainer.Click();
-                            this.WaitForTransaction();
-                            textBoxContainer.SendKeys(filterByString);
-                            this.FindElementWaitUntilVisible(By.XPath(textboxRequestedSuggestionSelectedXpath));
-                        }
-                        else
-                        {
-                            this.ElementExists(By.XPath(filterByValueInputXpath), out var filterByValueInput);
-                            if (filterByValueInput != null) filterByValueInput.SendKeys(filterByString);
-                            this.FindElementWaitUntilVisible(By.XPath(filterByValueInputInteractedXpath));
-
-                            this.ElementExists(By.XPath(filterByContainerXpath), out var filterByHeader);
-                            if (filterByHeader != null) filterByHeader.Click();
-                            this.FindElementWaitUntilVisible(By.XPath(unfocusedOperatorsContainerXpath));
-                        }
-                    }
-                    // DateField Grid Control
-                    else if (this.ElementExists(By.XPath(dateFieldFilterContainerXpath)))
-                    {
-                        try
-                        {
-                            this.Click(By.XPath(dateFieldFilterOpenCalendarButtonXpath));
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new Exception(". Failed to locate the Date Picker Calendar Icon to sort the DateField column on the grid.", ex);
-                        }
-                        this.FindElementWaitUntilVisible(By.XPath(datePickerCalloutContainerXpath));
-                        if (this.ElementExists(By.XPath(datePickerRequestedSuggestionXpath.Replace("[FILTERBYSTRING]", DateTime.Parse(filterByString, null).ToString("d, MMMM, yyyy"))), out var datePickerElement))
-                        {
-                            datePickerElement.NullGuard();
-                            datePickerElement.Click();
-                            this.WaitForTransaction();
-                        }
-                        else
-                        {
-                            // requested date is not visible, let's navigate to the requested date
-                            var requestedDate = DateTime.Parse(filterByString, new System.Globalization.CultureInfo("en-US"));
-                            var currentDate = this.FindElementWaitUntilPresent(By.XPath(currentDateElementXpath)).Text;
-                            var currentMonth = this.FindElementWaitUntilPresent(By.XPath(currentMonthElementXpath)).Text;
-                            if (requestedDate.Year < currentDate.ToDouble())
-                            {
-                                while (requestedDate.Year < currentDate.ToDouble())
-                                {
-                                    // Click Previous Year
-                                    this.Click(By.XPath(previousYearButtonXpath));
-                                    this.WaitForTransaction();
-                                    currentDate = this.FindElementWaitUntilPresent(By.XPath(currentDateElementXpath)).Text;
-                                }
-                            }
-                            else if (requestedDate.Year > currentDate.ToDouble())
-                            {
-                                while (requestedDate.Year > currentDate.ToDouble())
-                                {
-                                    // Click Next Year
-                                    this.Click(By.XPath(nextYearButtonXpath));
-                                   this.WaitForTransaction();
-                                    currentDate = this.FindElementWaitUntilPresent(By.XPath(currentDateElementXpath)).Text;
-                                }
-                            }
-                            if (requestedDate.ToString("MMMM") != currentMonth.TrimEnd(digits))
-                            {
-                                try
-                                {
-                                    this.Click(By.XPath(requestedMonthButtonXpath.Replace("[DATE]", requestedDate.ToString("MMMM"))));
-                                }
-                                catch(Exception ex)
-                                {
-                                    throw new Exception(". Failed to locate the requested Month button from the Month Picker to sort the grid column.", ex);
-                                }
-                                this.WaitForTransaction();
-                            }
-
-                            // Let's select the requested date
-                            this.Click(By.XPath(datePickerRequestedSuggestionXpath));
-                            try
-                            {
-                                this.FindElementsWaitUntilVisible(By.XPath(datePickerRequestedSuggestionSelectedXpath));
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new Exception(". Date Picker input element failed to be populated as expected when attempting to sort grid column.", ex);
-                            }
-
-                            this.TryClick(By.XPath(filterByContainerXpath));
-                            this.FindElementWaitUntilVisible(By.XPath(unfocusedOperatorsContainerXpath));
-                        }
-                    }
-                    if (comparisonOperation != string.Empty)
-                    {
-                        this.TryClick(By.XPath(filterByContainerXpath));
-                        this.FindElementWaitUntilVisible(By.XPath(unfocusedOperatorsContainerXpath));
-
-                        this.TryClick(By.XPath(filterByOperatorsContainerXpath));
-                        this.FindElementWaitUntilVisible(By.XPath(operatorDropdownListXpath));
-
-                        this.TryClick(By.XPath(operatorDropdownListXpath));
-                        this.WaitForTransaction();
-                    }
-
-                    this.TryClick(By.XPath(applyButtonXpath));
-
-                    this.WaitForTransaction();
-                    this.WaitForElementToDisappear(By.XPath(progressIndicatorXpath));
-
-                    if (scrolled)
-                        this.JSExecutor.execute(scrollBarResetScript);
-                }
-                else
-                    throw new InvalidOperationException($"Sub Grid Column Sort: {columnName} sorting setup isn't valid.");
-                if (scrolled)
-                    this.JSExecutor.execute(scrollBarResetScript);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($". Failed to sort requested grid column '{columnName}'.", ex);
-            }
-        }
         public bool ElementExists(By locator)
         {
             this.switchToIFrame(locator);
