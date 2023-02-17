@@ -1206,6 +1206,7 @@ namespace HitachiQA.Driver
         public string GetFieldValue(By by)
         {
             this.WaitForTransaction();
+            this.waitForPageLoad(by.IFrameLocator);
 
             var fieldElement = this.FindElementWaitUntilPresent(by);
             var fieldDoc = new HtmlDocument();
@@ -1293,7 +1294,7 @@ namespace HitachiQA.Driver
         public List<string> GetFieldOptions(By by)
         {
             this.WaitForTransaction();
-
+            this.waitForPageLoad(by.IFrameLocator);
             var fieldElement = this.FindElementWaitUntilPresent(by);
             var fieldDoc = new HtmlDocument();
             fieldDoc.LoadHtml(fieldElement.GetAttribute("outerHTML"));
@@ -1340,6 +1341,7 @@ namespace HitachiQA.Driver
         public void OpenFieldValue(By by)
         {
             this.WaitForTransaction();
+            this.waitForPageLoad(by.IFrameLocator);
 
             var fieldElement = this.FindElementWaitUntilPresent(by);
             var fieldDoc = new HtmlDocument();
