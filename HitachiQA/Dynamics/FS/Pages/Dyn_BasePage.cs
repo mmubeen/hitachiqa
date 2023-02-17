@@ -38,20 +38,37 @@ namespace HitachiQA.Dynamics.FS.Pages
 
         public Element CommandBarShowMoreOptionsButton => Element($"{COMMAND_BAR_XPATH} //button[contains(@id, 'OverflowButton')]");
 
-        public Element GetEntityTab(string tabDisplayName) => Element($"//ul[contains(@id, 'tablist')] //li[*//text()='{tabDisplayName}']");
-        public void NavigateToEntityTab(string tabDisplayName, bool related){
-            if(related)
+        public void ClickCommandBarButton(string displayText)
+        {
+            this.Element(COMMAND_BAR_XPATH).assertElementIsPresent();
+            var targetCommand = GetCommandBarButton(displayText);
+            if(targetCommand.ElementExists())
             {
-                this.GetEntityTab("Related").Click();
-                GetFlyoutElement(tabDisplayName).Click();
+                targetCommand.Click();
             }
             else
             {
-                this.GetEntityTab(tabDisplayName).Click();
+                this.Element($"{COMMAND_BAR_XPATH} //li[last()]").Click();
+                targetCommand.Click();
             }
         }
 
-        public Element GetFlyoutElement(string text) => Element($"//*[@id='__flyoutRootNode'] //*[./*[text()='{text}']]");
+        public Element GetEntityTab(string tabDisplayName) => Element($"//ul[contains(@id, 'tablist')] //li[*//text()='{tabDisplayName}']");
+        public void NavigateToEntityTab(string tabDisplayName){
+            this.Element("//ul[@role='tablist']//li[text()]").assertElementIsPresent();
+            var targetTab = this.Element("//ul[@role='tablist']//li[text()='{tabDisplayName}']");
+            if(targetTab.ElementExists())
+            {
+                targetTab.Click();
+            }
+            else
+            {
+                this.Element("//ul[@role='tablist']//li[last()]").Click();
+                GetFlyoutElement(tabDisplayName).Click();
+            }
+        }
+
+        public Element GetFlyoutElement(string text) => Element($"//*[@id='__flyoutRootNode'] //*[text()='{text}']");
         
         public Element AppBreadCrumb => Element("//*[@data-id=\"appBreadCrumbText\"]/..");
 
@@ -66,7 +83,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         public Dyn_QuickCreateTab QuickCreateTab =>  new Dyn_QuickCreateTab(ObjectContainer);
         public void SaveForm()
         {
-            this.GetCommandBarButton("Save").Click();
+            this.ClickCommandBarButton("Save");
             this.Element("//span[text()='Saving...']").assertElementIsPresent();
         }
         public void GridSearch(string input)
