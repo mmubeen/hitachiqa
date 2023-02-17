@@ -56,7 +56,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         public Element GetEntityTab(string tabDisplayName) => Element($"//ul[contains(@id, 'tablist')] //li[*//text()='{tabDisplayName}']");
         public void NavigateToEntityTab(string tabDisplayName){
             this.Element("//ul[@role='tablist']//li[text()]").assertElementIsPresent();
-            var targetTab = this.Element("//ul[@role='tablist']//li[text()='{tabDisplayName}']");
+            var targetTab = this.Element($"//ul[@role='tablist']//li[text()='{tabDisplayName}']");
             if(targetTab.ElementExists())
             {
                 targetTab.Click();
