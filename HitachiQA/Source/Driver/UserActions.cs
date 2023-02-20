@@ -130,14 +130,16 @@ namespace HitachiQA.Driver
                 catch (StaleElementReferenceException)
                 {
                     Thread.Sleep(1000);
+                    WaitForTransaction();
+                    waitForPageLoad(ElementLocator.IFrameLocator);
                     FindElementWaitUntilClickable(ElementLocator, ProcessWaitParam(wait_Seconds)).Click();
 
                 }
                 catch (ElementClickInterceptedException)
                 {
+                    Thread.Sleep(1000);
                     WaitForTransaction();
                     waitForPageLoad(ElementLocator.IFrameLocator);
-                    Thread.Sleep(1000);
                     FindElementWaitUntilClickable(ElementLocator, ProcessWaitParam(wait_Seconds)).Click();
                 }
                 catch (Exception)
@@ -266,6 +268,7 @@ namespace HitachiQA.Driver
             }
 
             ScrollIntoView(target);
+            Thread.Sleep(200);
             if (HIGHLIGHT_ON)
                 highlight(target);
             target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
@@ -365,6 +368,28 @@ namespace HitachiQA.Driver
             return this.WebDriver.FindElements(locator).ToList();
         }
 
+        public void Hover(By by, int? wait_Seconds = null, bool optional=false)
+        {
+            switchToIFrame(by);
+            var locator = by.Locator;
+            WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
+            IWebElement target;
+            target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
+            ScrollIntoView(target);
+            var action = new Actions(this.WebDriver);
+            try
+            {
+                action.MoveToElement(target).Build().Perform();
+            }
+            catch(Exception)
+            {
+                if(!optional)
+                {
+                    throw;
+                }
+            }
+        }
+
         //Find Element - Wait Until Clickable
         public IWebElement FindElementWaitUntilClickable(By by, int? wait_Seconds = null)
         {
@@ -375,29 +400,20 @@ namespace HitachiQA.Driver
 
             try
             {
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
-                ScrollIntoView(target);
-                var action = new Actions(this.WebDriver);
-                action.MoveToElement(target).Build().Perform();
+                Hover(by, wait_Seconds, true);
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
 
             }
             catch (StaleElementReferenceException)
             {
                 Thread.Sleep(2000);
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
-                ScrollIntoView(target);
-                var action = new Actions(this.WebDriver);
-                action.MoveToElement(target).Build().Perform();
+                Hover(by, wait_Seconds, true);
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
             }
             catch (ElementClickInterceptedException)
             {
                 Thread.Sleep(2000);
-                target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
-                ScrollIntoView(target);
-                var action = new Actions(this.WebDriver);
-                action.MoveToElement(target).Build().Perform();
+                Hover(by, wait_Seconds, true);
                 target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
                 
             }
@@ -1008,8 +1024,8 @@ namespace HitachiQA.Driver
                 { "//input[@type='text' and contains(@data-bind,'currency')]", "textfield"},
                 { "//div[@role='combobox']", "combobox"},
                 { "//*[contains(@class,'enumValuesDropdown')]//*[@role='combobox']", "enum_combobox"},
-                { "//input[@role='combobox' and not(contains(@id, 'DatePicker'))]", "input_with_combobox"},
                 { "//self::*[.//*[contains(@id, 'DatePicker')]]", "datepicker"},
+                { "//input[@role='combobox' and not(contains(@id, 'DatePicker'))]", "input_with_combobox"},
                 { "//div[contains(@class,'ms-TextField is-disabled')]//button", "textfieldreadonly"},
                 { "//input[@data-role='dropdownlist']/../..", "dropdown_listbox" },
                 { "//select", "dropdown"},
@@ -1205,8 +1221,8 @@ namespace HitachiQA.Driver
 
         public string GetFieldValue(By by)
         {
-            this.WaitForTransaction();
             this.waitForPageLoad(by.IFrameLocator);
+            this.WaitForTransaction();
 
             var fieldElement = this.FindElementWaitUntilPresent(by);
             var fieldDoc = new HtmlDocument();
@@ -1505,6 +1521,8 @@ namespace HitachiQA.Driver
         public bool ElementExists(By locator)
         {
             this.switchToIFrame(locator);
+            this.waitForPageLoad(locator.IFrameLocator);
+            this.WaitForTransaction();
             var elements = this.WebDriver.FindElements(locator.Locator);
             if (elements.Any())
                 return true;
@@ -1513,6 +1531,9 @@ namespace HitachiQA.Driver
         public bool ElementExists(By locator, out IWebElement? element)
         {
             this.switchToIFrame(locator);
+            this.waitForPageLoad(locator.IFrameLocator);
+            this.WaitForTransaction();
+
             var elements = this.WebDriver.FindElements(locator.Locator);
             if (elements.Any())
             {
@@ -1522,15 +1543,26 @@ namespace HitachiQA.Driver
             element = null;
             return false;
         }
-        public bool TryClick(By locator)
+        public bool TryClick(By locator, double waitSeconds=0)
         {
+            this.switchToIFrame(locator);
+            this.waitForPageLoad(locator.IFrameLocator);
+            this.WaitForTransaction();
+            var retries = Enumerable.Range(0, (int)(waitSeconds / 0.333))
+                                   .Select(i => TimeSpan.FromSeconds(0.333 * i));
+            var retry = Policy.HandleResult<bool>(false)
+            .WaitAndRetry(retries);
 
-            if (this.ElementExists(locator, out IWebElement? element) && element.Displayed && element.Enabled)
-            {
-                element.NullGuard();
-                element.Click();
-                return true;
-            }
+            retry.Execute(()=>{
+                if (this.ElementExists(locator, out IWebElement? element) && element.Displayed && element.Enabled)
+                {
+                    element.NullGuard();
+                    element.Click();
+                    return true;
+                }
+                return false;
+            });
+           
             return false;        
         }
         public void SendKeys(string key)
