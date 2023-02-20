@@ -1618,9 +1618,12 @@ namespace HitachiQA.Driver
             input.SendKeys(filePath);
         }
 
-        public IAlert GetBrowserAlert()
+        public IAlert GetBrowserAlert(int? wait_Seconds=null)
         {
-            return this.WebDriver.SwitchTo().Alert();
+            WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
+            var alert = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.AlertIsPresent());
+            
+            return alert;
         }
 
 
