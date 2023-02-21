@@ -149,7 +149,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         }
         public void GridSearch(string input)
         {
-            this.Element("//input[contains(@aria-label, 'Filter by keyword')]").SetFieldValue(input);
+            this.Element("//input[contains(@aria-label, 'Filter by keyword') or contains(@aria-label, 'Quick find')]").SetFieldValue(input);
             this.PressEnter();
         }
 
