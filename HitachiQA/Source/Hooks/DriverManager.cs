@@ -163,6 +163,7 @@ namespace HitachiQA.Hooks
                         FirefoxOptions = new FirefoxOptions();
                         FirefoxOptions.AddArgument("--no-sandbox");
                         FirefoxOptions.AddArgument("--start-maximized");
+                        FirefoxOptions.AcceptInsecureCertificates = true;
                         FirefoxOptions.AddArguments(optionsList);
                     }
 
@@ -198,7 +199,10 @@ namespace HitachiQA.Hooks
 
         public void Dispose()
         {
-           this.WebDriver.Dispose();
+            if(!BrowserIndicator.isNoBrowserFeature)
+            {
+                this.WebDriver.Dispose();
+            }
         }
     }
 
