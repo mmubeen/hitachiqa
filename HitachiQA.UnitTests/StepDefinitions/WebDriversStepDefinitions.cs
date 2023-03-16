@@ -16,10 +16,12 @@ namespace HitachiQA.UnitTests.StepDefinitions
         ObjectContainer ObjectContainer;
 
         UserActions UserActions => ObjectContainer.Resolve<UserActions>();
+        DriverManager DriverManager;
 
-        public WebDriversStepDefinitions(ObjectContainer objectContainer)
+        public WebDriversStepDefinitions(ObjectContainer objectContainer, DriverManager DriverManager)
         {
             ObjectContainer = objectContainer;
+            this.DriverManager = DriverManager;
         }
 
         [Given(@"Browser is up")]
@@ -31,7 +33,15 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Then(@"user should land on HSAL homepage")]
         public void ThenUserShouldLandOnHSALHomepage()
         {
-            new Element(By.XPath("//*[contains(text(), 'Hitachi Solutions')]"), UserActions).assertElementIsPresent();
+            new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
+            UserActions.OpenNewTab();
+            new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
+            new Element(By.XPath("(//*[contains(text(), 'Search')])[2]"), UserActions).Click();
+            UserActions.SwitchContext();
+            Log.Info(UserActions.Title);
+            //DriverManager.SwitchWindowContext();
+            new Element(By.XPath("//*[@placeholder= 'Search within Hitachi']"), UserActions).assertElementNotPresent(5);
+
             this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }
 

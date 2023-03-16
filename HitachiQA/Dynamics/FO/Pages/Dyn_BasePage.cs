@@ -27,7 +27,7 @@ namespace HitachiQA.Dynamics.FO.Pages
 
         public Element GetEntityTab(string tabDisplayName) => Element($"//ul[contains(@id, 'tablist')] //li[*//text()='{tabDisplayName}']");
 
-        public Element Grid => Element("( //div[contains(@id, '-pcf_grid_control_container')] //*[@data-id='grid-container']  | //*[@data-id='data-set-body-container' and //*[@class='wj-cells'] ] )");
+        public Element Grid => Element("( //div[contains(@id, '-pcf_grid_control_container')] //*[@data-id='grid-container']  | //*[@data-id='data-set-body-container' and //*[@class='wj-cells'] ]  |  //*[@data-dyn-controlname='Grid' and @data-dyn-role='ReactList']) ");
 
         public Element GetGrid(string sectionName) => Element($"//section[@aria-label='{sectionName}' and {Grid.locator.Locator.Criteria}] ");
     }

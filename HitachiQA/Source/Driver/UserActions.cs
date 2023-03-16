@@ -731,17 +731,22 @@ namespace HitachiQA.Driver
         }
 
 
-        private const string HORIZONTAL_SCROLL_BAR = "//div[@class='ag-body-horizontal-scroll'] //div[@ref='eViewport']";
-        private object GRID_SCROLL_JS_EXEC(By gridLocator, string command)
+        private const string HORIZONTAL_SCROLL_BAR = "//div[@class='ag-body-horizontal-scroll' or contains(@class, 'ScrollbarLayout_main Scrollbar')]";
+        // private const string HORIZONTAL_SCROLL_BAR = "//div[@class='ag-body-horizontal-scroll' or contains(@class, 'ScrollbarLayout_main Scrollbar')] //div[@ref='eViewport']";
+
+        private object? GRID_SCROLL_JS_EXEC(By gridLocator, string command)
         {
-            var scrollBarLoc = $"{gridLocator.Locator.Criteria} {HORIZONTAL_SCROLL_BAR}";
-            var element = this.FindElementWaitUntilPresent(By.XPath(scrollBarLoc));
-            return JSExecutor.execute(command, element);
+            var scrollBarLoc = By.XPath($"{gridLocator.Locator.Criteria} {HORIZONTAL_SCROLL_BAR}");
+            if(!ElementExists(scrollBarLoc, out var element))
+            {
+                return null;
+            }
+            return JSExecutor.execute(command, element?? throw new NullReferenceException("element"));
         }
 
-        private object GRID_SCROLL_LEFT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(-400, 0);");
-        private object GRID_SCROLL_ALL_RIGHT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(12000, 0);");
-        private object GRID_QUERY_HOW_MUCH_UNTIL_RESET(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "return arguments[0].scrollLeft;");
+        private object? GRID_SCROLL_LEFT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(-400, 0);");
+        private object? GRID_SCROLL_ALL_RIGHT_COMMAND(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "arguments[0].scrollBy(12000, 0);");
+        private object? GRID_QUERY_HOW_MUCH_UNTIL_RESET(By gridLocator) => GRID_SCROLL_JS_EXEC(gridLocator, "return arguments[0].scrollLeft;");
 
        
 
@@ -752,7 +757,7 @@ namespace HitachiQA.Driver
 
             this.WaitForTransaction();
 
-            string gridCellXPath = $"//*[@role='columnheader']";
+            string gridCellXPath = $"//*[@role='columnheader' and @aria-colindex] | //*[@data-dyn-columnname]/*[@title or @data-dyn-qtip-title]";
 
             Dictionary<int, string?> result = new Dictionary<int, string?>();
 
@@ -760,37 +765,48 @@ namespace HitachiQA.Driver
             GRID_SCROLL_ALL_RIGHT_COMMAND(by);
             do
             {
+                this.FindElementWaitUntilPresent(By.XPath(by.Locator.Criteria+gridCellXPath));
                 var gridElement = this.FindElementWaitUntilPresent(by);
+                
                 var gridDoc = new HtmlDocument();
                 gridDoc.LoadHtml(gridElement.GetAttribute("innerHTML"));
 
                 var headers = gridDoc.DocumentNode.SelectNodes(gridCellXPath);
-
+                var iteration = 0;
                 foreach (var header in headers)
                 {
-                    var index = int.Parse(header.GetAttributeValue("aria-colindex", null));
-                    var displayText = header.GetAttributeValue("title", null);
-
+                    
+                    var index = int.Parse(header.GetAttributeValue("aria-colindex", "-1"));
+                    string? displayText = header.GetAttributeValue("title", null);
+                    if(index== -1)
+                    {
+                        displayText = header.InnerText;
+                    }
                     //PCF grids have title in a child node
                     if (displayText == null)
                     {
                         var rowDoc = new HtmlDocument();
                         rowDoc.LoadHtml(header.InnerHtml);
 
-                        displayText = rowDoc.DocumentNode.SelectSingleNode("//*[@title]")?.InnerText;
+                        displayText = rowDoc.DocumentNode.SelectSingleNode("//*[@title or @data-dyn-qtip-title]")?.InnerText;
                         displayText = System.Web.HttpUtility.HtmlDecode(displayText??"");
                     }
 
+                    iteration++;
 
-                    if (!result.ContainsKey(index))
+                    if (index!=-1 && !result.ContainsKey(index))
                     {
                         result.Add(index, displayText);
+                    }
+                    else if(index==-1)
+                    {
+                        result.Add(iteration, displayText);
                     }
                 }
 
                 GRID_SCROLL_LEFT_COMMAND(by);
             }
-            while (Convert.ToDouble(GRID_QUERY_HOW_MUCH_UNTIL_RESET(by)) != 0);
+            while (GRID_QUERY_HOW_MUCH_UNTIL_RESET(by) is var queryResult && queryResult!=null && Convert.ToDouble(queryResult) != 0 );
 
             return result;
         }
@@ -803,7 +819,7 @@ namespace HitachiQA.Driver
             var headers = this.GetGridHeaders(by);
             var results = new List<Dictionary<string, string?>>();
 
-            var rowXPath = $"//*[@role='row' and descendant::*[@aria-colindex] ]";
+            var rowXPath = $"//*[@role='row' and (@aria-rowindex or descendant::*[@aria-colindex]) ]";
 
             GRID_SCROLL_ALL_RIGHT_COMMAND(by);
             do
@@ -814,7 +830,10 @@ namespace HitachiQA.Driver
 
                 var rows = gridDoc.DocumentNode.SelectNodes(rowXPath);
                 //remove header (1st row)
-                rows.RemoveAt(0);
+                var headerNode = rows.FirstOrDefault(it=> it.GetAttributeValue<int>("aria-rowindex", -1)==1);
+                headerNode.NullGuard();
+                rows.Remove(headerNode);
+                
                 foreach(var rowNode in rows)
                 {
                     var rowHTML = rowNode.InnerHtml; 
@@ -844,7 +863,8 @@ namespace HitachiQA.Driver
                         var xpaths_and_atts = new Dictionary<string, string>()
                         {
                             {$"//*[@aria-colindex='{headerIndex}' and @col-id]  //*[@aria-label]", "aria-label" },
-                             {$"//*[@aria-colindex='{headerIndex}' and @title]", "title" },
+                            {$"//*[@aria-colindex='{headerIndex}' and @title]", "title" },
+                            {$"//*[@aria-label='{headerName}' and @title]", "title" }
 
                         };
 
@@ -909,8 +929,18 @@ namespace HitachiQA.Driver
 
             var index = matchingRow["index"];
 
-            var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index)+1} and descendant::*[@aria-colindex=1] ]//i[@data-icon-name]");
-            this.DoubleClick(checkBoxLoc);
+            var checkBoxLocDoubleClick = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index)+1} and descendant::*[@aria-colindex=1] ]//i[@data-icon-name]");
+            if(ElementExists(checkBoxLocDoubleClick))
+            {
+                this.DoubleClick(checkBoxLocDoubleClick);
+            }
+            else{
+                var checkBoxLoc = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index)+1}]//*[@title='Select or unselect row']");
+                this.Click(checkBoxLoc);
+                var firstCol = By.XPath(by.Locator.Criteria + $"//*[@role='row' and @aria-rowindex={int.Parse(index)+1}]//input[@aria-label]");
+                this.Click(firstCol);
+
+            }
 
             //var EditButtonLoc = By.XPath("((//div[@id='mainContent'] //*[contains(@data-id, 'Command')])[1] | //*[@data-id='OverflowFlyout']) //button[*//text()='Edit']");
 
@@ -1628,8 +1658,58 @@ namespace HitachiQA.Driver
 
 
 
+        private int CurrentWindowHandleIndex => this.WebDriver.WindowHandles.IndexOf(this.CurrentWindowHandle);
 
+        public string CurrentWindowHandle => this.WebDriver.CurrentWindowHandle;
+        private void OpenNew(WindowType type)
+        {
+            if (type == WindowType.Tab)
+            {
+                ((IJavaScriptExecutor)WebDriver).ExecuteScript($"window.open('{Main.Configuration.GetVariable("HOST")}','_blank');");
+                this.WebDriver.SwitchTo().Window(this.WebDriver.WindowHandles.Last());
+            }
+            else
+            {
+                this.WebDriver.SwitchTo().NewWindow(type);
+                this.WebDriver.Navigate().GoToUrl(Main.Configuration.GetVariable("HOST"));
+            }
 
+        }
+        public void OpenNewWindow() => OpenNew(WindowType.Window);
+        public void OpenNewTab() => OpenNew(WindowType.Tab);
+        public void SwitchToHandle(int index)
+        {
+            this.WebDriver.SwitchTo().Window(this.WebDriver.WindowHandles[index]);
+        }
+        public void SwitchToHandle(string handleId)
+        {
+            this.WebDriver.SwitchTo().Window(handleId);
+        }
+        public void SwitchContext(int index = -1, bool close = false)
+        {
+            string target;
+            int windowHandlesCount = this.WebDriver.WindowHandles.Count;
+            if (index == -1)
+            {
+                if (windowHandlesCount == 1)
+                    throw new InvalidOperationException("Attempted to switch context with only a single handle invoked (run OpenNewWindow() to invoke new handles)");
+                else
+                {
+                    var targetIndex = CurrentWindowHandleIndex == windowHandlesCount - 2 ? windowHandlesCount - 1 : windowHandlesCount - 2;
+                    target = this.WebDriver.WindowHandles[targetIndex];
+                }
+            }
+            else
+            {
+                target = this.WebDriver.WindowHandles[index];
+            }
+            if (close)
+            {
+                this.WebDriver.Close();
+            }
+            this.WebDriver.SwitchTo().Window(target);
+        }
 
+        public string Title=> this.WebDriver.Title;
     }
 }

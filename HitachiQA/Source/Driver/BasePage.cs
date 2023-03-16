@@ -1,5 +1,6 @@
 ﻿using BoDi;
 using HitachiQA.Driver;
+using HitachiQA.Hooks;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,14 @@ namespace HitachiQA.Driver
         public readonly UserActions UserActions;
         public readonly ScreenShot ScreenShot;
         protected readonly ObjectContainer ObjectContainer;
+        private DriverManager DriverManager;
         public BasePage(ObjectContainer ObjectContainer)
         {
             this.ObjectContainer = ObjectContainer;
             this.UserActions = ObjectContainer.Resolve<UserActions>();
             this.ScreenShot = ObjectContainer.Resolve<ScreenShot>();
+            this.DriverManager = ObjectContainer.Resolve<DriverManager>();
+
         }
 
         public Element Element(string xpath)
@@ -66,6 +70,14 @@ namespace HitachiQA.Driver
             UserActions.Navigate(PATH_OR_URL);
         }
         public void PressEnter()
+        {
+            UserActions.SendKeys(Keys.Enter);
+        }
+        /// <summary>
+        /// example: Keys.Enter
+        /// </summary>
+        /// <param name="key"></param>
+        public void SendKeys(string key)
         {
             UserActions.SendKeys(Keys.Enter);
         }
@@ -154,5 +166,14 @@ namespace HitachiQA.Driver
             return UserActions.GetBrowserAlert();
         }
 
+
+        public string CurrentWindowHandle => this.UserActions.CurrentWindowHandle;
+        public void OpenNewWindow() => UserActions.OpenNewWindow();
+        public void OpenNewTab() => UserActions.OpenNewTab();
+        public void SwitchToHandle(int index) => UserActions.SwitchToHandle(index);
+        public void SwitchToHandle(string handleId) => UserActions.SwitchToHandle(handleId);
+        public void SwitchContext(int index = -1, bool close = false) => UserActions.SwitchContext(index, close);
+        public void SwitchContextAndCloseCurrentHandle(int index = -1) => this.SwitchContext(index, true);
+        public string Title => UserActions.Title;
     }
 }

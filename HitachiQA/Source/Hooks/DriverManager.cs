@@ -21,11 +21,13 @@ using NetDriverManager = WebDriverManager.DriverManager;
 namespace HitachiQA.Hooks
 {
     [Binding]
-    public class DriverManager : HookBase
+    public class DriverManager : HookBase, IDisposable
     {
         public static List<String>? optionsList;
 
-        public BrowserIndicator BrowserIndicator;
+        public BrowserIndicator BrowserIndicator = new BrowserIndicator();
+        public IWebDriver WebDriver;
+
 
         public DriverManager(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
         {
@@ -33,11 +35,14 @@ namespace HitachiQA.Hooks
         }
 
 
+
+
+
+
         [BeforeScenario(Order = 2)]
-        public void invokeDriver(FeatureContext FT, ScenarioContext SC, ObjectContainer oc)
+        public void invokeDriver(FeatureContext FT, ScenarioContext SC, IObjectContainer oc)
         {
 
-            BrowserIndicator = new BrowserIndicator();
             if (FT.FeatureInfo.Tags.Contains("NoBrowser") || SC.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
                 BrowserIndicator.isNoBrowserFeature = true;
@@ -46,10 +51,10 @@ namespace HitachiQA.Hooks
             {
                 BrowserIndicator.isNoBrowserFeature = false;
 
-                var config = oc.Resolve<IConfiguration>();
+                IConfiguration config= oc.Resolve<IConfiguration>();
                 var browser = config.GetVariable("BROWSER");
+                var driver = invokeNewDriver(oc, browser);
 
-                invokeNewDriver(oc, browser);
             }
             oc.RegisterInstanceAs<BrowserIndicator>(BrowserIndicator);
 
@@ -92,7 +97,8 @@ namespace HitachiQA.Hooks
             }
             finally
             {
-                oc.Resolve<IWebDriver>().Dispose();
+                //this.Dispose();
+                //oc.Resolve<IWebDriver>().Dispose();
             }
 
         }
@@ -113,7 +119,7 @@ namespace HitachiQA.Hooks
         public static FirefoxOptions? FirefoxOptions;
         public static EdgeOptions? EdgeOptions;
 
-        public static void invokeNewDriver(ObjectContainer oc, string browser)
+        public IWebDriver invokeNewDriver(IObjectContainer oc, string browser)
         {
             IWebDriver driver;
             List<string> optionsList= new List<string>();
@@ -184,12 +190,16 @@ namespace HitachiQA.Hooks
                     throw new NotImplementedException($"Environment variable BROWSER value={browser} is not supported");
             }
             driver.Navigate().GoToUrl(Main.Configuration.GetVariable("HOST"));
-            oc.RegisterInstanceAs<IWebDriver>(driver);
-            
+            oc.RegisterInstanceAs<IWebDriver>(driver, null, true);
+            this.WebDriver = driver;
+            return driver;
+
         }
 
-      
-
+        public void Dispose()
+        {
+           this.WebDriver.Dispose();
+        }
     }
 
     public class BrowserIndicator
