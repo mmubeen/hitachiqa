@@ -1660,6 +1660,8 @@ namespace HitachiQA.Driver
 
         private int CurrentWindowHandleIndex => this.WebDriver.WindowHandles.IndexOf(this.CurrentWindowHandle);
 
+        public List<string> WindowHandles => this.WebDriver.WindowHandles.ToList();
+
         public string CurrentWindowHandle => this.WebDriver.CurrentWindowHandle;
         private void OpenNew(WindowType type)
         {

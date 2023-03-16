@@ -166,7 +166,7 @@ namespace HitachiQA.Driver
             return UserActions.GetBrowserAlert();
         }
 
-
+        public List<string> WindowHandles => this.UserActions.WindowHandles;
         public string CurrentWindowHandle => this.UserActions.CurrentWindowHandle;
         public void OpenNewWindow() => UserActions.OpenNewWindow();
         public void OpenNewTab() => UserActions.OpenNewTab();
