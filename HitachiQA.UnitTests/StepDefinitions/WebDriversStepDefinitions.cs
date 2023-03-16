@@ -83,8 +83,6 @@ namespace HitachiQA.UnitTests.StepDefinitions
                 default:
                     throw new NotImplementedException($"BROWSER value={browser} is not supported");
             }
-            driver.Dispose();
-
            
         }
 
@@ -114,8 +112,6 @@ namespace HitachiQA.UnitTests.StepDefinitions
                     break;
                 default: throw new NotImplementedException(option);
             }
-            ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Dispose();
-
         }
     }
 }
