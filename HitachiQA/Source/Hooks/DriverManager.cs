@@ -201,7 +201,7 @@ namespace HitachiQA.Hooks
         {
             if(!BrowserIndicator.isNoBrowserFeature)
             {
-                this.WebDriver.Dispose();
+                try {this.WebDriver.Dispose(); }catch(Exception) { }
             }
         }
     }
