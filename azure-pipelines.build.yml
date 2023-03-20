@@ -87,7 +87,7 @@ stages:
           searchPatternPack: '$(project)'
           nobuild: true
           outputDir: '$(System.DefaultWorkingDirectory)'
-          versioningScheme: 'off'
+          versioningScheme: 'byPrereleaseNumber'
           majorVersion: '1'
           includesource: true
           
