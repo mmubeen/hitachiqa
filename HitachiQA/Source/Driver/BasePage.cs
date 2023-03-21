@@ -43,8 +43,6 @@ namespace HitachiQA.Driver
             UserActions.ScrollToBottom();
         }
 
-       
-
         public void ScrollToTop()
         {
             UserActions.ScrollToTop();
@@ -63,6 +61,11 @@ namespace HitachiQA.Driver
         public void refreshPage()
         {
             UserActions.Refresh();
+        }
+
+        public void NavigateBack()
+        {
+            UserActions.Back();
         }
 
         public void Navigate(string PATH_OR_URL)
