@@ -89,6 +89,7 @@ stages:
           outputDir: '$(System.DefaultWorkingDirectory)'
           versioningScheme: 'byPrereleaseNumber'
           majorVersion: '1'
+          minorVersion: '0.1'
           includesource: true
           
       - task: PublishBuildArtifacts@1
