@@ -36,6 +36,11 @@ namespace HitachiQA.Dynamics.FO.Pages
             Element($"//input[@name='GridFilter_Input']").setText(Criteria);
             Element($"//li[contains(@class, 'quickFilter')][descendant::*[text()='{filterByColumn}']][descendant::*[text()='{Criteria}']]").Click();
         }
+
+        public void GetGridRowByGridName(string gridName, int rowIndex)
+        {
+            Element($"//*[text()='{gridName}']/ancestor::*/descendant::*[@role='grid']/descendant::*[@role='row' and @aria-rowindex='{rowIndex}']");
+        }
     }
 
 
