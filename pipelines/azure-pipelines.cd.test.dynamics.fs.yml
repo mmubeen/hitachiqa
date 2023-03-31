@@ -16,10 +16,10 @@ stages:
     jobs:
     - job:
       steps:
-      - template: azure-pipelines.downloadbuild.template.yml
+      - template: ./templates/downloadbuild.template.yml
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'
           projects: '**/HitachiQA.UnitTests.dll'
-          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.runsettings --no-build --filter TestCategory=Dynamics'
+          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.fs.runsettings --no-build --filter TestCategory=Dynamics'
           testRunTitle: 'HitachiQA Unit Tests'

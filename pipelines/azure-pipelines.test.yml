@@ -9,13 +9,6 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  solution: '**/*.sln'
-  project: '**/*.csproj'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  name: $(Date:yyyyMMdd)$(Rev:.r)
-
 resources:
   pipelines:
   - pipeline: BuildPipeline # identifier for the resource (used in pipeline resource variables)
@@ -29,7 +22,7 @@ stages:
     pool: 
       vmImage: 'windows-latest'
     jobs:
-      - template: "azure-pipelines.downloadbuild.template.yml"
+      - template: ./templates/downloadbuild.template.yml
 
       - job: 
         steps:

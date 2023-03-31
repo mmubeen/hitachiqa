@@ -23,7 +23,7 @@ stages:
       - job:
         steps:
         - checkout: none
-        - template: azure-pipelines.downloadbuild.template.yml
+        - template: ./templates/downloadbuild.template.yml
         - task: DotNetCoreCLI@2
           inputs:
             command: 'push'

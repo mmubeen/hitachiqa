@@ -1,0 +1,25 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger: none
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+    
+stages:
+  - stage: Test
+    pool: 
+      vmImage: 'windows-latest'
+    jobs:
+    - job:
+      steps:
+      - template: ./templates/downloadbuild.template.yml
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '**/HitachiQA.UnitTests.dll'
+          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.FO.runsettings --no-build --filter TestCategory=Dynamics'
+          testRunTitle: 'HitachiQA Unit Tests'
