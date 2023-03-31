@@ -14,6 +14,12 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+parameters:
+  - name: MajorRelease
+    displayName: Build a major release
+    type: boolean
+    default: false
+
 variables:
   solution: '**/*.sln'
   project: '**/*.csproj'
@@ -80,6 +86,7 @@ stages:
         displayName: 'dotnet build $(buildConfiguration)'
         
       - task: DotNetCoreCLI@2
+        condition: ${{ !parameters.MajorRelease }}
         displayName: 'pack'
         inputs:
           command: 'pack'
@@ -91,6 +98,16 @@ stages:
           majorVersion: '1'
           minorVersion: '0.1'
           includesource: true
+      - task: DotNetCoreCLI@2
+        condition: ${{ parameters.MajorRelease }}
+        displayName: 'pack'
+        inputs:
+          command: 'pack'
+          projects: '$(solution)'
+          searchPatternPack: '$(project)'
+          nobuild: true
+          outputDir: '$(System.DefaultWorkingDirectory)'
+          versioningScheme: off
           
       - task: PublishBuildArtifacts@1
         inputs:
