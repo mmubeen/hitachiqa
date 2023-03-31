@@ -1,4 +1,4 @@
-﻿@Dynamics
+﻿@dynamics.fo
 Feature: FO
 
 A short summary of the feature

@@ -21,5 +21,5 @@ stages:
         inputs:
           command: 'test'
           projects: '**/HitachiQA.UnitTests.dll'
-          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.FO.runsettings --no-build --filter TestCategory=Dynamics'
+          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.FO.runsettings --no-build --filter TestCategory=dynamics.fo'
           testRunTitle: 'HitachiQA Unit Tests'

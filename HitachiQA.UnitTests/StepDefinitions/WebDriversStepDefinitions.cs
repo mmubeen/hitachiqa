@@ -36,11 +36,11 @@ namespace HitachiQA.UnitTests.StepDefinitions
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
             UserActions.OpenNewTab();
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
-            new Element(By.XPath("(//*[contains(text(), 'Search')])[2]"), UserActions).Click();
+            new Element(By.XPath("//*[contains(text(), 'Contact us')]"), UserActions).Click();
             UserActions.SwitchContext();
             Log.Info(UserActions.Title);
             //DriverManager.SwitchWindowContext();
-            new Element(By.XPath("//*[@placeholder= 'Search within Hitachi']"), UserActions).assertElementNotPresent(5);
+            new Element(By.XPath("//*[text()='Contact Us – We’d like to hear from you!']"), UserActions).assertElementNotPresent(5);
 
             this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }

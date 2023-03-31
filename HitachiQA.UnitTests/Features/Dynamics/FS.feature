@@ -1,4 +1,4 @@
-﻿@Dynamics
+﻿@dynamics.fs
 Feature: FS
 Tests the dynamics functionality of the IConfiguration object
 
