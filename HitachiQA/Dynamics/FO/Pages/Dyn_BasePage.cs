@@ -23,7 +23,6 @@ namespace HitachiQA.Dynamics.FO.Pages
 
         public Element GetElementByControlName(string controlName) => Element($"//*[@data-dyn-controlname='{controlName}']");
 
-        public Element GetElementByTitle(string displayName) => Element($"//*[@title='{displayName}']");
 
         public Element GetEntityTab(string tabDisplayName) => Element($"//ul[contains(@id, 'tablist')] //li[*//text()='{tabDisplayName}']");
 

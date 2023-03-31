@@ -17,6 +17,10 @@ stages:
     - job:
       steps:
       - template: ./templates/downloadbuild.template.yml
+      - task: FileTransform@1
+        inputs:
+          folderPath: '$(System.DefaultWorkingDirectory)/**/Release/net6.0/'
+          fileType: 'json'
       - task: DotNetCoreCLI@2
         inputs:
           command: 'test'

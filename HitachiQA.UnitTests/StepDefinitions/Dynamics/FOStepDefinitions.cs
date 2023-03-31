@@ -22,13 +22,13 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
         [When(@"user clicks on '([^']*)' tile")]
         public void WhenUserClicksOnTile(string tileDisplayText)
         {
-            this.Page.GetElementByTitle(tileDisplayText).Click();
+            this.Page.GetElementByText(tileDisplayText).Click();
         }
 
         [When(@"user clicks on '([^']*)'")]
         public void WhenUserClicksOn(string displayText)
         {
-            this.Page.GetField(displayText).Click();
+            this.Page.GetElementByText(displayText).Click();
         }
         [When(@"user fills out FO UI form")]
         public void WhenUserFillsOutUIForm(Table table)

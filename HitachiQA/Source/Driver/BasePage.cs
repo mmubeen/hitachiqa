@@ -159,7 +159,8 @@ namespace HitachiQA.Driver
 
             return Element(string.Join(" | ", finalXPaths));
         }
-
+        public Element GetElementByText(string text) => Element($"//*[text()='{text}']");
+        public Element GetElementByTitle(string displayName) => Element($"//*[@title='{displayName}']");
         public void AcceptBrowserAlert()
         {
             GetBrowserAlert().Accept();

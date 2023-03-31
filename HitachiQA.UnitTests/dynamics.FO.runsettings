@@ -2,8 +2,7 @@
 <RunSettings>
 	<RunConfiguration>
 		<EnvironmentVariables>
-			<!--<HOST>Https://Hslsr2prsdev.crm7.dynamics.com</HOST>-->
-			<HOST>https://mddev7a29df073d88851fdevaos.cloudax.dynamics.com/</HOST>
+			<HOST>https://hitachiqac852abe02ab300cedevaos.axcloud.dynamics.com/</HOST>
 			<SERVER_HOST>TBD</SERVER_HOST>
 			<BROWSER>Chrome</BROWSER>
 		</EnvironmentVariables>
