@@ -2,10 +2,10 @@
 parameters:
 - name: projectName
   type: string
-  default: 'Functional Testing'
+  default: 'HitachiQA'
 - name: definitionId
   type: string
-  default: '6'
+  default: '94'
 
 
 
@@ -17,7 +17,7 @@ steps:
     script: |
       $personalAccessToken = "$(System.AccessToken)"
       $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "",$personalAccessToken)))
-      $buildsUrl = "https://dev.azure.com/HitachiQA/${{parameters.projectName}}/_apis/build/builds?definitions=${{parameters.definitionId}}&api-version=7.0"
+      $buildsUrl = "https://dev.azure.com/tfs-hisol-crm/${{parameters.projectName}}/_apis/build/builds?definitions=${{parameters.definitionId}}&api-version=7.0"
       Write-Host "requested Uri: $buildsUrl"
       $builds = (Invoke-RestMethod -Uri $buildsUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)}).value
       $filteredBuilds = $builds | Where-Object { ($_.sourceVersion -eq "$(Build.SourceVersion)") -and ($_.result -eq 'succeeded') }
