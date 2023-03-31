@@ -86,7 +86,7 @@ stages:
         displayName: 'dotnet build $(buildConfiguration)'
         
       - task: DotNetCoreCLI@2
-        condition: '!${{ parameters.MajorRelease }}'
+        condition: 'not(${{ parameters.MajorRelease }})'
         displayName: 'pack'
         inputs:
           command: 'pack'
