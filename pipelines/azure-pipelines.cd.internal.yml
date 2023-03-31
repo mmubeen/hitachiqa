@@ -29,5 +29,6 @@ stages:
             command: 'push'
             packagesToPush: '**/*.nupkg; !**/*.symbols.nupkg;'
             nuGetFeedType: 'internal'
-            publishVstsFeed: 'c2ea9fd3-e9a8-4690-bac9-7c3063ac1e20'
+            publishVstsFeed: 'ae37399a-6d13-479d-85f6-0257203b84b1'
             arguments: '--skip-duplicate'
+            
