@@ -29,7 +29,7 @@ steps:
   displayName: 'Download artifact'
   inputs:
     buildType: 'specific'
-    project: 'b9f1ebb9-5ad2-4343-9fb3-f0521fcff956'
+    project: '61625407-898a-434e-8afd-d63c0ae44cfa'
     pipeline: $(definitionId)
     specificBuildWithTriggering: true
     buildVersionToDownload: specific
