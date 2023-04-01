@@ -34,22 +34,8 @@ stages:
         vmImage: 'ubuntu-latest'
       displayName: 'Build job'
       steps:
-        # The first task is the dotnet command build, pointing to our csproj file
-        - task: UseDotNet@2
-          inputs:
-            version: 6.0.x
+        - template: build-and-publish.template.yml
 
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'build'
-            arguments: '--configuration $(buildConfiguration)'
-            projects: '$(project)'
-          displayName: 'dotnet build $(buildConfiguration)'
-        
-        - task: PublishBuildArtifacts@1
-          inputs:
-            pathToPublish: '$(System.DefaultWorkingDirectory)'
-            artifactName: drop
     - job: Test
       dependsOn: Build
       pool:
@@ -62,13 +48,7 @@ stages:
           downloadType: 'single'
           artifactName: 'drop'
           downloadPath: '$(System.DefaultWorkingDirectory)'
-      - task: DotNetCoreCLI@2
-        displayName: "Unit Tests"
-        inputs:
-          command: 'test'
-          projects: '**/HitachiQA.UnitTests.dll'
-          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=dynamics.fo&TestCategory!=dynamics.fs'
-          testRunTitle: 'HitachiQA Unit Tests'
+      - template: templates/run-tests.template.yml
 
     - job: publishNugetFiles
       dependsOn: Test
@@ -78,12 +58,12 @@ stages:
       - task: UseDotNet@2
         inputs:
           version: 6.0.x
-      - task: DotNetCoreCLI@2
+      - task: DownloadBuildArtifacts@0
         inputs:
-          command: 'build'
-          arguments: '--configuration $(buildConfiguration)'
-          projects: '$(project)'
-        displayName: 'dotnet build $(buildConfiguration)'
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(System.DefaultWorkingDirectory)'
         
       - task: DotNetCoreCLI@2
         condition: 'not(${{ parameters.MajorRelease }})'

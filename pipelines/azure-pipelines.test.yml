@@ -22,14 +22,14 @@ stages:
     pool: 
       vmImage: 'windows-latest'
     jobs:
-      - template: ./templates/downloadbuild.template.yml
-
       - job: 
         steps:
         - checkout: none
+        - template: ./templates/downloadbuild.template.yml
+        
         - task: DotNetCoreCLI@2
           inputs:
             command: 'test'
             projects: '**/HitachiQA.UnitTests.dll'
-            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=dynamics.fo&TestCategory!=dynamics.fs'
+            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter git pull'
             testRunTitle: 'HitachiQA Unit Tests'

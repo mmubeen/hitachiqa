@@ -16,14 +16,9 @@ stages:
     jobs:
     - job:
       steps:
-      - template: 'templates/downloadbuild.template.yml'
-      - task: FileTransform@1
-        inputs:
-          folderPath: '$(System.DefaultWorkingDirectory)/_HitachiQA.CI (build)/drop/HitachiQA.UnitTests/bin/Release/net6.0'
-          fileType: 'json'
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'test'
-          projects: '**/HitachiQA.UnitTests.dll'
-          arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/dynamics.fs.runsettings --no-build --filter TestCategory=dynamics.fs'
-          testRunTitle: 'HitachiQA Unit Tests'
+      - template: 'templates/build.template.yml'
+
+      - template: templates/run-tests.template.yml
+        parameters:
+          filter: TestCategory=dynamics.fs
+          runTitle: "Dynamics FS Unit Tests"

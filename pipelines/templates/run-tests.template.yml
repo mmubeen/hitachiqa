@@ -1,0 +1,23 @@
+parameters:
+- name: filter
+  type: string
+  default: 'TestCategory!=dynamics.fo&TestCategory!=dynamics.fs'
+- name: runTitle
+  type: string
+  default: 'HitachiQA Unit Tests'
+
+
+tasks:
+#file transform consumes env variables and replaces them in appsettings.json (they must exist in appsettings.json)
+- task: FileTransform@1
+  inputs:
+    folderPath: '$(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/bin/Release/net6.0'
+    fileType: 'json'
+
+- task: DotNetCoreCLI@2
+  displayName: "Unit Tests"
+  inputs:
+    command: 'test'
+    projects: '**/HitachiQA.UnitTests.dll'
+    arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter ${{parameters.filter}}'
+    testRunTitle: ${{ parameters.runTitle }}

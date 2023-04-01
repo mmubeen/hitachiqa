@@ -1,0 +1,9 @@
+#build.template.yml
+
+
+steps:
+- template: build.template.yml
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(System.DefaultWorkingDirectory)'
+    artifactName: drop
