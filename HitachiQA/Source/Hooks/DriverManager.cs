@@ -193,6 +193,7 @@ namespace HitachiQA.Hooks
                     throw new NotImplementedException($"Environment variable BROWSER value={browser} is not supported");
             }
             oc.RegisterInstanceAs<IWebDriver>(driver, null, true);
+            this.WebDriver = driver;
 
             try
             {
@@ -200,11 +201,9 @@ namespace HitachiQA.Hooks
             }
             catch(Exception ex) 
             {
-                this.Dispose();
                 throw new Exception($"Failed navigating to Host {Main.Configuration.GetVariable("HOST", true)}", ex);
             }
 
-            this.WebDriver = driver;
             return driver;
 
         }
