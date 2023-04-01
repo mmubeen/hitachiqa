@@ -2,7 +2,6 @@
 Feature: FO
 
 A short summary of the feature
-@NoBrowser
 Scenario: Navigating and performing various actions
 	Given user is signed in to 'Finance and Operations'
 	And user is in company 'USMF' context
