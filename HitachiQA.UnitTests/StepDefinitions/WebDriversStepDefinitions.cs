@@ -40,7 +40,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             UserActions.SwitchContext();
             Log.Info(UserActions.Title);
             //DriverManager.SwitchWindowContext();
-            new Element(By.XPath("//*[text()='Contact Us – We’d like to hear from you!']"), UserActions).assertElementNotPresent(5);
+            new Element(By.XPath("//*[text()='Contact Us ï¿½ Weï¿½d like to hear from you!']"), UserActions).assertElementNotPresent(5);
 
             this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }
@@ -90,6 +90,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         public void GivenUserLoadsOptionIntoTheBrowser(string option)
         {
             DriverManager.ChromeOptions = new ChromeOptions();
+            DriverManager.ChromeOptions.AddArgument("--headless");
             DriverManager.ChromeOptions.AddArgument(option);
         }
 
