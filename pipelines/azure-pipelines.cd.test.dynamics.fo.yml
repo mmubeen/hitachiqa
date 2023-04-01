@@ -21,4 +21,5 @@ stages:
         parameters:
           filter: TestCategory=dynamics.fo
           runTitle: "Dynamics FO Unit Tests"
+          runsettings: dynamics.FO.runsettings
       
