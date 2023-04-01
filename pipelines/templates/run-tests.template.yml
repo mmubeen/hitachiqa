@@ -7,7 +7,7 @@ parameters:
   default: 'HitachiQA Unit Tests'
 
 
-tasks:
+steps:
 #file transform consumes env variables and replaces them in appsettings.json (they must exist in appsettings.json)
 - task: FileTransform@1
   inputs:
