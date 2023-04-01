@@ -12,7 +12,7 @@ pool:
 stages:
   - stage: Test
     pool: 
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     jobs:
     - job:
       steps:
