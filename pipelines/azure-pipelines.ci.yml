@@ -34,7 +34,7 @@ stages:
         vmImage: 'ubuntu-latest'
       displayName: 'Build job'
       steps:
-        - template: build-and-publish.template.yml
+        - template: templates/build-and-publish.template.yml
 
     - job: Test
       dependsOn: Build
