@@ -5,6 +5,9 @@ parameters:
 - name: runTitle
   type: string
   default: 'HitachiQA Unit Tests'
+- name: runsettings
+  type: string
+  default: default.runsettings
 
 
 steps:
@@ -22,5 +25,5 @@ steps:
   inputs:
     command: 'test'
     projects: '**/HitachiQA.UnitTests.dll'
-    arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/default.runsettings --no-build --filter ${{parameters.filter}}'
+    arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/${{runsettings}} --no-build --filter ${{parameters.filter}}'
     testRunTitle: ${{ parameters.runTitle }}
