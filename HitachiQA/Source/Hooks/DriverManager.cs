@@ -154,9 +154,9 @@ namespace HitachiQA.Hooks
                         ChromeOptions.AddArguments(optionsList);
                     }
 
-                    Log.Debug("initializing chromedriver");
+                    Log.Info("initializing chromedriver");
                     driver = new ChromeDriver(ChromeOptions);
-                    Log.Debug("initialized chromedriver");
+                    Log.Info("initialized chromedriver");
                     break;
 
                 case "firefox":
