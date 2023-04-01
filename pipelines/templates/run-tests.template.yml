@@ -25,5 +25,5 @@ steps:
   inputs:
     command: 'test'
     projects: '**/HitachiQA.UnitTests.dll'
-    arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/${{runsettings}} --no-build --filter ${{parameters.filter}}'
+    arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/${{parameters.runsettings}} --no-build --filter ${{parameters.filter}}'
     testRunTitle: ${{ parameters.runTitle }}
