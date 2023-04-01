@@ -32,68 +32,36 @@ stages:
     - job: Build
       pool:
         vmImage: 'ubuntu-latest'
-      displayName: 'Build job'
+      displayName: 'Build Test Publish'
       steps:
         - template: templates/build.template.yml
         - template: templates/run-tests.template.yml
+
+        - task: DotNetCoreCLI@2
+          condition: 'not(${{ parameters.MajorRelease }})'
+          displayName: 'pack'
+          inputs:
+            command: 'pack'
+            projects: '$(solution)'
+            searchPatternPack: '$(project)'
+            nobuild: true
+            outputDir: '$(System.DefaultWorkingDirectory)'
+            versioningScheme: 'byPrereleaseNumber'
+            majorVersion: '1'
+            minorVersion: '0.1'
+            includesource: true
+
+        - task: DotNetCoreCLI@2
+          condition: ${{ parameters.MajorRelease }}
+          displayName: 'pack'
+          inputs:
+            command: 'pack'
+            projects: '$(solution)'
+            searchPatternPack: '$(project)'
+            nobuild: true
+            outputDir: '$(System.DefaultWorkingDirectory)'
+            versioningScheme: off
+
         - template: templates/publish.template.yml
-
-    # - job: Test
-    #   dependsOn: Build
-    #   pool:
-    #     vmImage: 'ubuntu-latest'
-    #   steps:
-    #   - checkout: none
-    #   - task: DownloadBuildArtifacts@0
-    #     inputs:
-    #       buildType: 'current'
-    #       downloadType: 'single'
-    #       artifactName: 'drop'
-    #       downloadPath: '$(System.DefaultWorkingDirectory)'
-    #   - template: templates/run-tests.template.yml
-
-    - job: publishNugetFiles
-      dependsOn: Build
-      pool:
-        vmImage: 'ubuntu-latest'
-      steps:
-      - task: UseDotNet@2
-        inputs:
-          version: 6.0.x
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'build'
-          arguments: '--configuration $(buildConfiguration)'
-          projects: '$(project)'
-        displayName: 'dotnet build $(buildConfiguration)'
-        
-      - task: DotNetCoreCLI@2
-        condition: 'not(${{ parameters.MajorRelease }})'
-        displayName: 'pack'
-        inputs:
-          command: 'pack'
-          projects: '$(solution)'
-          searchPatternPack: '$(project)'
-          nobuild: true
-          outputDir: '$(System.DefaultWorkingDirectory)'
-          versioningScheme: 'byPrereleaseNumber'
-          majorVersion: '1'
-          minorVersion: '0.1'
-          includesource: true
-      - task: DotNetCoreCLI@2
-        condition: ${{ parameters.MajorRelease }}
-        displayName: 'pack'
-        inputs:
-          command: 'pack'
-          projects: '$(solution)'
-          searchPatternPack: '$(project)'
-          nobuild: true
-          outputDir: '$(System.DefaultWorkingDirectory)'
-          versioningScheme: off
-          
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathToPublish: '$(System.DefaultWorkingDirectory)'
-          artifactName: drop
 
      
