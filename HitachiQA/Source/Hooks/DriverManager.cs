@@ -149,11 +149,14 @@ namespace HitachiQA.Hooks
                         ChromeOptions.AddArgument("--start-maximized");
                         ChromeOptions.AddArgument("--no-sandbox"); // Bypass OS security model
                         ChromeOptions.AddArgument("--disable-dev-shm-usage");
+                        ChromeOptions.AddArgument("--disable-extensions");
                         ChromeOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
                         ChromeOptions.AddArguments(optionsList);
                     }
 
+                    Log.Debug("initializing chromedriver");
                     driver = new ChromeDriver(ChromeOptions);
+                    Log.Debug("initialized chromedriver");
                     break;
 
                 case "firefox":

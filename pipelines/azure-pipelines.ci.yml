@@ -35,23 +35,24 @@ stages:
       displayName: 'Build job'
       steps:
         - template: templates/build-and-publish.template.yml
+        - template: templates/run-tests.template.yml
 
-    - job: Test
-      dependsOn: Build
-      pool:
-        vmImage: 'ubuntu-latest'
-      steps:
-      - checkout: none
-      - task: DownloadBuildArtifacts@0
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(System.DefaultWorkingDirectory)'
-      - template: templates/run-tests.template.yml
+    # - job: Test
+    #   dependsOn: Build
+    #   pool:
+    #     vmImage: 'ubuntu-latest'
+    #   steps:
+    #   - checkout: none
+    #   - task: DownloadBuildArtifacts@0
+    #     inputs:
+    #       buildType: 'current'
+    #       downloadType: 'single'
+    #       artifactName: 'drop'
+    #       downloadPath: '$(System.DefaultWorkingDirectory)'
+    #   - template: templates/run-tests.template.yml
 
     - job: publishNugetFiles
-      dependsOn: Test
+      # dependsOn: Test
       pool:
         vmImage: 'ubuntu-latest'
       steps:
