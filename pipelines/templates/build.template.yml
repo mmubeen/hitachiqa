@@ -1,9 +1,15 @@
 #build.template.yml
-variables:
-  solution: '**/*.sln'
-  project: '**/*.csproj'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+parameters: 
+- name: buildConfiguration
+  type: string
+  default: 'Release'
+# - name: solution
+#   type: string
+#   default: '**/*.sln'
+- name: project
+  type: string
+  default: '**/*.csproj'
+
 
 steps:
 - task: UseDotNet@2
@@ -13,7 +19,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    arguments: '--configuration $(buildConfiguration)'
-    projects: '$(project)'
-  displayName: 'dotnet build $(buildConfiguration)'
+    arguments: '--configuration ${{parameters.buildConfiguration}}'
+    projects: '${{parameters.project}}'
+  displayName: 'dotnet build ${{parameters.buildConfiguration}}'
 
