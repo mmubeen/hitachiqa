@@ -17,7 +17,6 @@ stages:
     - job:
       steps:
       - template: 'templates/build.template.yml'
-      
       - template: templates/run-tests.template.yml
         parameters:
           filter: TestCategory=dynamics.fo
