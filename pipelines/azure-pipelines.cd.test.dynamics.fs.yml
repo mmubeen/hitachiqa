@@ -22,3 +22,4 @@ stages:
         parameters:
           filter: TestCategory=dynamics.fs
           runTitle: "Dynamics FS Unit Tests"
+          runsettings: dynamics.fs.runsettings
