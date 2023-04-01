@@ -42,6 +42,7 @@ namespace HitachiQA.Hooks
         [BeforeScenario(Order = 2)]
         public void invokeDriver(FeatureContext FT, ScenarioContext SC, IObjectContainer oc)
         {
+            oc.RegisterInstanceAs<BrowserIndicator>(BrowserIndicator);
 
             if (FT.FeatureInfo.Tags.Contains("NoBrowser") || SC.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
@@ -56,7 +57,6 @@ namespace HitachiQA.Hooks
                 var driver = invokeNewDriver(oc, browser);
 
             }
-            oc.RegisterInstanceAs<BrowserIndicator>(BrowserIndicator);
 
         }
 
@@ -97,8 +97,7 @@ namespace HitachiQA.Hooks
             }
             finally
             {
-                //this.Dispose();
-                //oc.Resolve<IWebDriver>().Dispose();
+                //oc.Resolve<DriverManager>().Dispose();
             }
 
         }
@@ -193,16 +192,18 @@ namespace HitachiQA.Hooks
                     }
                     throw new NotImplementedException($"Environment variable BROWSER value={browser} is not supported");
             }
+            oc.RegisterInstanceAs<IWebDriver>(driver, null, true);
+
             try
             {
                 driver.Navigate().GoToUrl(Main.Configuration.GetVariable("HOST"));
             }
-            catch(Exception) 
+            catch(Exception ex) 
             {
                 this.Dispose();
-                throw;
+                throw new Exception($"Failed navigating to Host {Main.Configuration.GetVariable("HOST", true)}", ex);
             }
-            oc.RegisterInstanceAs<IWebDriver>(driver, null, true);
+
             this.WebDriver = driver;
             return driver;
 
