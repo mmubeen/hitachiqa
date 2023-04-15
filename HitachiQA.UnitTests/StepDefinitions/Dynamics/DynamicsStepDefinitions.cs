@@ -1,5 +1,5 @@
 using HitachiQA.Driver;
-using HitachiQA.Dynamics.Pages;
+using HitachiQA.Dynamics.FS.Pages;
 using HitachiQA.Helpers;
 using HitachiQA.Source.Helpers;
 using HtmlAgilityPack;
@@ -13,10 +13,10 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
     [Binding]
     public class DynamicsStepDefinitions
     {
-        private Dynamics_LoginPage Page { get; }
+        private Dyn_LoginPage Page { get; }
         private IConfiguration Config;
 
-        public DynamicsStepDefinitions(Dynamics_LoginPage loginPage, IConfiguration Config)
+        public DynamicsStepDefinitions(Dyn_LoginPage loginPage, IConfiguration Config)
         {
             Page = loginPage;
             this.Config = Config;
