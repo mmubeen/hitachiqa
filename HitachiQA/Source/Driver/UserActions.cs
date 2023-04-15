@@ -13,7 +13,6 @@ using HtmlAgilityPack;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Runtime.CompilerServices;
 using DocumentFormat.OpenXml.Bibliography;
-using OpenQA.Selenium.DevTools.V103.IndexedDB;
 using Polly;
 using AngleSharp.Text;
 

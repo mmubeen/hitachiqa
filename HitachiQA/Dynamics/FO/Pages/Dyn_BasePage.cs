@@ -50,7 +50,7 @@ namespace HitachiQA.Dynamics.FO.Pages
         public void SwitchCompanyContext(string companyName)
         {
             CompanyButton.Click();
-            Thread.Sleep(500);
+            Thread.Sleep(300);
             CompanyLookup.SetFieldValue(companyName);
             Thread.Sleep(2000);
         }
