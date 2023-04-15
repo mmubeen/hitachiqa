@@ -36,11 +36,16 @@ namespace HitachiQA.UnitTests.StepDefinitions
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
             UserActions.OpenNewTab();
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
+            new Element(By.XPath("//*[@title='Open mobile navigation']"), UserActions).TryClick();
+
             new Element(By.XPath("//*[contains(text(), 'Contact us')]"), UserActions).Click();
+            var contactUsElement = new Element(By.XPath("//*[@data-formtitle='Contact Us']"), UserActions);
+            contactUsElement.assertElementIsPresent(5);
+
             UserActions.SwitchContext();
             Log.Info(UserActions.Title);
             //DriverManager.SwitchWindowContext();
-            new Element(By.XPath("//*[text()='Contact Us � We�d like to hear from you!']"), UserActions).assertElementNotPresent(5);
+            contactUsElement.assertElementNotPresent(5);
 
             this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }
