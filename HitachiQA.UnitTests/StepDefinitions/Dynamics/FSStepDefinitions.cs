@@ -1,5 +1,4 @@
 using HitachiQA.Dynamics.FS.Pages;
-using HitachiQA.Dynamics.Pages;
 using HitachiQA.Source.Helpers;
 using System;
 using TechTalk.SpecFlow;
@@ -11,10 +10,10 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
     {
         private Dyn_BasePage Page { get; }
         private SharedData SharedData { get; }
-        private Dynamics_AppsLandingPage AppsLandingPage { get; }
+        private Dyn_AppsLandingPage AppsLandingPage { get; }
 
 
-        public FSStepDefinitions(Dyn_BasePage Page, SharedData SD, Dynamics_AppsLandingPage FS_ALP)
+        public FSStepDefinitions(Dyn_BasePage Page, SharedData SD, Dyn_AppsLandingPage FS_ALP)
         {
             this.Page = Page;
             this.SharedData = SD;
