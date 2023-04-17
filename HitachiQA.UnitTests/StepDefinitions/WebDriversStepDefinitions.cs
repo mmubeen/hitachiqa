@@ -36,9 +36,16 @@ namespace HitachiQA.UnitTests.StepDefinitions
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
             UserActions.OpenNewTab();
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
-            new Element(By.XPath("//*[@title='Open mobile navigation']"), UserActions).TryClick();
+            
+            if(new Element(By.XPath("//*[@title='Open mobile navigation']"), UserActions).TryClick())
+            {
+                new Element(By.XPath("(//*[contains(text(), 'Contact us')])[2]"), UserActions).Click();
+            }
+            else
+            {
+                new Element(By.XPath("(//*[contains(text(), 'Contact us')])[1]"), UserActions).Click();
+            }
 
-            new Element(By.XPath("//*[contains(text(), 'Contact us')]"), UserActions).Click();
             var contactUsElement = new Element(By.XPath("//*[@data-formtitle='Contact Us']"), UserActions);
             contactUsElement.assertElementIsPresent(5);
 

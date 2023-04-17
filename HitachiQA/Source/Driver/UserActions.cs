@@ -1582,7 +1582,7 @@ namespace HitachiQA.Driver
             var retry = Policy.HandleResult<bool>(false)
             .WaitAndRetry(retries);
 
-            retry.Execute(()=>{
+            return retry.Execute(()=>{
                 if (this.ElementExists(locator, out IWebElement? element) && element.Displayed && element.Enabled)
                 {
                     element.NullGuard();
@@ -1592,7 +1592,6 @@ namespace HitachiQA.Driver
                 return false;
             });
            
-            return false;        
         }
         public void SendKeys(string key)
         {
