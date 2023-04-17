@@ -24,14 +24,14 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 
 > **Approach 1 (internal):** Not recommended for clients (useful until approach 2 is completed)
 >1. Make sure user is authenticated in Tools->Options->Azure Service Authentication
->2. Make sure user has contributor access to the [Fuctional Testing](https://dev.azure.com/HitachiQA/Functional%20Testing) project in ADO
->3. Add the HitachiQA feed to Visual Studio, instructions [here](https://dev.azure.com/HitachiQA/Functional%20Testing/_artifacts/feed/HitachiQA/connect/visual%20studio) (Options > NuGet Package Manager > Package Sources)
+>2. Make sure user has contributor access to the [Fuctional Testing](https://tfs-hisol-crm.visualstudio.com/_git/HitachiQA) project in ADO
+>3. Add the HitachiQA feed to Visual Studio, instructions [here](https://tfs-hisol-crm.visualstudio.com/HitachiQA/_artifacts/feed/HitachiFeed/connect/visual%20studio) (Options > NuGet Package Manager > Package Sources)
 
-> **Approach 2 (external):** In order to push binaries to other projects, we use the following [Pipeline](https://dev.azure.com/HitachiQA/Functional%20Testing/_build?definitionId=4)
+> **Approach 2 (external):** In order to push binaries to other projects, we use the following [Pipeline](https://tfs-hisol-crm.visualstudio.com/HitachiQA/_build?definitionId=113)
 >1. On the other project, check if a feed already exists, if not create a Feed (preferably named `HitachiQA` or `HitachiTest`), it's url will be used in step 3.
 >2. [retrieve a PAT](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate)
->3. create a new Service Connection with the follwing naming convention ```<Project>_<your name>_ServiceConnection```, instructions [Here](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/nuget#:~:text=To%20publish%20a%20package%20to,Save%20when%20you%20are%20done.)
->4. Edit HitachiQA.ExternalOrgPush pipeline here add the newly created Service Connection name URL found [Here](https://dev.azure.com/HitachiQA/Functional%20Testing/_git/HitachiQA?path=/azure-pipelines-external-push.yml)
+>3. create a new Service Connection with the follwing naming convention ```<Project>_<your name>_ServiceConnection```, instructions [Here](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml)
+>4. Edit HitachiQA.ExternalOrgPush pipeline here add the newly created Service Connection name URL found [Here](https://tfs-hisol-crm.visualstudio.com/HitachiQA/_apps/hub/ms.vss-build-web.ci-designer-hub?pipelineId=113&branch=master)
 >5. kick off the pipeline with the three arguments above
 >6. Add the feed on step 1 to Visual Studio (Options > NuGet Package Manager > Package Sources, similar to Approach 1->Step 3)
 
