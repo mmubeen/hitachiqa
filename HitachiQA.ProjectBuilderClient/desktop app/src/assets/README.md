@@ -1,6 +1,6 @@
 # Introduction 
  
-## **Getting Started on implementing projects**
+## **Getting Started on implementing projects** (Automated by this app)
 
 The objective is to create another project and then use HitachiQA as a nuget package. Example [Here](https://github.com/Hitachi-SolutionsQA/Demo)
 1. Download `Visual Studio 2022`
