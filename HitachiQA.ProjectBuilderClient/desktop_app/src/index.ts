@@ -85,7 +85,10 @@ async function runScript(event: any, script: string){
       '-NoProfile': true,
     }});
   
-  const filePath = path.join(app.getAppPath(), '.webpack/renderer', script);
+  const rendererPath = path.join(app.getAppPath(), '.webpack/renderer')
+  const assets = path.join(app.getAppPath(), '.webpack/renderer/assets')
+  script = script+` -assetsDir ${assets}`
+  const filePath = path.join(rendererPath, script)
 
   console.log(filePath)
   let result = await ps.invoke(filePath).catch(e=> {

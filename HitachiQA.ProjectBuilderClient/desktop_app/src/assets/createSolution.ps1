@@ -3,7 +3,8 @@ param (
     [string]$projectName = $(throw "Please specify the projectName."),
     [string]$targetFramework = "net6.0",
     [string]$targetHost = $(throw "Please specify the targetHost."),
-    [string]$outputFolder = $(throw "please provide output folder")
+    [string]$outputFolder = $(throw "please provide output directory"),
+    [string]$assetsDir = $(throw "please provide assets directory")
 )
 
 Write-Host "Project Name: $projectName"
@@ -12,8 +13,6 @@ Write-Host "Target Host: $targetHost"
 Write-Host "Output Folder: $outputFolder"
 
 Set-Location -Path $outputFolder
-Write-Host "Working Directory: $pwd"
-
 #
 # Check if specflow template exists
 #
@@ -46,14 +45,14 @@ New-Item -ItemType Directory -Path ./Features
 New-Item -ItemType Directory -Path ./StepDefinitions
 New-Item -ItemType Directory -Path ./Pages
 
-Copy-Item "../assets/default.runsettings"   ./
-Copy-Item "../assets/ImplicitUsings.cs"     ./
-Copy-Item "../assets/Nuget.config"          ./
-Copy-Item "../assets/specflow.json"         ./
+Copy-Item "$assetsDir/assets/default.runsettings"   ./
+Copy-Item "$assetsDir/assets/ImplicitUsings.cs"     ./
+Copy-Item "$assetsDir/assets/Nuget.config"          ./
+Copy-Item "$assetsDir/assets/specflow.json"         ./
 
-Copy-Item "../assets/HsalSearch.feature"    ./Features/
-Copy-Item "../assets/HsalSearchSteps.cs"    ./StepDefinitions/
-Copy-Item "../assets/HsalHome.cs"           ./Pages/
+Copy-Item "$assetsDir/assets/HsalSearch.feature"    ./Features/
+Copy-Item "$assetsDir/assets/HsalSearchSteps.cs"    ./StepDefinitions/
+Copy-Item "$assetsDir/assets/HsalHome.cs"           ./Pages/
 
 
 $fileNames = @()
@@ -78,5 +77,7 @@ foreach($fileName in $fileNames)
 dotnet add package SpecFlow.MsTest --version 3.9.74
 dotnet add package FluentAssertions --version 6.10.0
 dotnet add package HitachiQA -n --version 1.0.1
+dotnet add package MSTest.TestAdapter --version 1.0.1
+dotnet add package Microsoft.NET.Test.Sdk --version 17.3.2
 
 cd ../

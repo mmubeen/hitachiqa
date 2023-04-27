@@ -1,8 +1,12 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box,  Typography, SelectProps } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, SelectProps, ListItemButton, ListItemText } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 
 interface FormData {
@@ -25,8 +29,8 @@ const Form: React.FC = () => {
     outputFolderError: false,
     result: ''
   });
-
   const [loading, setLoading] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement  | { name?: string; value: unknown }>| SelectProps<string>) => {
 
@@ -49,18 +53,32 @@ const Form: React.FC = () => {
   const onSubmit = async (formData: FormData)=>{
     console.log(formData) 
     setLoading(true);
-    let args = ` -projectName ${formData.projectName} -targetFramework ${formData.targetFramework} -targetHost ${formData.host} -outputFolder ${formData.outputFolder}`
+    let args = ` -projectName ${formData.projectName} -targetFramework ${formData.targetFramework} -targetHost ${formData.host} -outputFolder "${formData.outputFolder}"`
     let result = await window.electronAPI.runScript("/assets/createSolution.ps1"+args)
                 .finally(()=>{
                   setLoading(false);
                 })
+            
     setFormData((prevFormData) => ({ ...prevFormData, "result": 'raw' in result? result.raw:result }));
 
+    if("hadErrors" in result)
+    {
+      if(!result.hasErrors)
+      {
+        handleOpenDialog();
+      }
+    }
     console.log("result: ")
     console.log(result)
   }
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
 
   const openDir = async ()=>{
@@ -82,6 +100,7 @@ const Form: React.FC = () => {
 
 
   return (
+    <div>
     <Box component="form" onSubmit={handleSubmit} sx={{ margin: 2 }}>
       <TextField
         required
@@ -155,9 +174,6 @@ const Form: React.FC = () => {
         style={{minWidth: "200px"}}
         
       >Build Project</LoadingButton>
-      {/* <Button type="submit" variant="contained">
-        Build Project
-      </Button> */}
       </FormControl>
       <FormControl fullWidth sx={{m: 1}}>
       <TextField
@@ -172,6 +188,34 @@ const Form: React.FC = () => {
       </FormControl>
       
     </Box>
+    <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {`Successfully Built ${formData.projectName}`}
+        </DialogTitle>
+        <DialogContent>
+          <h4>Next Steps:</h4>
+          <DialogContentText id="alert-dialog-description">
+            - Download Visual Studio 2022
+          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            - Install specflow for Visual Studio 2022 extension
+          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            - Build and run your first test
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} autoFocus>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 };
 
