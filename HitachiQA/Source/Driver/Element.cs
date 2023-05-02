@@ -233,18 +233,19 @@ namespace HitachiQA.Driver
         [Obsolete("please use SetFieldValue(string value) instead")]
         public void setValue(string fieldType, string value)
         {
-            switch (fieldType.ToLower())
-            {
-                case "input":
-                    this.setText(value);
-                    break;
-                case "dropdown":
-                    this.SelectMatDropdownOptionByText(value);
-                    break;
-                default:
-                    Functions.handleFailure(new NotImplementedException($"Field type: {fieldType} is not implemented"));
-                    break;
-            }
+            throw new NotImplementedException();
+            //switch (fieldType.ToLower())
+            //{
+            //    case "input":
+            //        this.setText(value);
+            //        break;
+            //    case "dropdown":
+            //        this.SelectMatDropdownOptionByText(value);
+            //        break;
+            //    default:
+            //        Functions.handleFailure(new NotImplementedException($"Field type: {fieldType} is not implemented"));
+            //        break;
+            //}
         }
 
         public void SetFieldValue(string value)
@@ -263,11 +264,11 @@ namespace HitachiQA.Driver
         {
             UserActions.OpenFieldValue(locator);
         }
-        public void AssertFieldIsReadOnly()
+        public void AssertFieldIsReadOnlyDynamics()
         {
             new Element(By.XPath(this.locator.Locator.Criteria+"//*[contains(@data-id,'locked-icon')]", this.locator.IFrameLocator), UserActions).assertElementIsPresent();
         }
-        public void AssertFieldIsNotReadOnly()
+        public void AssertFieldIsNotReadOnlyDynamics()
         {
             //
             //because we need to add a condition, the xpath on this field might not end with ]. 
@@ -282,21 +283,25 @@ namespace HitachiQA.Driver
         //
         //  Text Fields Actions
         //
+        [Obsolete("please use SetFieldValue(string value) instead")]
         public void setText(String TextToEnter, int? wait_Seconds = null)
         {
             UserActions.setText(locator, TextToEnter, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
+        [Obsolete("please use GetFieldValue() instead")]
         public string getTextFieldText(int? wait_Seconds = null)
         {
            return  UserActions.getTextFieldText(locator, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
+        [Obsolete("please use SetFieldValue(string.empty) instead")]
         public void clearTextField()
         {
             UserActions.clearTextField(locator);
         }
 
+        [Obsolete("please use GetFieldValue().should().be(expected) instead")]
         public void assertTextFieldTextEquals(string expected)
         {
             string elementText = this.getTextFieldText();
@@ -305,7 +310,7 @@ namespace HitachiQA.Driver
 
         }
 
-        [Obsolete("Please use assertTextFieldTextEquals(string expected)")]
+        [Obsolete("please use GetFieldValue().should().be(expected) instead")]
         public bool assertTextFieldTextEquals(string expected, bool optional=false)
         {
             string elementText = this.getTextFieldText();
@@ -316,65 +321,7 @@ namespace HitachiQA.Driver
             Functions.handleFailure(new Exception($"Text Field {locator.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}"), optional);
             return false;
         }
-
-        // 
-        // Dropdown actions 
-        // 
-
-        public void SelectMatDropdownOptionByText( string optionDisplayText)
-        {
-            UserActions.SelectMatDropdownOptionByText(locator, optionDisplayText);
-        }
-
-        public void SelectMatDropdownOptionContainingText(string optionDisplayText)
-        {
-            UserActions.SelectMatDropdownOptionContainingText(locator, optionDisplayText);
-        }
-
-        public void SelectMatDropdownOptionByIndex(int LogicalIndex, out string selectionDisplayName)
-        {
-            UserActions.SelectMatDropdownOptionByIndex(locator, LogicalIndex, out selectionDisplayName);
-        }
-
-        public void SelectMatDropdownOptionByIndex(int LogicalIndex)
-        {
-            UserActions.SelectMatDropdownOptionByIndex(locator, LogicalIndex);
-        }
-
-        public void AssertMatDropdownOptionsContain(string optionText)
-        {
-            List<string> dropdownOptions = UserActions.GetAllMatDropdownOptions(locator).ToList();
-
-            dropdownOptions.Should().Contain(optionText);
-        }
-
-        [Obsolete("Please use AssertMatDropdownOptionsContain(string optionText)")]
-        public bool AssertMatDropdownOptionsContain(string optionText, bool optional = false)
-        {
-            List<string> dropdownOptions = UserActions.GetAllMatDropdownOptions(locator).ToList();
-
-            return Assert.Contains(dropdownOptions, optionText, optional);
-        }
-
-        public void AssertMatDropdownOptionsEqual(List<String> optionsText)
-        {
-            List<String> dropdownOptions = UserActions.GetAllMatDropdownOptions(locator).ToList();
-
-            dropdownOptions.Should().BeEquivalentTo(optionsText);
-        }
-
-        [Obsolete("Please use AssertMatDropdownOptionsEqual(List<String> optionsText)")]
-        public bool AssertMatDropdownOptionsEqual(List<String> optionsText, bool optional = false)
-        {
-            List<String> dropdownOptions = UserActions.GetAllMatDropdownOptions(locator).ToList();
-
-            dropdownOptions.ForEach(it => Log.Debug("dropdownOptions: " + it));
-            return Assert.AreEqual(dropdownOptions, optionsText, optional);
-        }
-        public IEnumerable<string> GetMatdropdownOptionsText()
-        {
-            return UserActions.GetAllMatDropdownOptions(locator);
-        }
+       
 
         //
         // RADIO BUTTON
@@ -406,7 +353,7 @@ namespace HitachiQA.Driver
             return UserActions.GetGridItems(locator);
         }
         /// <summary>
-        /// To be executed on a Grid element
+        /// To be executed on a Grid element of dynamics
         /// Opens first record found with a matching column name or value.
         /// Fails if no record found
         /// </summary>
@@ -414,27 +361,56 @@ namespace HitachiQA.Driver
         {
             UserActions.OpenGridRecord(locator, columnName, value); 
         }
+        /// <summary>
+        /// To be executed on a Grid element of dynamics
+        /// Opens record at a given index
+        /// Fails if no record found
+        /// </summary>
         public void OpenGridRecord(int LogicalIndex)
         {
             UserActions.OpenGridRecord(locator, "index", (LogicalIndex+1).ToString());
         }
+        /// <summary>
+        /// To be executed on a Grid element of dynamics
+        /// selects the first record found with a matching column name or value.
+        /// Fails if no record found
+        /// </summary>
         public void SelectGridRecord(string columnName, string value)
         {
             UserActions.SelectGridRecord(locator, columnName, value);
         }
+
+        /// <summary>
+        /// To be executed on a Grid element of dynamics
+        /// selects record at a given index
+        /// Fails if no record found
+        /// </summary>
         public void SelectGridRecord(int LogicalIndex)
         {
             UserActions.SelectGridRecord(locator, "index", (LogicalIndex + 1).ToString());
         }
+
+        /// <summary>
+        /// To be executed on a Grid element of dynamics
+        /// selects the select all button on the header row
+        /// </summary>
         public void SelectAllGridRecords()
         {
             this.UserActions.SelectAllGridRecords(locator);
         }
+
+        /// <summary>
+        /// To be executed on a Grid element of dynamics
+        /// selects the select all button on the header row
+        /// </summary>
         public void SortGridColumn(string columnName, string filterByString = "", bool descendingSort = false, string comparisonOperation = "")
         {
             this.UserActions.SortGridColumn(locator, columnName, filterByString, descendingSort, comparisonOperation); 
         }
 
+        /// <summary>
+        /// simulates the user's action of drag and drop to upload files
+        /// </summary>
         public void UploadFile(string filePath)
         {
             UserActions.UploadFile(locator, filePath);
