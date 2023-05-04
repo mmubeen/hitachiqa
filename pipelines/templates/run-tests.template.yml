@@ -20,6 +20,8 @@ steps:
     folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net6.0'
     fileType: 'json'
 
+- pwsh: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net6.0/playwright.ps1 install --with-deps'
+
 - task: DotNetCoreCLI@2
   displayName: "Unit Tests"
   inputs:
