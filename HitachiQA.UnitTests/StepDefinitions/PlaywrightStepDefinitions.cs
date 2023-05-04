@@ -1,5 +1,5 @@
 using HitachiQA.Helpers;
-using HitachiQA.Source.Playwright;
+using HitachiQA.Playwright;
 using Microsoft.Playwright;
 using System;
 using TechTalk.SpecFlow;

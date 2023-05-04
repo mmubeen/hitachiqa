@@ -210,7 +210,7 @@ const Form: React.FC = () => {
       
     </Box>
     <Dialog
-        open={openDialog}
+        open={true}
         onClose={handleCloseDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -227,7 +227,8 @@ const Form: React.FC = () => {
             - Install specflow for Visual Studio 2022 extension
           </DialogContentText>
           <DialogContentText id="alert-dialog-description">
-            - Build and run your first test
+            - Build and run your first test <br />
+           note: you might be asked to authenticate, use your Hitachi credentials
           </DialogContentText>
         </DialogContent>
         <DialogActions>
