@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HitachiQA.Source.Playwright
+namespace HitachiQA.Playwright
 {
     public static class LocatorExtensions
     {

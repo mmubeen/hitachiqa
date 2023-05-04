@@ -19,7 +19,7 @@ using TechTalk.SpecFlow;
 using WebDriverManager.DriverConfigs.Impl;
 using WebDriverManager.Helpers;
 using NetDriverManager = WebDriverManager.DriverManager;
-using HitachiQA.Source.Playwright;
+using HitachiQA.Playwright;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HitachiQA.Hooks
@@ -58,21 +58,20 @@ namespace HitachiQA.Hooks
 
                 IConfiguration config= oc.Resolve<IConfiguration>();
                 var browser = config.GetVariable("BROWSER");
-                var driver = config.GetVariable("DRIVER", true);
+                var framework = config.GetVariable("FRAMEWORK", true);
 
                 //if no selenium tag
                 //and either driver is playwright or feature tag contains playwright
                 //           
-                if (!featureTags.Contains("Selenium", ignorecase) && (driver?.ToUpper() == "PLAYWRIGHT" || featureTags.Contains("Playwright", ignorecase)))
+                if (!featureTags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || featureTags.Contains("Playwright", ignorecase)))
                 {
                     PlaywrightEngine = oc.Resolve<IPlaywright>();
 
                     PlaywrightBrowser = oc.Resolve<IBrowser>();
-                    PlaywrightBrowserContext = PlaywrightBrowser.CreateNewContext();
+                    PlaywrightBrowserContext = PlaywrightBrowser.CreateNewContext(Main.Configuration.GetVariable("HOST"));
                     PlaywrightPage = PlaywrightBrowserContext.CreateNewPage();
                     oc.RegisterInstanceAs<IBrowserContext>(PlaywrightBrowserContext);
                     oc.RegisterInstanceAs<IPage>(PlaywrightPage);
-                    PlaywrightPage.GotoAsync(Main.Configuration.GetVariable("HOST")).Wait();
                     oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(PlaywrightPage, TestContext));
                 }
                 else
@@ -97,9 +96,9 @@ namespace HitachiQA.Hooks
 
                 IConfiguration config = oc.Resolve<IConfiguration>();
                 var browser = config.GetVariable("BROWSER");
-                var driver = config.GetVariable("DRIVER", true);
+                var framework = config.GetVariable("FRAMEWORK", true);
                 
-                if(!tags.Contains("Selenium", ignorecase) && (driver?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase)))
+                if(!tags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase)))
                 {
                     var b = InvokeNewPlaywrightBrowser(oc, browser);
                     oc.RegisterInstanceAs<IBrowser>(b);
@@ -293,7 +292,7 @@ namespace HitachiQA.Hooks
         [BeforeTestRun]
         public static async Task InvokePlaywright(IObjectContainer container)
         {
-            container.RegisterInstanceAs<IPlaywright>(await Playwright.CreateAsync());
+            container.RegisterInstanceAs<IPlaywright>(await Microsoft.Playwright.Playwright.CreateAsync());
         }
     }
 
