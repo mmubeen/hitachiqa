@@ -12,22 +12,25 @@ import DialogTitle from '@mui/material/DialogTitle';
 interface FormData {
   projectName: string;
   host: string;
-  targetFramework: string;
+  dotnetFramework: string;
   outputFolder: string;
   outputFolderError: boolean;
-  result: string
+  result: string,
+  framework: string
 }
 
-const targetFrameworkOptions = ['net6.0', 'net7.0'];
+const dotnetFrameworkOptions = ['net6.0', 'net7.0'];
+const frameworkOptions = ['Playwright', 'Selenium'];
 
 const Form: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     projectName: '',
     host: 'https://www.hitachi.us',
-    targetFramework: targetFrameworkOptions[0],
+    dotnetFramework: dotnetFrameworkOptions[0],
     outputFolder: '',
     outputFolderError: false,
-    result: ''
+    result: '',
+    framework: "Selenium"
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -53,7 +56,7 @@ const Form: React.FC = () => {
   const onSubmit = async (formData: FormData)=>{
     console.log(formData) 
     setLoading(true);
-    let args = ` -projectName ${formData.projectName} -targetFramework ${formData.targetFramework} -targetHost ${formData.host} -outputFolder "${formData.outputFolder}"`
+    let args = ` -projectName ${formData.projectName} -dotnetFramework ${formData.dotnetFramework} -targetHost ${formData.host} -outputFolder "${formData.outputFolder}" -framework ${formData.framework}`
     let result = await window.electronAPI.runScript("/assets/createSolution.ps1"+args)
                 .finally(()=>{
                   setLoading(false);
@@ -129,17 +132,35 @@ const Form: React.FC = () => {
         helperText={formData.host!=="" && !/^(https?:\/\/).*/.test(formData.host)? "make the URL it starts with http:// or https://":""}
       />
       <FormControl required sx={{ m: 1, mb: 2 }}>
-        <InputLabel id="target-framework-label">Target Framework</InputLabel>
+        <InputLabel id="dotnet-framework-label">Dotnet Framework</InputLabel>
         <Select
-          labelId="target-framework-label"
-          id="target-framework-select"
-          name="targetFramework"
-          value={formData.targetFramework}
-          label="Target Framework"
+          labelId="dotnet-framework-label"
+          id="dotnet-framework-select"
+          name="dotnetFramework"
+          value={formData.dotnetFramework}
+          label="Dotnet Framework"
           onChange={handleChange}
           style={{minWidth:"150px"}}
         >
-          {targetFrameworkOptions.map((option) => (
+          {dotnetFrameworkOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl required sx={{ m: 1, mb: 2 }}>
+        <InputLabel id="framework-label">Framework</InputLabel>
+        <Select
+          labelId="framework-label"
+          id="framework-select"
+          name="framework"
+          value={formData.framework}
+          label="Framework"
+          onChange={handleChange}
+          style={{minWidth:"150px"}}
+        >
+          {frameworkOptions.map((option) => (
             <MenuItem key={option} value={option}>
               {option}
             </MenuItem>

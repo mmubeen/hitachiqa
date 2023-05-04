@@ -1,16 +1,18 @@
 
 param (
     [string]$projectName = $(throw "Please specify the projectName."),
-    [string]$targetFramework = "net6.0",
+    [string]$dotnetFramework = "net6.0",
     [string]$targetHost = $(throw "Please specify the targetHost."),
     [string]$outputFolder = $(throw "please provide output directory"),
-    [string]$assetsDir = $(throw "please provide assets directory")
+    [string]$assetsDir = $(throw "please provide assets directory"),
+    [string]$framework = $(throw "please provide a framework options ('playwright', 'selenium')")
 )
 
 Write-Host "Project Name: $projectName"
-Write-Host "Target Framework: $targetFramework"
+Write-Host "Dotnet Framework: $dotnetFramework"
 Write-Host "Target Host: $targetHost"
 Write-Host "Output Folder: $outputFolder"
+Write-Host "Framework: $framework"
 
 Set-Location -Path $outputFolder
 #
@@ -32,7 +34,7 @@ if (!$templateExists) {
 }
 
 dotnet new sln -n $projectName -o ./$projectName
-dotnet new mstest -n $projectName -f $targetFramework
+dotnet new mstest -n $projectName -f $dotnetFramework
 
 cd ./$projectName
 
@@ -51,8 +53,19 @@ Copy-Item "$assetsDir/assets/Nuget.config"          ./
 Copy-Item "$assetsDir/assets/specflow.json"         ./
 
 Copy-Item "$assetsDir/assets/HsalSearch.feature"    ./Features/
-Copy-Item "$assetsDir/assets/HsalSearchSteps.cs"    ./StepDefinitions/
-Copy-Item "$assetsDir/assets/HsalHome.cs"           ./Pages/
+if ($framework -ieq "playwright") {
+    Copy-Item "$assetsDir/assets/playwright/HsalSearchSteps.cs"    ./StepDefinitions/
+    Copy-Item "$assetsDir/assets/playwright/HsalHome.cs"           ./Pages/    
+    Copy-Item "$assetsDir/assets/playwright/appsettings.json"           ./    
+
+    
+} else {
+    Copy-Item "$assetsDir/assets/selenium/HsalSearchSteps.cs"    ./StepDefinitions/
+    Copy-Item "$assetsDir/assets/selenium/HsalHome.cs"           ./Pages/    
+    Copy-Item "$assetsDir/assets/selenium/appsettings.json"           ./    
+
+}
+
 
 
 $fileNames = @()
@@ -67,8 +80,19 @@ foreach($fileName in $fileNames)
     $fileContent = Get-Content $fileName
     $fileContent = $fileContent -replace "{{ProjectName}}", $projectName
     $fileContent = $fileContent -replace "{{TargetHost}}", $targetHost
+    
+#please keep formatting as is
     $fileContent = $fileContent -replace "</TargetFramework>", '</TargetFramework>
 	<RunSettingsFilePath>$(MSBuildProjectDirectory)\default.runsettings</RunSettingsFilePath>'
+
+#please keep formatting as is
+    $fileContent = $fileContent -replace "</Project>", '  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>'
 
     $fileContent | Set-Content $fileName
 }
@@ -76,7 +100,8 @@ foreach($fileName in $fileNames)
 
 dotnet add package SpecFlow.MsTest --version 3.9.74
 dotnet add package FluentAssertions --version 6.10.0
-dotnet add package HitachiQA -n --version 1.0.1
+dotnet add package HitachiQA -n --version 1.0.2
+#dotnet add package HitachiQA -n --version 1.0.1-CI-20230504-020919
 dotnet add package MSTest.TestAdapter --version 1.0.1
 dotnet add package Microsoft.NET.Test.Sdk --version 17.3.2
 
