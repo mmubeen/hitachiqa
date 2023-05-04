@@ -80,7 +80,7 @@ foreach($fileName in $fileNames)
     $fileContent = Get-Content $fileName
     $fileContent = $fileContent -replace "{{ProjectName}}", $projectName
     $fileContent = $fileContent -replace "{{TargetHost}}", $targetHost
-    
+
 #please keep formatting as is
     $fileContent = $fileContent -replace "</TargetFramework>", '</TargetFramework>
 	<RunSettingsFilePath>$(MSBuildProjectDirectory)\default.runsettings</RunSettingsFilePath>'
@@ -104,5 +104,13 @@ dotnet add package HitachiQA -n --version 1.0.2
 #dotnet add package HitachiQA -n --version 1.0.1-CI-20230504-020919
 dotnet add package MSTest.TestAdapter --version 1.0.1
 dotnet add package Microsoft.NET.Test.Sdk --version 17.3.2
+
+dotnet tool install --global PowerShell
+
+pwsh bin/Debug/$dotnetFramework/playwright.ps1 install
+
+
+
+
 
 cd ../

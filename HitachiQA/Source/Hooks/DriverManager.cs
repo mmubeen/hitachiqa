@@ -68,18 +68,18 @@ namespace HitachiQA.Hooks
                     PlaywrightEngine = oc.Resolve<IPlaywright>();
 
                     PlaywrightBrowser = oc.Resolve<IBrowser>();
-                    PlaywrightBrowserContext = PlaywrightBrowser.CreateNewContext(Main.Configuration.GetVariable("HOST"));
+                    PlaywrightBrowserContext = PlaywrightBrowser.CreateNewContext(Configuration.GetVariable("HOST"));
                     PlaywrightPage = PlaywrightBrowserContext.CreateNewPage();
                     oc.RegisterInstanceAs<IBrowserContext>(PlaywrightBrowserContext);
                     oc.RegisterInstanceAs<IPage>(PlaywrightPage);
                     oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(PlaywrightPage, TestContext));
+                    PlaywrightPage.GotoAsync("/");
                 }
                 else
                 {
                     invokeNewSeleniumDriver(oc, browser);
                     WebDriver.NullGuard();
                     oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(WebDriver, TestContext));
-
                 }
 
 

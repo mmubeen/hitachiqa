@@ -210,7 +210,7 @@ const Form: React.FC = () => {
       
     </Box>
     <Dialog
-        open={true}
+        open={openDialog}
         onClose={handleCloseDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
