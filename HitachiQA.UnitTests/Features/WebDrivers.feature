@@ -20,7 +20,7 @@ Examples:
 
 Scenario: Navigating to a site
 	Given Browser is up
-	Then user should land on HSAL homepage
+	Then user should land on HSAL homepage selenium
 
 @NoBrowser
 Scenario: Browser options can be set

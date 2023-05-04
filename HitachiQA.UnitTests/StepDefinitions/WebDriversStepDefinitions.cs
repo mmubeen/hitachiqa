@@ -6,7 +6,6 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using HitachiQA.Helpers;
 using FluentAssertions.Extensions;
-using HitachiQA.Source.Helpers;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {
@@ -30,7 +29,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             this.ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Should().NotBeNull();
         }
 
-        [Then(@"user should land on HSAL homepage")]
+        [Then(@"user should land on HSAL homepage selenium")]
         public void ThenUserShouldLandOnHSALHomepage()
         {
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
@@ -67,7 +66,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [When(@"""([^""]*)"" is invoked")]
         public void WhenIsInvoked(string browser)
         {
-            DriverManager.invokeNewDriver(ObjectContainer, browser);
+            DriverManager.invokeNewSeleniumDriver(ObjectContainer, browser);
         }
 
 

@@ -1,12 +1,9 @@
 using HitachiQA.Driver;
 using HitachiQA.Dynamics.FS.Pages;
 using HitachiQA.Helpers;
-using HitachiQA.Source.Helpers;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
-using System;
-using TechTalk.SpecFlow;
+
 
 namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
 {
@@ -31,12 +28,12 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
         [When(@"user signs in")]
         public void WhenUserSignsIn()
         {
-            Page.UsernameTextField.setText(Config["dynamics.username"]);
+            Page.UsernameTextField.SetFieldValue(Config["dynamics.username"]);
 
             //Next button
             Page.SubmitButton.Click();
 
-            Page.PasswordTextField.setText(Config["dynamics.password"]);
+            Page.PasswordTextField.SetFieldValue(Config["dynamics.password"]);
 
             //Sign in button
             Page.SubmitButton.Click();

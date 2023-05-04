@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
-namespace HitachiQA.Source.Helpers
+namespace HitachiQA.Helpers
 {
     [Binding]
     public class SharedData : Dictionary<string, Dictionary<string, object>>

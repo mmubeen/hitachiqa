@@ -1,6 +1,6 @@
 using HitachiQA.Driver;
 using HitachiQA.Helpers;
-using HitachiQA.Source.Helpers;
+using HitachiQA.Source;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -53,7 +53,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             {
                 var fieldDoc = new HtmlDocument();
                 fieldDoc.LoadHtml(knownHTML);
-                KeyValuePair<string, string> matchingPair = UserActions.FindKnownXPathMatchingPair(fieldDoc, out _, By.XPath("unit test placeholder"));
+                KeyValuePair<string, string> matchingPair = FieldAutoDetector.FindKnownXPathMatchingPair(fieldDoc, out _, By.XPath("unit test placeholder"));
 
                 matchingPairs.Add(matchingPair);
             }

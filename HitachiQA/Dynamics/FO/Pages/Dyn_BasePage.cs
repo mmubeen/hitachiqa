@@ -32,7 +32,7 @@ namespace HitachiQA.Dynamics.FO.Pages
 
         public void SetGridQuickFilterValue(string filterByColumn, string Criteria)
         {
-            Element($"//input[@name='GridFilter_Input']").setText(Criteria);
+            Element($"//input[@name='GridFilter_Input']").SetFieldValue(Criteria);
             Element($"//li[contains(@class, 'quickFilter')][descendant::*[text()='{filterByColumn}']][descendant::*[text()='{Criteria}']]").Click();
         }
 

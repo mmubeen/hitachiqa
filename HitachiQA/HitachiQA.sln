@@ -5,8 +5,9 @@ VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitachiQA", "HitachiQA.csproj", "{CF9BBB97-409D-4D86-B39C-0B3D070C732A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HitachiQA.UnitTests", "..\HitachiQA.UnitTests\HitachiQA.UnitTests.csproj", "{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitachiQA.UnitTests", "..\HitachiQA.UnitTests\HitachiQA.UnitTests.csproj", "{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}"
 EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

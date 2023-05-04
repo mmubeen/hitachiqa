@@ -1,8 +1,10 @@
 ﻿using BoDi;
 using DocumentFormat.OpenXml.Bibliography;
 using HitachiQA.Helpers;
+using HitachiQA.Driver;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Playwright;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -17,6 +19,8 @@ using TechTalk.SpecFlow;
 using WebDriverManager.DriverConfigs.Impl;
 using WebDriverManager.Helpers;
 using NetDriverManager = WebDriverManager.DriverManager;
+using HitachiQA.Source.Playwright;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HitachiQA.Hooks
 {
@@ -26,22 +30,22 @@ namespace HitachiQA.Hooks
         public static List<String>? optionsList;
 
         public BrowserIndicator BrowserIndicator = new BrowserIndicator();
-        public IWebDriver WebDriver;
-
-
-        public DriverManager(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
+        private IWebDriver? WebDriver { get; set; }
+        private IPage? PlaywrightPage { get; set; }
+        private IBrowser? PlaywrightBrowser { get; set; }
+        private IBrowserContext? PlaywrightBrowserContext { get; set; }
+        private IPlaywright? PlaywrightEngine { get; set; }
+        private TestContext TestContext { get;  }
+        public DriverManager(IObjectContainer oc, FeatureContext fc, IConfiguration config, TestContext tc) : base(oc, fc, config)
         {
-            
+            this.TestContext = tc;
         }
-
-
-
-
-
 
         [BeforeScenario(Order = 2)]
         public void invokeDriver(FeatureContext FT, ScenarioContext SC, IObjectContainer oc)
         {
+            var featureTags = FT.FeatureInfo.Tags;
+            var ignorecase = StringComparer.InvariantCultureIgnoreCase;
             oc.RegisterInstanceAs<BrowserIndicator>(BrowserIndicator);
 
             if (FT.FeatureInfo.Tags.Contains("NoBrowser") || SC.ScenarioInfo.Tags.Contains("NoBrowser"))
@@ -54,10 +58,66 @@ namespace HitachiQA.Hooks
 
                 IConfiguration config= oc.Resolve<IConfiguration>();
                 var browser = config.GetVariable("BROWSER");
-                var driver = invokeNewDriver(oc, browser);
+                var driver = config.GetVariable("DRIVER", true);
+
+                //if no selenium tag
+                //and either driver is playwright or feature tag contains playwright
+                //           
+                if (!featureTags.Contains("Selenium", ignorecase) && (driver?.ToUpper() == "PLAYWRIGHT" || featureTags.Contains("Playwright", ignorecase)))
+                {
+                    PlaywrightEngine = oc.Resolve<IPlaywright>();
+
+                    PlaywrightBrowser = oc.Resolve<IBrowser>();
+                    PlaywrightBrowserContext = PlaywrightBrowser.CreateNewContext();
+                    PlaywrightPage = PlaywrightBrowserContext.CreateNewPage();
+                    oc.RegisterInstanceAs<IBrowserContext>(PlaywrightBrowserContext);
+                    oc.RegisterInstanceAs<IPage>(PlaywrightPage);
+                    PlaywrightPage.GotoAsync(Main.Configuration.GetVariable("HOST")).Wait();
+                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(PlaywrightPage, TestContext));
+                }
+                else
+                {
+                    invokeNewSeleniumDriver(oc, browser);
+                    WebDriver.NullGuard();
+                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(WebDriver, TestContext));
+
+                }
+
 
             }
 
+        }
+        [BeforeFeature(Order = 2)]
+        public static void invokePlaywrightBrowser(FeatureContext FT, IObjectContainer oc)
+        {
+            var tags = FT.FeatureInfo.Tags;
+            var ignorecase = StringComparer.InvariantCultureIgnoreCase;
+            if (!tags.Contains("NoBrowser", ignorecase))
+            { 
+
+                IConfiguration config = oc.Resolve<IConfiguration>();
+                var browser = config.GetVariable("BROWSER");
+                var driver = config.GetVariable("DRIVER", true);
+                
+                if(!tags.Contains("Selenium", ignorecase) && (driver?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase)))
+                {
+                    var b = InvokeNewPlaywrightBrowser(oc, browser);
+                    oc.RegisterInstanceAs<IBrowser>(b);
+
+                }
+            }
+        }
+        [AfterScenario]
+        public void closeContext(IObjectContainer oc)
+        {
+            if(this.PlaywrightPage != null && PlaywrightPage.Video!=null)
+            {
+                var videoPath = PlaywrightPage.Video.PathAsync().Result;
+                this.TestContext.AddResultFile(videoPath);
+                PlaywrightBrowserContext?.CloseAsync().Wait();
+                Console.WriteLine($"\nVideo: {new Uri(videoPath)}\n");
+
+            }
         }
 
         [AfterScenario(Order =1)]
@@ -102,23 +162,11 @@ namespace HitachiQA.Hooks
 
         }
 
-        [BeforeScenario("newWindow", Order = 1)]
-        public static void pre_NewWindow()
-        {
-            throw new NotImplementedException();
-        }
-
-        [AfterScenario("newWindow", Order = 1)]
-        public static void post_NewWindow()
-        {
-            throw new NotImplementedException();
-        }
-
         public static ChromeOptions? ChromeOptions;
         public static FirefoxOptions? FirefoxOptions;
         public static EdgeOptions? EdgeOptions;
 
-        public IWebDriver invokeNewDriver(IObjectContainer oc, string browser)
+        public IWebDriver invokeNewSeleniumDriver(IObjectContainer oc, string browser)
         {
             IWebDriver driver;
             List<string> optionsList= new List<string>();
@@ -207,13 +255,41 @@ namespace HitachiQA.Hooks
             return driver;
 
         }
+        public static IBrowser InvokeNewPlaywrightBrowser(IObjectContainer oc, string browserName)
+        {
+            var engine = oc.Resolve<IPlaywright>();
+            IBrowser browser;
+            switch (browserName.ToLower())
+            {
+                case "chrome":
+                    browser = engine.Chromium.LaunchAsync(new() { Headless=false, Channel="chrome"}).Result;
+                    break;
+                default:
+                    if (string.IsNullOrWhiteSpace(browserName))
+                    {
+                        throw new InvalidOperationException("BROWSER variable was not set, most likely forgot to select a .runsettings file. Refer to README for more info");
+                    }
+                    throw new NotImplementedException($"Environment variable BROWSER value={browserName} is not supported");
+            }
+
+            return browser;
+
+
+        }
 
         public void Dispose()
         {
             if(!BrowserIndicator.isNoBrowserFeature)
             {
-                try {this.WebDriver.Dispose(); }catch(Exception) { }
+                try {this.WebDriver?.Dispose(); }catch(Exception) { }
+                //try { this.PlaywrightEngine?.Dispose(); } catch (Exception) { }
+
             }
+        }
+        [BeforeTestRun]
+        public static async Task InvokePlaywright(IObjectContainer container)
+        {
+            container.RegisterInstanceAs<IPlaywright>(await Playwright.CreateAsync());
         }
     }
 
