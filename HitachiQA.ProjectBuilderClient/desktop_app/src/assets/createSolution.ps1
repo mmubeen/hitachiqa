@@ -101,8 +101,7 @@ foreach($fileName in $fileNames)
 
 dotnet add package SpecFlow.MsTest --version 3.9.74
 dotnet add package FluentAssertions --version 6.10.0
-dotnet add package HitachiQA -n --version 1.0.2
-#dotnet add package HitachiQA -n --version 1.0.1-CI-20230504-020919
+dotnet add package HitachiQA -n --version 1.0.3
 dotnet add package MSTest.TestAdapter --version 1.0.1
 dotnet add package Microsoft.NET.Test.Sdk --version 17.3.2
 

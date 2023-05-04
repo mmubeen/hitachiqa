@@ -139,7 +139,10 @@ const Form: React.FC = () => {
     return false;
 
   }
-
+  const openSolution= async()=>{
+    var openSolutionResult = await window.electronAPI.runScript(`start "${formData.outputFolder}/${formData.projectName}/${formData.projectName}.sln"`);
+    
+  }
   const runInstallPlaywright= async()=>{
     setLoading(true);
     setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "default"}));
@@ -319,7 +322,13 @@ const Form: React.FC = () => {
             <Chip label="Code generation" color="success" size="small" style={{justifyContent:'left'}} icon={getPostBuildIcon("success")}/>
             <Chip label="Selenium Installation" color="success" size="small" style={{justifyContent:'left'}} icon={getPostBuildIcon("success")}/>
             <Chip label="Dotnet build" color={postBuildEvents.build} icon={getPostBuildIcon(postBuildEvents.build)} size="small" style={{justifyContent:'left'}}/>
-            {postBuildEvents.build==="error" && <Typography color="error" fontSize={10} variant="caption" display="block" style={{width:"280%"}}>Error might be authentication to HitachiQA feed, please open visual studio and build to enter credentials</Typography>}
+            {postBuildEvents.build==="error" && 
+              <div>
+                <Typography color="error" fontSize={10} variant="caption" display="block" style={{width:"280%"}}>Error might be authentication to HitachiQA feed, please open visual studio and build to enter credentials</Typography>
+                <Button color="success" size="small" onClick={openSolution}>Open Visual Studio</Button>
+              </div>
+                
+            }
             <Chip label="Playwright installation" color={postBuildEvents.playwright} icon={getPostBuildIcon(postBuildEvents.playwright)} size="small" style={{justifyContent:'left'}}/>
           </Stack>
 
