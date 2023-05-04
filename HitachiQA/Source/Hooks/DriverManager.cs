@@ -21,6 +21,7 @@ using WebDriverManager.Helpers;
 using NetDriverManager = WebDriverManager.DriverManager;
 using HitachiQA.Playwright;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace HitachiQA.Hooks
 {
@@ -261,11 +262,7 @@ namespace HitachiQA.Hooks
             switch (browserName.ToLower())
             {
                 case "chrome":
-                    #if DEBUG
-                        browser = engine.Chromium.LaunchAsync(new() { Headless=false, Channel="chrome"}).Result;
-                    #else
-                        browser = engine.Chromium.LaunchAsync(new() { Headless=true, Channel="chrome"}).Result;
-                    #endif
+                        browser = engine.Chromium.LaunchAsync(PlaywrightOptions(oc)).Result;
                     break;
                 default:
                     if (string.IsNullOrWhiteSpace(browserName))
@@ -277,6 +274,39 @@ namespace HitachiQA.Hooks
 
             return browser;
 
+
+        }
+
+        private static BrowserTypeLaunchOptions PlaywrightOptions(IObjectContainer oc)
+        {
+            var config = oc.Resolve<IConfiguration>();
+            var options = new BrowserTypeLaunchOptions();
+            var props = options.GetType().Properties();
+            foreach (var prop in props)
+            {
+                if(prop.GetSetMethod()==null) {
+                    continue;
+                }
+                var value = config.GetVariable($"Playwright.{prop.Name}", true);
+
+                if (string.IsNullOrWhiteSpace(value)) {
+                    continue;
+                }
+                try
+                {
+                    prop.GetSetMethod()?.Invoke(options, new[] { value });
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception($"error setting playwright option `Playwright.{prop.Name}` value: `{value ?? "null"}`\n", ex);
+                }
+                
+            }
+
+            options.Headless ??= false;
+            options.Channel ??= "chrome";
+            return options;
+            
 
         }
 
