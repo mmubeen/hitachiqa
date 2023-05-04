@@ -50,6 +50,7 @@ namespace HitachiQA
             }
             if (optional)
             {
+                
                 var val = config.GetChildren().FirstOrDefault(it => it.Key == VariableName)?.Value;
                 return val;
             }

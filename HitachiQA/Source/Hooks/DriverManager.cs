@@ -288,13 +288,25 @@ namespace HitachiQA.Hooks
                     continue;
                 }
                 var value = config.GetVariable($"Playwright.{prop.Name}", true);
-
-                if (string.IsNullOrWhiteSpace(value)) {
+                if (string.IsNullOrWhiteSpace(value))
+                {
                     continue;
                 }
+                object parsedValue;
+                var propTypeName = Nullable.GetUnderlyingType(prop.PropertyType)?.Name??prop.PropertyType.Name;
+                if (propTypeName == typeof(bool).Name) {
+                    parsedValue = bool.Parse(value);
+                }
+                else if(propTypeName == typeof(string).Name) {
+                    parsedValue = value;
+                }
+                else {
+                    throw new NotImplementedException(propTypeName);
+                }
+               
                 try
                 {
-                    prop.GetSetMethod()?.Invoke(options, new[] { value });
+                    prop.GetSetMethod()?.Invoke(options, new[] { parsedValue });
                 }
                 catch(Exception ex)
                 {
@@ -305,6 +317,7 @@ namespace HitachiQA.Hooks
 
             options.Headless ??= false;
             options.Channel ??= "chrome";
+            
             return options;
             
 
