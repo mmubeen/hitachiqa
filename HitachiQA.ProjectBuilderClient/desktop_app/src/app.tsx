@@ -13,9 +13,11 @@ declare global {
     electronAPI: {
       openFile: () => any;
       runScript: (script: string) => any;
+      runBuildScript: (script: string) => any;
       closeApp: () => any;
       minimizeApp: () => any;
-      getReadme: () => Promise<string>
+      getReadme: () => Promise<string>,
+      validateCommandLineToolInstalled: (toolName: string)=> Promise<boolean>
     }
   }
 } 

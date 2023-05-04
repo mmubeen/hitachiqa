@@ -46,6 +46,7 @@ Remove-Item "usings.cs"
 New-Item -ItemType Directory -Path ./Features
 New-Item -ItemType Directory -Path ./StepDefinitions
 New-Item -ItemType Directory -Path ./Pages
+New-Item -ItemType Directory -Path ./bin/Debug/$dotnetFramework/
 
 Copy-Item "$assetsDir/assets/default.runsettings"   ./
 Copy-Item "$assetsDir/assets/ImplicitUsings.cs"     ./
@@ -62,7 +63,7 @@ if ($framework -ieq "playwright") {
 } else {
     Copy-Item "$assetsDir/assets/selenium/HsalSearchSteps.cs"    ./StepDefinitions/
     Copy-Item "$assetsDir/assets/selenium/HsalHome.cs"           ./Pages/    
-    Copy-Item "$assetsDir/assets/selenium/appsettings.json"           ./    
+    Copy-Item "$assetsDir/assets/selenium/appsettings.json"      ./    
 
 }
 
@@ -104,11 +105,6 @@ dotnet add package HitachiQA -n --version 1.0.2
 #dotnet add package HitachiQA -n --version 1.0.1-CI-20230504-020919
 dotnet add package MSTest.TestAdapter --version 1.0.1
 dotnet add package Microsoft.NET.Test.Sdk --version 17.3.2
-
-dotnet tool install --global PowerShell
-
-pwsh bin/Debug/$dotnetFramework/playwright.ps1 install
-
 
 
 

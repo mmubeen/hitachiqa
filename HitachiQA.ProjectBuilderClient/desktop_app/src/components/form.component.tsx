@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, SelectProps, ListItemButton, ListItemText } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, SelectProps, ListItemButton, ListItemText, FormHelperText, Chip, Stack, CircularProgress, Typography } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import {Done, Error, Replay} from '@mui/icons-material';
 
 
 interface FormData {
@@ -18,7 +19,10 @@ interface FormData {
   result: string,
   framework: string
 }
-
+interface PostBuildEventStatus {
+  build:"default"|"success"|"error",
+  playwright: "default"|"success"|"error"
+}
 const dotnetFrameworkOptions = ['net6.0', 'net7.0'];
 const frameworkOptions = ['Playwright', 'Selenium'];
 
@@ -32,8 +36,13 @@ const Form: React.FC = () => {
     result: '',
     framework: "Selenium"
   });
+  const [postBuildEvents, setPostBuildEvents] = useState<PostBuildEventStatus>({
+    build:"default",
+    playwright:"default"
+  })
   const [loading, setLoading] = useState<boolean>(false);
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [validations, setValidations] = useState([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement  | { name?: string; value: unknown }>| SelectProps<string>) => {
 
@@ -56,8 +65,15 @@ const Form: React.FC = () => {
   const onSubmit = async (formData: FormData)=>{
     console.log(formData) 
     setLoading(true);
+
+    let hadErrors = await validateTools()
+    if(hadErrors)
+    {
+      setLoading(false);
+      return;
+    }
     let args = ` -projectName ${formData.projectName} -dotnetFramework ${formData.dotnetFramework} -targetHost ${formData.host} -outputFolder "${formData.outputFolder}" -framework ${formData.framework}`
-    let result = await window.electronAPI.runScript("/assets/createSolution.ps1"+args)
+    let result = await window.electronAPI.runBuildScript("/assets/createSolution.ps1"+args)
                 .finally(()=>{
                   setLoading(false);
                 })
@@ -66,9 +82,10 @@ const Form: React.FC = () => {
 
     if("hadErrors" in result)
     {
-      if(!result.hasErrors)
+      if(!result.hadErrors)
       {
         handleOpenDialog();
+        runInstallPlaywright();
       }
     }
     console.log("result: ")
@@ -76,7 +93,7 @@ const Form: React.FC = () => {
   }
 
   const handleOpenDialog = () => {
-    setOpenDialog(true);
+    setOpenDialog(true); 
   };
 
   const handleCloseDialog = () => {
@@ -85,7 +102,7 @@ const Form: React.FC = () => {
 
 
   const openDir = async ()=>{
-    let path = await window.electronAPI.openFile().then((filepath:string|undefined)=> 
+    await window.electronAPI.openFile().then((filepath:string|undefined)=> 
     {
       if(filepath)
       {
@@ -101,7 +118,81 @@ const Form: React.FC = () => {
 
   }
 
+  const validateTools= async () =>{
+    setValidations([]);
+    let dotnet = await window.electronAPI.validateCommandLineToolInstalled("dotnet")
+    //let pwsh = await window.electronAPI.validateCommandLineToolInstalled("pwsh")
 
+    if(!dotnet)
+    {
+      setValidations((prevState)=>[...prevState, {key: "dotnet", value: "dotnet command line tool not found: please install visual studio 2022 before running this tool"} ]);
+    }
+    // if(!pwsh)
+    // {
+    //   setValidations((prevState)=>[...prevState, {key: "pwsh", value: "pwsh command line tool not found: to install, please run \`dotnet tool install --global PowerShell\`"} ]);
+    // }
+
+    if(!dotnet)
+    {
+      return true;
+    }
+    return false;
+
+  }
+
+  const runInstallPlaywright= async()=>{
+    setLoading(true);
+    setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "default"}));
+    setPostBuildEvents((prevFormData) => ({ ...prevFormData, playwright: "default"}));
+
+    let playwrightPath = `"${formData.outputFolder}/${formData.projectName}/bin/Debug/${formData.dotnetFramework}/playwright.ps1"`
+
+    var buildResult = await window.electronAPI.runScript(`dotnet build "${formData.outputFolder}/${formData.projectName}/${formData.projectName}.csproj"`);
+
+    var testPlaywrightPath = await window.electronAPI.runScript(`if(Test-Path ${playwrightPath}){echo "True"} else {echo "False"}`);
+    console.log("testPlaywrightPath")
+    console.log(testPlaywrightPath)
+    if(!hasError(buildResult) && !hasError(testPlaywrightPath) && (testPlaywrightPath.raw as string).toLowerCase()==="true"){
+
+      setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "success"}));
+
+      var playwrightResult = await window.electronAPI.runScript(`powershell -File ${playwrightPath} install --with-deps`);
+      if(!hasError(playwrightResult)){
+        setPostBuildEvents((prevFormData) => ({ ...prevFormData, playwright: "success"}));
+      }
+      else {
+        setPostBuildEvents((prevFormData) => ({ ...prevFormData, playwright: "error"}));
+      }
+    }
+    else{
+      setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "error"}));
+      setPostBuildEvents((prevFormData) => ({ ...prevFormData, playwright: "error"}));
+
+    }
+    setLoading(false);
+  }
+
+  const getPostBuildIcon = (outcome: string)=>{
+    switch(outcome)
+    {
+      case "success":
+        return (<Done style={{left:170, position:"relative"}}/>)
+      case "error":
+        return (<Replay cursor="pointer" style={{left:170, position:"relative"}} onClick={runInstallPlaywright}/>)
+      default: 
+        return (<CircularProgress color="primary" size={20} style={{left:170, position:"relative"}}/>)
+    }
+  }
+
+  function hasError(result: any)
+  {
+    console.log(result);
+    if("hadErrors" in result)
+    {
+      return result.hadErrors;
+    }
+    return true;
+  }
   return (
     <div>
     <Box component="form" onSubmit={handleSubmit} sx={{ margin: 2 }}>
@@ -196,6 +287,11 @@ const Form: React.FC = () => {
         
       >Build Project</LoadingButton>
       </FormControl>
+      <FormControl error={true} fullWidth >
+        {validations.map(val=> 
+          <FormHelperText key={val.key} id={val.key}>{val.value}</FormHelperText>
+        )}
+      </FormControl>
       <FormControl fullWidth sx={{m: 1}}>
       <TextField
         multiline
@@ -219,10 +315,17 @@ const Form: React.FC = () => {
           {`Successfully Built ${formData.projectName}`}
         </DialogTitle>
         <DialogContent>
+          <Stack direction="column" spacing={1} style={{maxWidth:"200px"}}>
+            <Chip label="Code generation" color="success" size="small" style={{justifyContent:'left'}} icon={getPostBuildIcon("success")}/>
+            <Chip label="Selenium Installation" color="success" size="small" style={{justifyContent:'left'}} icon={getPostBuildIcon("success")}/>
+            <Chip label="Dotnet build" color={postBuildEvents.build} icon={getPostBuildIcon(postBuildEvents.build)} size="small" style={{justifyContent:'left'}}/>
+            {postBuildEvents.build==="error" && <Typography color="error" fontSize={10} variant="caption" display="block" style={{width:"280%"}}>Error might be authentication to HitachiQA feed, please open visual studio and build to enter credentials</Typography>}
+            <Chip label="Playwright installation" color={postBuildEvents.playwright} icon={getPostBuildIcon(postBuildEvents.playwright)} size="small" style={{justifyContent:'left'}}/>
+          </Stack>
+
+        </DialogContent>
+        <DialogContent>
           <h4>Next Steps:</h4>
-          <DialogContentText id="alert-dialog-description">
-            - Download Visual Studio 2022
-          </DialogContentText>
           <DialogContentText id="alert-dialog-description">
             - Install specflow for Visual Studio 2022 extension
           </DialogContentText>

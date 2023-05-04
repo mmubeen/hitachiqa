@@ -73,9 +73,21 @@ app.on('activate', () => {
 
 ipcMain.handle('dialog:openFile', handleFileOpen)
 ipcMain.handle('script:run', runScript)
+ipcMain.handle('script:runBuild', runBuildScript)
 ipcMain.handle('app:close', closeApp)
 ipcMain.handle('app:minimize', minimizeApp)
 ipcMain.handle('file:readme', getReadme)
+ipcMain.handle('validate:toolInstalled', validateCommandLineToolInstalled)
+
+async function runBuildScript(event: any, script: string){
+  const rendererPath = path.join(app.getAppPath(), '.webpack/renderer')
+  const assets = path.join(app.getAppPath(), '.webpack/renderer/assets')
+  script = script+` -assetsDir ${assets}`
+  const filePath = path.join(rendererPath, script)
+
+  console.log(filePath)
+  return await runScript(event, filePath)
+}
 
 async function runScript(event: any, script: string){
   const ps = new PowerShell({
@@ -83,15 +95,11 @@ async function runScript(event: any, script: string){
     executableOptions: {
       '-ExecutionPolicy': 'Bypass',
       '-NoProfile': true,
+      "-NonInteractive": true
     }});
   
-  const rendererPath = path.join(app.getAppPath(), '.webpack/renderer')
-  const assets = path.join(app.getAppPath(), '.webpack/renderer/assets')
-  script = script+` -assetsDir ${assets}`
-  const filePath = path.join(rendererPath, script)
 
-  console.log(filePath)
-  let result = await ps.invoke(filePath).catch(e=> {
+  let result = await ps.invoke(script).catch(e=> {
       return e;
       }
     )
@@ -119,6 +127,29 @@ async function getReadme(event: any):Promise<string> {
   return readFile(filePath, 'utf8');
 
   
+}
+
+async function validateCommandLineToolInstalled(event: any, toolInvokingName: string) {
+  const ps = new PowerShell({
+    debug: true,
+    executableOptions: {
+      '-ExecutionPolicy': 'Bypass',
+      '-NoProfile': true,
+    }
+  });
+
+  let results = await ps.invoke(`${toolInvokingName} --version`).catch((e)=> {
+      return e;
+  });
+  console.log(results);
+  if("hadErrors" in results)
+  {
+    if(!results.hadErrors)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 

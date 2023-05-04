@@ -8,7 +8,6 @@ const MarkdownDisplay = () => {
 
   useEffect(() => {
      window.electronAPI.getReadme().then(result=>{
-      console.log(result);
       setMarkdown(result);
     });
 
