@@ -262,7 +262,11 @@ namespace HitachiQA.Hooks
             switch (browserName.ToLower())
             {
                 case "chrome":
-                    browser = engine.Chromium.LaunchAsync(new() { Headless=false, Channel="chrome"}).Result;
+                    #if DEBUG
+                        browser = engine.Chromium.LaunchAsync(new() { Headless=false, Channel="chrome"}).Result;
+                    #else
+                        browser = engine.Chromium.LaunchAsync(new() { Headless=true, Channel="chrome"}).Result;
+                    #endif
                     break;
                 default:
                     if (string.IsNullOrWhiteSpace(browserName))
