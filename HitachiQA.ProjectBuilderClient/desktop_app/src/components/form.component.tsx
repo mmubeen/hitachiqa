@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, SelectProps, ListItemButton, ListItemText, FormHelperText, Chip, Stack, CircularProgress, Typography } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, SelectProps, ListItemButton, ListItemText, FormHelperText, Chip, Stack, CircularProgress, Typography, LinearProgress } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -43,7 +43,32 @@ const Form: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [validations, setValidations] = useState([]);
+  const [progress, setProgress] = React.useState(0);
+  
+  let timer: NodeJS.Timer = null;
 
+  function startProgress(currentProgress: number) {
+    
+    if(currentProgress===100 && timer!== null)
+    {
+      clearInterval(timer);
+      setProgress(100);
+    }
+    let newProgress = currentProgress;
+    const startTimer = () => {
+      timer = setInterval(() => {
+        if (newProgress < 90) {
+          newProgress += 1;
+          setProgress(newProgress);
+        }
+      }, 300);
+    };
+  
+    startTimer();
+    setTimeout(() => {
+      clearInterval(timer);
+    }, 30000-6000-(currentProgress*600));
+  }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement  | { name?: string; value: unknown }>| SelectProps<string>) => {
 
     const { name, value } = 'target' in e ? e.target:e;
@@ -65,7 +90,7 @@ const Form: React.FC = () => {
   const onSubmit = async (formData: FormData)=>{
     console.log(formData) 
     setLoading(true);
-
+    startProgress(0);
     let hadErrors = await validateTools()
     if(hadErrors)
     {
@@ -75,17 +100,25 @@ const Form: React.FC = () => {
     let args = ` -projectName ${formData.projectName} -dotnetFramework ${formData.dotnetFramework} -targetHost ${formData.host} -outputFolder "${formData.outputFolder}" -framework ${formData.framework}`
     let result = await window.electronAPI.runBuildScript("/assets/createSolution.ps1"+args)
                 .finally(()=>{
+                  startProgress(100);
                   setLoading(false);
                 })
             
     setFormData((prevFormData) => ({ ...prevFormData, "result": 'raw' in result? result.raw:result }));
+
 
     if("hadErrors" in result)
     {
       if(!result.hadErrors)
       {
         handleOpenDialog();
-        runInstallPlaywright();
+        if(!isPlaywrightFilePresent())
+        {
+          runInstallPlaywright();
+        }
+        else{
+          setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "success", playwright: "success"}));
+        }
       }
     }
     console.log("result: ")
@@ -143,19 +176,19 @@ const Form: React.FC = () => {
     var openSolutionResult = await window.electronAPI.runScript(`start "${formData.outputFolder}/${formData.projectName}/${formData.projectName}.sln"`);
     
   }
+  const openDevTools= ()=>{
+    window.electronAPI.openDevTools();
+    
+  }
   const runInstallPlaywright= async()=>{
     setLoading(true);
-    setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "default"}));
-    setPostBuildEvents((prevFormData) => ({ ...prevFormData, playwright: "default"}));
+    setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "default", playwright: "default"}));
 
-    let playwrightPath = `"${formData.outputFolder}/${formData.projectName}/bin/Debug/${formData.dotnetFramework}/playwright.ps1"`
 
-    var buildResult = await window.electronAPI.runScript(`dotnet build "${formData.outputFolder}/${formData.projectName}/${formData.projectName}.csproj"`);
 
-    var testPlaywrightPath = await window.electronAPI.runScript(`if(Test-Path ${playwrightPath}){echo "True"} else {echo "False"}`);
-    console.log("testPlaywrightPath")
-    console.log(testPlaywrightPath)
-    if(!hasError(buildResult) && !hasError(testPlaywrightPath) && (testPlaywrightPath.raw as string).toLowerCase()==="true"){
+    var buildResult = await window.electronAPI.runScript(`dotnet build "${formData.outputFolder}/${formData.projectName}/${formData.projectName}.csproj" --interactive`);
+
+    if(!hasError(buildResult) && isPlaywrightFilePresent()){
 
       setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "success"}));
 
@@ -168,11 +201,11 @@ const Form: React.FC = () => {
       }
     }
     else{
-      setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "error"}));
-      setPostBuildEvents((prevFormData) => ({ ...prevFormData, playwright: "error"}));
-
+      setPostBuildEvents((prevFormData) => ({ ...prevFormData, build: "error", playwright: "error"}));
     }
     setLoading(false);
+    setProgress(100);
+
   }
 
   const getPostBuildIcon = (outcome: string)=>{
@@ -185,6 +218,18 @@ const Form: React.FC = () => {
       default: 
         return (<CircularProgress color="primary" size={20} style={{left:170, position:"relative"}}/>)
     }
+  }
+  const playwrightPath:string= `"${formData.outputFolder}/${formData.projectName}/bin/Debug/${formData.dotnetFramework}/playwright.ps1"`
+
+  async function isPlaywrightFilePresent()
+  {
+    var testPlaywrightPath = await window.electronAPI.runScript(`if(Test-Path ${playwrightPath}){echo "True"} else {echo "False"}`);
+    if(hasError(testPlaywrightPath)){
+        return false;
+    }
+    console.log("testPlaywrightPath")
+    console.log(testPlaywrightPath)
+    return (testPlaywrightPath.raw as string).toLowerCase()==="true"
   }
 
   function hasError(result: any)
@@ -290,6 +335,7 @@ const Form: React.FC = () => {
         
       >Build Project</LoadingButton>
       </FormControl>
+      <LinearProgress variant="determinate" value={progress} />
       <FormControl error={true} fullWidth >
         {validations.map(val=> 
           <FormHelperText key={val.key} id={val.key}>{val.value}</FormHelperText>
@@ -325,7 +371,9 @@ const Form: React.FC = () => {
             {postBuildEvents.build==="error" && 
               <div>
                 <Typography color="error" fontSize={10} variant="caption" display="block" style={{width:"280%"}}>Error might be authentication to HitachiQA feed, please open visual studio and build to enter credentials</Typography>
-                <Button color="success" size="small" onClick={openSolution}>Open Visual Studio</Button>
+                <div style={{ textAlign: "right", position: "absolute", right:"20px" }}>
+                  <Chip label="Open Visual Studio" color="primary" size="small" onClick={openSolution}></Chip>
+                </div>
               </div>
                 
             }
@@ -344,6 +392,8 @@ const Form: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          <Chip label="Open DevTools" color="default" size="small" onClick={openDevTools}></Chip>
+          <Chip label="Open in Visual Studio" color="primary" size="small" onClick={openSolution}></Chip>
           <Button onClick={handleCloseDialog} autoFocus>
             Ok
           </Button>

@@ -30,7 +30,8 @@ const createWindow = (): void => {
       nodeIntegration: true,
       contextIsolation: true
     },
-    frame: false
+    frame: false,
+    icon: './images/squarelogo.png'
   }); 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -78,6 +79,7 @@ ipcMain.handle('app:close', closeApp)
 ipcMain.handle('app:minimize', minimizeApp)
 ipcMain.handle('file:readme', getReadme)
 ipcMain.handle('validate:toolInstalled', validateCommandLineToolInstalled)
+ipcMain.handle('devTools:open', openDevTools)
 
 async function runBuildScript(event: any, script: string){
   const rendererPath = path.join(app.getAppPath(), '.webpack/renderer')
@@ -95,7 +97,7 @@ async function runScript(event: any, script: string){
     executableOptions: {
       '-ExecutionPolicy': 'Bypass',
       '-NoProfile': true,
-      "-NonInteractive": true
+      "-NonInteractive": false
     }});
   
 
@@ -152,6 +154,11 @@ async function validateCommandLineToolInstalled(event: any, toolInvokingName: st
   return false;
 }
 
+function openDevTools(event: any)
+{
+    mainWindow.webContents.openDevTools();
+
+}
 
 function closeApp () {
   app.quit();

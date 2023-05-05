@@ -2,7 +2,7 @@
   "name": "client-app",
   "productName": "client-app",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Tool used to build new projects implementing the HitachiQA test automation framework",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -12,10 +12,7 @@
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
-  "author": {
-    "name": "Miguel Acosta",
-    "email": "macosta@hitachisolutions.com"
-  },
+  "author":"Miguel Acosta",
   "license": "MIT",
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",

@@ -9,9 +9,16 @@ import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
-  packagerConfig: {},
+  packagerConfig: {
+    icon: './images/squarelogo.ico'
+  },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [new MakerSquirrel({
+    setupIcon: './images/squarelogo.ico',
+    iconUrl: "https://hsdyn.sharepoint.com/sites/Brand/_api/siteiconmanager/getsitelogo",
+    authors:"Hitachi Solutions America"
+
+  }), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
   plugins: [
     new WebpackPlugin({
       devContentSecurityPolicy:"default-src 'self' 'unsafe-eval' 'unsafe-inline' https://hitachi.us/",

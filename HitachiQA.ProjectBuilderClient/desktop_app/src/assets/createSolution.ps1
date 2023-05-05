@@ -43,10 +43,20 @@ dotnet sln add ./$projectName.csproj
 Remove-Item "UnitTest1.cs"
 Remove-Item "usings.cs"
 
+dotnet add package Microsoft.Playwright.MSTest -n --version 1.33.0
+dotnet add package Microsoft.Playwright -n --version 1.33.0
+dotnet add package SpecFlow.MsTest -n --version 3.9.74
+dotnet add package FluentAssertions -n --version 6.11.0
+dotnet add package MSTest.TestAdapter -n --version 3.0.2
+dotnet add package MSTest.TestFramework -n --version 3.0.2
+dotnet add package Microsoft.NET.Test.Sdk -n --version 17.5.0
+
+dotnet build
+& "$pwd/bin/Debug/$dotnetFramework/playwright.ps1" install --with-deps
+
 New-Item -ItemType Directory -Path ./Features
 New-Item -ItemType Directory -Path ./StepDefinitions
 New-Item -ItemType Directory -Path ./Pages
-New-Item -ItemType Directory -Path ./bin/Debug/$dotnetFramework/
 
 Copy-Item "$assetsDir/assets/default.runsettings"   ./
 Copy-Item "$assetsDir/assets/ImplicitUsings.cs"     ./
@@ -99,12 +109,7 @@ foreach($fileName in $fileNames)
 }
 
 
-dotnet add package SpecFlow.MsTest --version 3.9.74
-dotnet add package FluentAssertions --version 6.10.0
 dotnet add package HitachiQA -n --version 1.0.3
-dotnet add package MSTest.TestAdapter --version 1.0.1
-dotnet add package Microsoft.NET.Test.Sdk --version 17.3.2
-
 
 
 
