@@ -11,6 +11,7 @@ parameters:
     type: string
     default: Biberk_MA_ServiceConnection
     values:
+    - BB_MS_ServiceConnection
     - Biberk_MA_ServiceConnection
     - CPI_SV_ServiceConnection
     - Deere_MA_ServiceConnection
