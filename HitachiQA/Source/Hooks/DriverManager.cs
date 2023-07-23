@@ -207,6 +207,7 @@ namespace HitachiQA.Hooks
                     break;
 
                 case "firefox":
+                    throw new Exception("firefox webdriver is broken. please fix in HitachiQA/Source/Hooks/DriverManager.invokeNewSeleniumDriver");
                     _ = new NetDriverManager().SetUpDriver(new FirefoxConfig(), VersionResolveStrategy.Latest);
                     if(FirefoxOptions == null)
                     {
