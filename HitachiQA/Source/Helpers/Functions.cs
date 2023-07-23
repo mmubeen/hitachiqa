@@ -15,6 +15,8 @@ using OpenQA.Selenium.DevTools;
 using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 using System.Runtime.CompilerServices;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using OtpNet;
 
 namespace HitachiQA.Helpers
 {
@@ -407,7 +409,18 @@ namespace HitachiQA.Helpers
             return (1.0M - ((decimal)distance / (decimal)Math.Max(s.Length, t.Length)));
 
         }
+        private static string GenerateOneTimeCode(string key)
+        {
+            // credits:
+            // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
+            // https://www.nuget.org/packages/Otp.NET/
+            byte[] base32Bytes = Base32Encoding.ToBytes(key);
 
-       
+            var totp = new Totp(base32Bytes);
+            var result = totp.ComputeTotp(); // <- got 2FA code at this time!
+            return result;
+        }
+
+
     }
 }
