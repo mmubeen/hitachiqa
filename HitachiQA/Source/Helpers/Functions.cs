@@ -409,7 +409,7 @@ namespace HitachiQA.Helpers
             return (1.0M - ((decimal)distance / (decimal)Math.Max(s.Length, t.Length)));
 
         }
-        private static string GenerateOneTimeCode(string key)
+        public static string GenerateMFAOneTimeCode(string key)
         {
             // credits:
             // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
