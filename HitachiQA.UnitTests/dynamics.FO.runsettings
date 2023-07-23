@@ -2,7 +2,7 @@
 <RunSettings>
 	<RunConfiguration>
 		<EnvironmentVariables>
-			<HOST>https://hitachiqac852abe02ab300cedevaos.axcloud.dynamics.com/</HOST>
+			<HOST>https://hs.crm.dynamics.com/</HOST>
 			<SERVER_HOST>TBD</SERVER_HOST>
 			<BROWSER>Chrome</BROWSER>
 		</EnvironmentVariables>

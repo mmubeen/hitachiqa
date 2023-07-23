@@ -1,9 +1,6 @@
-using HitachiQA.Driver;
 using HitachiQA.Dynamics.FS.Pages;
 using HitachiQA.Helpers;
-using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
-
 
 namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
 {
@@ -37,6 +34,19 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
 
             //Sign in button
             Page.SubmitButton.Click();
+
+            if (!string.IsNullOrWhiteSpace(Config.GetVariable("mfa.secret", true)))
+            {
+                Page.GetField("PhoneAppOTP").Click();
+
+                var code = Functions.GenerateMFAOneTimeCode("2vrcg2yhplhzvxfz");
+                Page.GetField("otc").SetFieldValue(code);
+                Page.SubmitButton.Click();
+            }
+            else
+            {
+                Page.GetField("PhoneAppNotification").Click();
+            }
 
             //Yes (stay signed in)
             if (Page.SubmitButton.GetAttribute("value") == "Sign in")
