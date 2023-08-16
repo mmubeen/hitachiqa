@@ -8,8 +8,11 @@ namespace HitachiQA.UnitTests
         [TestMethod]
         public void IsStringEncrypted()
         {
+            // Arrange
             string theString = "test12";
+            // Act
             string encrypt = Cryptography.Encrypt(theString);
+            // Assert
             encrypt.Should().Be("IvkLxQ7k+mp5OVoKenFqJw==");
         }
 
