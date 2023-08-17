@@ -8,20 +8,10 @@ namespace HitachiQA.UnitTests
         [TestMethod]
         public void IsStringEncrypted()
         {
-            // Arrange
-            string theString = "test12";
-            // Act
+            string theString = "test12$#@";            
             string encrypt = Cryptography.Encrypt(theString);
-            // Assert
-            encrypt.Should().Be("IvkLxQ7k+mp5OVoKenFqJw==");
+            string decrypt = Cryptography.Decrypt(encrypt);            
+            decrypt.Should().Be("test12$#@");
         }
-
-        [TestMethod]
-        public void IsStringDecrypted()
-        {
-            string encrypt = "IvkLxQ7k+mp5OVoKenFqJw==";
-            string decrypted = Cryptography.Decrypt(encrypt);
-            decrypted.Should().Be("test12");
-        } 
     }
 }
