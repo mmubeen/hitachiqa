@@ -1,6 +1,7 @@
 using BoDi;
 using HitachiQA.Driver;
 using HitachiQA.Hooks;
+using HitachiQA.Hooks.Browsers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using System;
@@ -59,7 +60,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Then(@"NoBrowser tag on this feature should cascade down to this test")]
         public void ThenNoBrowserTagOnThisFeatureShouldCascadeDownToThisTest()
         {
-            this.ObjectContainer.Resolve<BrowserIndicator>().isNoBrowserFeature.Should().BeTrue();  
+            this.ObjectContainer.Resolve<BrowserIndicator>().IsBrowserFeature.Should().BeFalse();  
         }
 
     }

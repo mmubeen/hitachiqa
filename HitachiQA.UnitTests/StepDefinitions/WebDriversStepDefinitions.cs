@@ -1,6 +1,6 @@
 using BoDi;
 using HitachiQA.Driver;
-using HitachiQA.Hooks;
+using HitachiQA.Hooks.Browsers;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
@@ -15,12 +15,12 @@ namespace HitachiQA.UnitTests.StepDefinitions
         ObjectContainer ObjectContainer;
 
         UserActions UserActions => ObjectContainer.Resolve<UserActions>();
-        DriverManager DriverManager;
+        WebDriverHook WebDriverHook;
 
-        public WebDriversStepDefinitions(ObjectContainer objectContainer, DriverManager DriverManager)
+        public WebDriversStepDefinitions(ObjectContainer objectContainer, WebDriverHook WDH)
         {
             ObjectContainer = objectContainer;
-            this.DriverManager = DriverManager;
+            WebDriverHook = WDH;
         }
 
         [Given(@"Browser is up")]
@@ -45,13 +45,13 @@ namespace HitachiQA.UnitTests.StepDefinitions
                 new Element(By.XPath("(//*[contains(text(), 'Contact us')])[1]"), UserActions).Click();
             }
 
-            var contactUsElement = new Element(By.XPath("//*[@data-formtitle='Contact Us']"), UserActions);
-            contactUsElement.assertElementIsPresent(5);
+            var firstNameFormInput = new Element(By.XPath("//*[text()='First Name']/..//input"), UserActions);
+            firstNameFormInput.assertElementIsPresent(5);
 
             UserActions.SwitchContext();
             Log.Info(UserActions.Title);
             //DriverManager.SwitchWindowContext();
-            contactUsElement.assertElementNotPresent(5);
+            firstNameFormInput.assertElementNotPresent(5);
 
             this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }
@@ -66,7 +66,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [When(@"""([^""]*)"" is invoked")]
         public void WhenIsInvoked(string browser)
         {
-            DriverManager.invokeNewSeleniumDriver(ObjectContainer, browser);
+            WebDriverHook.invokeNewSeleniumDriver(ObjectContainer, browser);
         }
 
 
@@ -100,9 +100,9 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Given(@"user loads option ""([^""]*)"" into the browser")]
         public void GivenUserLoadsOptionIntoTheBrowser(string option)
         {
-            DriverManager.ChromeOptions = new ChromeOptions();
-            DriverManager.ChromeOptions.AddArgument("--headless");
-            DriverManager.ChromeOptions.AddArgument(option);
+            WebDriverHook.ChromeOptions = new ChromeOptions();
+            WebDriverHook.ChromeOptions.AddArgument("--headless");
+            WebDriverHook.ChromeOptions.AddArgument(option);
         }
 
         [Then(@"""([^""]*)"" should be set to the browser")]

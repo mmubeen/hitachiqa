@@ -15,14 +15,11 @@ namespace HitachiQA.Driver
         public readonly UserActions UserActions;
         public readonly ScreenShot ScreenShot;
         protected readonly ObjectContainer ObjectContainer;
-        private DriverManager DriverManager;
         public BasePage(ObjectContainer ObjectContainer)
         {
             this.ObjectContainer = ObjectContainer;
             this.UserActions = ObjectContainer.Resolve<UserActions>();
             this.ScreenShot = ObjectContainer.Resolve<ScreenShot>();
-            this.DriverManager = ObjectContainer.Resolve<DriverManager>();
-
         }
 
         public Element Element(string xpath)

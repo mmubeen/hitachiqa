@@ -29,22 +29,22 @@ namespace HitachiQA.Helpers
 
         }
 
-        public string GetRandomVIN()
+        public async Task<string> GetRandomVIN()
         {
             //grabs random vin via randomvin.com
             string vin;
             try
             {
-                vin = (string)RestAPI.GET("https://randomvin.com/getvin.php?type=real");
+                vin = (string) await RestAPI.GETAsync("https://randomvin.com/getvin.php?type=real");
                 if (string.IsNullOrWhiteSpace(vin))
                 {
-                    return GetRandomVIN();
+                    return await GetRandomVIN();
                 }
                 return vin;
             }
             catch
             {
-                return GetRandomVIN();
+                return await GetRandomVIN();
             }
         }
 
