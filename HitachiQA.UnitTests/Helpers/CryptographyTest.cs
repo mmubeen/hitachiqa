@@ -1,6 +1,6 @@
 ﻿using HitachiQA.Helpers;
 
-namespace HitachiQA.UnitTests
+namespace HitachiQA.UnitTests.Helpers
 {
     [TestClass]
     public class CryptographyTest
@@ -8,9 +8,9 @@ namespace HitachiQA.UnitTests
         [TestMethod]
         public void IsStringEncrypted()
         {
-            string theString = "test12$#@";            
+            string theString = "test12$#@";
             string encrypt = Cryptography.Encrypt(theString);
-            string decrypt = Cryptography.Decrypt(encrypt);            
+            string decrypt = Cryptography.Decrypt(encrypt);
             decrypt.Should().Be("test12$#@");
         }
     }

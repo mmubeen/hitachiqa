@@ -15,7 +15,7 @@ Examples:
 	| browser |
 	| Chrome  |
 	#firefox is broken atm
-	#| Firefox |
+	| Firefox |
 	| Edge    |
 
 
