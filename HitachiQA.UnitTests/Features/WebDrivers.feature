@@ -14,7 +14,6 @@ Scenario: Browser can be invoked
 Examples: 
 	| browser |
 	| Chrome  |
-	#firefox is broken atm
 	| Firefox |
 	| Edge    |
 
