@@ -69,9 +69,9 @@ namespace HitachiQA.Driver
             return UserActions.Click(locator, UserActions.ProcessWaitParam(wait_Seconds), optional);
         }
 
-        public bool TryClick()
+        public bool TryClick(double waitSeconds=0)
         {
-            return UserActions.TryClick(locator);
+            return UserActions.TryClick(locator, waitSeconds);
         }
 
         public string GetAttribute(string attributeName)

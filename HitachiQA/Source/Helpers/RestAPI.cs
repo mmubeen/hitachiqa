@@ -1,259 +1,186 @@
-﻿using System;
-using System.Text;
-using OpenQA.Selenium;
+﻿using System.Text;
 using Newtonsoft.Json;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Collections.Generic;
-using HitachiQA.Driver;
-using BoDi;
-using Microsoft.Extensions.Configuration;
-using HitachiQA.Hooks;
+using Newtonsoft.Json.Linq;
 
 namespace HitachiQA.Helpers
 {
     public class RestAPI
     {
-        private readonly BrowserIndicator BrowserIndicator;
-        private readonly JSExecutor JSExecutor;
-        private readonly IConfiguration Configuration;
-        public RestAPI(ObjectContainer objectContainer)
-        {
-            this.BrowserIndicator = objectContainer.Resolve<BrowserIndicator>();
-            if(!BrowserIndicator.isNoBrowserFeature)
-            {
-                JSExecutor = objectContainer.Resolve<JSExecutor>();
-            }
-            this.Configuration = objectContainer.Resolve<IConfiguration>();
-        }
         public List<(string key, double seconds)> timeSpans = new List<(string key, double seconds)>();
-        public dynamic GET( String URL)
+        public virtual HttpClient Client { get; init; } = new();
+        public RestAPI(HttpClient client)
         {
-            return GET(URL, new AuthenticationHeaderValue("Bearer", getAuthToken()));
-        }
-        public dynamic GET(String URL, AuthenticationHeaderValue Authorization, Dictionary<string, string> headers = null)
-        {
+            Client = client;
 
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = Authorization;
-            client.DefaultRequestHeaders.Add("User-Agent", "Apollo Automation");
+
+        }
+        public async Task<object> SENDAsync(HttpMethod method, String URL, dynamic body, Dictionary<string, string> headers)
+        {
+            return await SENDAsync(method, URL, body, null, headers);
+        }
+        public async Task<object> SENDAsync(HttpMethod method, string URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+        {
+            DateTime start = DateTime.Now;
+            HttpRequestMessage request = BuildRequestMessage(method, URL, body, auth, headers);
+
+            HttpResponseMessage response = await Client.SendAsync(request);
+
+            TimeSpan requestTime = DateTime.Now - start;
+            timeSpans.Add(($"[{method}] {URL}", requestTime.TotalSeconds));
+
+            return await ConsumeResponse(response);
+        }
+
+        public HttpRequestMessage BuildRequestMessage(HttpMethod method, string URL, dynamic body, AuthenticationHeaderValue auth, Dictionary<string, string> headers)
+        {
+            var request = new HttpRequestMessage();
+            request.Method = method;
+            if (auth != null)
+            {
+                request.Headers.Authorization = auth;
+            }
+            //if URL provided is a path,
+            //enforce the base address' path prefix is part of the final uri
+            //e.g.; 'api/quote/123' and '/quote/123/' should both work seamlessly
+            //
+            var uri = new Uri(URL, UriKind.RelativeOrAbsolute);
+            if (!uri.IsAbsoluteUri)
+            {
+                if (!uri.OriginalString.StartsWith(Client.BaseAddress.AbsolutePath, StringComparison.CurrentCultureIgnoreCase) &&
+                    !('/' + uri.OriginalString).StartsWith(Client.BaseAddress.AbsolutePath, StringComparison.CurrentCultureIgnoreCase)
+                    )
+                {
+                    uri = new Uri(Client.BaseAddress.AbsolutePath + (uri.OriginalString.StartsWith("/") ? uri.OriginalString : "/" + uri.OriginalString), UriKind.Relative);
+                }
+            }
+            request.RequestUri = uri;
 
             if (headers != null)
             {
-                foreach(var header in headers)
+                foreach (var header in headers)
                 {
-                    client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                    request.Headers.Add(header.Key, header.Value);
                 }
             }
-            DateTime start = DateTime.Now;
-            HttpResponseMessage response = client.GetAsync(processURL(URL)).Result;
-            TimeSpan requestTime = DateTime.Now - start;
-
-            timeSpans.Add(($"[GET] {URL}", requestTime.TotalSeconds));
-
-            client.Dispose();
-            return ConsumeResponse(response, URL);
-        }
-        public dynamic POST(String URL, dynamic body)
-        {
-            return POST(URL, body, new AuthenticationHeaderValue("Bearer", getAuthToken()));
-        }
-
-        public dynamic POST(String URL, dynamic body, AuthenticationHeaderValue Authorization)
-        {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(processURL(URL));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = Authorization;
-            client.Timeout = TimeSpan.FromSeconds(600);
-
-            String bodyString;
-            if (body is String)
+            if (body != null)
             {
-                bodyString = body;
-            }
-            else
-            {
-                bodyString = JsonConvert.SerializeObject(body);
+                String bodyString = body is string ? body : ((JToken)JToken.FromObject(body)).ToString(Formatting.None);
+                HttpContent content = new StringContent(bodyString, Encoding.UTF8, "application/json");
+                request.Content = content;
             }
 
-            HttpContent content = new StringContent(bodyString, Encoding.UTF8, "application/json");
+            return request;
+        }
 
+        public async Task<object> GETAsync(String URL, Dictionary<string, string> headers) => await GETAsync(URL, null, headers);
+
+
+        public async Task<object> GETAsync(String URL, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+            => await SENDAsync(HttpMethod.Get, URL, null, auth, headers);
+
+        public async Task<object> POSTAsync(String URL, dynamic body, Dictionary<string, string> headers)
+            => await POSTAsync(URL, body, null, headers);
+
+        public async Task<object> POSTAsync(String URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+            => await SENDAsync(HttpMethod.Post, URL, body, auth, headers);
+
+        public async Task<object> POSTAsync(String URL, AuthenticationHeaderValue auth, HttpContent content)
+        {
+
+            var request = new HttpRequestMessage();
+            request.RequestUri = new Uri(URL);
+            request.Content = content;
+            request.Method = HttpMethod.Post;
+            request.Headers.Authorization = auth;
             DateTime start = DateTime.Now;
 
-            HttpResponseMessage response = client.PostAsync(processURL(URL), content).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             TimeSpan requestTime = DateTime.Now - start;
             timeSpans.Add(($"[POST] {URL}", requestTime.TotalSeconds));
 
-
-            client.Dispose();
-            return ConsumeResponse(response, URL, body);
-        }
-        public dynamic POST(String URL, AuthenticationHeaderValue Authorization, HttpContent content)
-        {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(processURL(URL));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = Authorization;
-            client.Timeout = TimeSpan.FromSeconds(280);
-
-            DateTime start = DateTime.Now;
-
-            HttpResponseMessage response = client.PostAsync(processURL(URL), content).Result;
-
-            TimeSpan requestTime = DateTime.Now - start;
-            timeSpans.Add(($"[POST] {URL}", requestTime.TotalSeconds));
-
-            client.Dispose();
-            return ConsumeResponse(response, URL, content);
+            return await ConsumeResponse(response);
         }
 
 
-        public dynamic PATCH(String URL, dynamic body)
+        public async Task<object> PATCHAsync(String URL, dynamic body, Dictionary<string, string> headers)
+            => await PATCHAsync(URL, body, null, headers);
+
+
+        public async Task<object> PATCHAsync(String URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+            => await SENDAsync(HttpMethod.Patch, URL, body, auth, headers);
+
+
+        public async Task<object> PUTAsync(string URL, object body, Dictionary<string, string> headers)
+            => await PUTAsync(URL, body, null, headers);
+
+
+        public async Task<object> PUTAsync(string URL, object body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+            => await SENDAsync(HttpMethod.Put, URL, body, auth, headers);
+
+        private async Task<object> ConsumeResponse(HttpResponseMessage response)
         {
-            return PATCH(URL, body, new AuthenticationHeaderValue("Bearer", getAuthToken()));
-        }
-
-        public dynamic PATCH(String URL, dynamic body, AuthenticationHeaderValue Authorization)
-        {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(processURL(URL));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = Authorization;
-
-            String bodyString;
-            if (body is String)
+            var URL = response.RequestMessage.RequestUri.ToString();
+            Log.Info($"[{response.RequestMessage.Method}].{URL}");
+            string errorMsg = null;
+            if (!response.IsSuccessStatusCode)
             {
-                bodyString = body;
-            }
-            else
-            {
-                bodyString = JsonConvert.SerializeObject(body);
-            }
-
-            HttpContent content = new StringContent(bodyString, Encoding.UTF8, "application/json");
-
-            DateTime start = DateTime.Now;
-
-            HttpResponseMessage response = client.PatchAsync(processURL(URL), content).Result;
-
-            TimeSpan requestTime = DateTime.Now - start;
-            timeSpans.Add(($"[PATCH] {URL}", requestTime.TotalSeconds));
-
-            client.Dispose();
-            return ConsumeResponse(response, URL,body);
-        }
-
-        public dynamic PUT(string URL, dynamic body)
-        {
-            return PUT(URL, body, new AuthenticationHeaderValue("Bearer", getAuthToken()));
-        }
-
-        public dynamic PUT(string URL, dynamic body, AuthenticationHeaderValue Authorization)
-        {
-            HttpClient client = new HttpClient()
-            {
-                BaseAddress = new Uri(processURL(URL))
-            };
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = Authorization;
-
-            string bodyString;
-            if (body is string)
-            {
-                bodyString = body;
-            }
-            else
-            {
-                bodyString = JsonConvert.SerializeObject(body);
-            }
-
-            HttpContent content = new StringContent(bodyString, Encoding.UTF8, "application/json");
-
-            DateTime start = DateTime.Now;
-
-            HttpResponseMessage response = client.PutAsync(processURL(URL), content).Result;
-
-            TimeSpan requestTime = DateTime.Now - start;
-            timeSpans.Add(($"[PUT] {URL}", requestTime.TotalSeconds));
-
-            client.Dispose();
-            return ConsumeResponse(response, URL, body);
-        }
-
-        private String processURL(String URL)
-        {
-            if (!URL.StartsWith("http"))
-            {
-                if (!URL.StartsWith("/"))
+                if (response.RequestMessage?.Content != null)
                 {
-                    return this.Configuration.GetVariable("SERVER_HOST") + "/"+URL;
+                    Log.Critical(await response.RequestMessage?.Content?.ReadAsStringAsync() ?? "");
                 }
-                return this.Configuration.GetVariable("SERVER_HOST") + URL;
+                errorMsg = await response.Content?.ReadAsStringAsync();
+                Log.Critical(errorMsg);
             }
-            return URL;
-        }
-
-        private dynamic ConsumeResponse(HttpResponseMessage response, string URL, dynamic body=null)
-        {
-            if(!response.IsSuccessStatusCode)
-            {
-                Log.Critical(processURL(URL));
-                Log.Critical(body);
-                Log.Critical(response.Content.ReadAsStringAsync().Result);
-            }
-            response.EnsureSuccessStatusCode();
-            String dataObjects = response.Content.ReadAsStringAsync().Result;
-            response.Dispose();
-
             try
             {
-                return JsonConvert.DeserializeObject<dynamic>(dataObjects);
-            }catch(JsonReaderException)
-            {
-                return dataObjects;
+                response.EnsureSuccessStatusCode();
             }
-        }
-
-        private String getAuthToken()
-        {
-            if(BrowserIndicator.isNoBrowserFeature)
+            catch (Exception ex)
             {
-                return getAuthTokenAPI();
+                throw new Exception(errorMsg ?? ex.Message, ex);
             }
-            String currentUser= (string)JSExecutor.execute("return window.localStorage.getItem('currentUser')");
-            return (String)JsonConvert.DeserializeObject<dynamic>(currentUser)["accessToken"];
-        }
+            response.EnsureSuccessStatusCode();
 
-        private String _APIToken = null;
-
-        private String getAuthTokenAPI()
-        {
-            if (_APIToken == null)
+            if (response.Content.Headers.TryGetValues("content-type", out var contentType) && contentType.Contains("application/pdf"))
             {
-                string TenantId = Configuration.GetVariable("API_TENANT_ID");
-                string ClientId = Configuration.GetVariable("API_CLIENT_ID");
-                string ClientSecret = Configuration.GetVariable("API_CLIENT_SECRET");
-                string Username = Configuration.GetVariable("API_USERNAME");
-                string Password = Configuration.GetVariable("API_PASSWORD");
-
-                HttpContent content = new FormUrlEncodedContent(new[]
+                var filename = response.Content.Headers.GetValues("content-disposition")
+                                                        .ElementAt(0)
+                                                        .Split(";")[1]
+                                                        .Substring(10)
+                                                        .Trim('"');
+                using (var file = File.Create(filename))
                 {
-                new KeyValuePair<string,string>("grant_type",       "PASSWORD" ),
-                new KeyValuePair<string,string>("client_id",        ClientId ),
-                new KeyValuePair<string,string>("client_secret",    ClientSecret ),
-                new KeyValuePair<string,string>("scope",            $"openid {ClientId}/.default" ),
-                new KeyValuePair<string,string>("userName",         Username ),
-                new KeyValuePair<string,string>("Password",         Password )
-            });
+                    var contentStream = await response.Content.ReadAsStreamAsync(); // get the actual content stream
+                    contentStream.CopyTo(file); // copy that stream to the file stream
 
-                var response = POST($"https://login.microsoftonline.com/{TenantId}/oauth2/v2.0/token", null, content);
-
-                _APIToken = response["access_token"];
+                    Log.Debug($"file for API request [/{URL}] \n location: " + file.Name);
+                    response.Dispose();
+                    return file.Name;
+                }
             }
-            return _APIToken;
+            else if (contentType != null && contentType.Any(it => it.Contains("json")))
+            {
+                var responseStr = response.Content.ReadAsStringAsync().Result;
+
+                response.Dispose();
+
+                try
+                {
+                    return JsonConvert.DeserializeObject<dynamic>(responseStr);
+                }
+                catch (JsonReaderException)
+                {
+                    return responseStr;
+                }
+            }
+            else
+            {
+                return response.Content.ReadAsStringAsync().Result;
+            }
+
+
         }
     }
 }

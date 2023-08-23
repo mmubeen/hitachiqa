@@ -1526,16 +1526,18 @@ namespace HitachiQA.Driver
             this.switchToIFrame(locator);
             this.waitForPageLoad(locator.IFrameLocator);
             this.WaitForTransaction();
-            var retries = Enumerable.Range(0, (int)(waitSeconds / 0.333))
-                                   .Select(i => TimeSpan.FromSeconds(0.333 * i));
+
             var retry = Policy.HandleResult<bool>(false)
-            .WaitAndRetry(retries);
+            .WaitAndRetry((int)waitSeconds, _=>TimeSpan.FromSeconds(1));
+
+            var interceptRetry = Policy.Handle<ElementClickInterceptedException>()
+            .WaitAndRetry(2, _ => TimeSpan.FromSeconds(1));
 
             return retry.Execute(()=>{
                 if (this.ElementExists(locator, out IWebElement? element) && element.Displayed && element.Enabled)
                 {
                     element.NullGuard();
-                    element.Click();
+                    interceptRetry.Execute(()=>element.Click());
                     return true;
                 }
                 return false;
