@@ -31,5 +31,5 @@ stages:
           inputs:
             command: 'test'
             projects: '**/HitachiQA.UnitTests.dll'
-            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter git pull'
+            arguments: '--settings $(System.DefaultWorkingDirectory)/drop/HitachiQA.UnitTests/default.runsettings --no-build --filter TestCategory!=dynamics.fo&TestCategory!=dynamics.fs'
             testRunTitle: 'HitachiQA Unit Tests'
