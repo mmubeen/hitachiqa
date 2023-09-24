@@ -12,15 +12,43 @@ namespace HitachiQA.Playwright
     {
         public static async Task AssertIsPresentAsync(this ILocator locator)
         {
-            await Assertions.Expect(locator.First).ToHaveCountAsync(1);
+            await Assertions.Expect(locator.First).ToHaveCountAsync(1, new() { Timeout=30000});
         }
         public static async Task AssertIsVissibleAsync(this ILocator locator)
         {
-            await Assertions.Expect(locator.First).ToBeVisibleAsync();
+            await Assertions.Expect(locator.First).ToBeVisibleAsync(new() { Timeout = 30000 });
         }
         public static async Task AssertNotVissibleAsync(this ILocator locator)
         {
-            await Assertions.Expect(locator.First).Not.ToBeVisibleAsync();
+            await Assertions.Expect(locator.First).Not.ToBeVisibleAsync(new() { Timeout = 30000 });
+        }
+        public static async Task<bool> ExistsAsync(this ILocator locator)
+        {
+            var count = await locator.CountAsync();
+            return count > 0;
+        }
+        public static async Task AssertIsPresentAsync(this Task<ILocator> locatorTask)
+        {
+            var loc = await locatorTask;
+            await loc.AssertIsPresentAsync();
+        }
+
+        public static async Task ClickAsync(this Task<ILocator> locatorTask)
+        {
+            var loc = await locatorTask;
+            await loc.ClickAsync();
+        }
+
+        public static async Task<string?> TextContentAsync(this Task<ILocator> locatorTask)
+        {
+            var loc = await locatorTask;
+            return await loc.TextContentAsync();
+        }
+
+        public static async Task SetFieldValueAsync(this Task<ILocator> locatorTask, object value)
+        {
+            var loc = await locatorTask;
+            await loc.SetFieldValueAsync(value);
         }
 
         public static async Task SetFieldValueAsync(this ILocator locator, object value)

@@ -24,8 +24,8 @@ namespace HitachiQA.UnitTests.StepDefinitions
         public async Task ThenUserShouldLandOnHSALHomepagePlaywright()
         {
             await this.Page.Locator("xpath=//*[contains(text(), 'Hitachi')]").AssertIsPresentAsync();
-            await this.Page.GetField("open-global-search").ClickAsync();
-            await this.Page.GetField("site-search-keyword").SetFieldValueAsync("automation");
+            await this.Page.GetFieldAsync("open-global-search").ClickAsync();
+            await this.Page.GetFieldAsync("site-search-keyword").SetFieldValueAsync("automation");
             await this.Page.Locator("xpath=//*[@role='submit']").ClickAsync();
         }
 
