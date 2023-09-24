@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstructionIP.Test.UI", "ConstructionIP.Test.UI.csproj", "{6A3714F8-ED4D-4EF1-A1AC-37BE2421F45A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitachiQA", "..\HitachiQA\HitachiQA.csproj", "{2229DB27-8C46-46D2-ACDC-B8BA9E291934}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A3714F8-ED4D-4EF1-A1AC-37BE2421F45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A3714F8-ED4D-4EF1-A1AC-37BE2421F45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A3714F8-ED4D-4EF1-A1AC-37BE2421F45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A3714F8-ED4D-4EF1-A1AC-37BE2421F45A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2229DB27-8C46-46D2-ACDC-B8BA9E291934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2229DB27-8C46-46D2-ACDC-B8BA9E291934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2229DB27-8C46-46D2-ACDC-B8BA9E291934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2229DB27-8C46-46D2-ACDC-B8BA9E291934}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A7FC56AC-227E-46F0-A761-F6B05E182B0B}
+	EndGlobalSection
+EndGlobal

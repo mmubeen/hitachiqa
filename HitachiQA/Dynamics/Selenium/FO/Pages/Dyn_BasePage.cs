@@ -16,7 +16,7 @@ namespace HitachiQA.Dynamics.FO.Pages
         public readonly GlobalCommandBar GlobalCommandBar;
         public Dyn_BasePage(ObjectContainer ObjectContainer) : base(ObjectContainer)
         {
-            this.GlobalCommandBar = ObjectContainer.Resolve<GlobalCommandBar>();
+            GlobalCommandBar = ObjectContainer.Resolve<GlobalCommandBar>();
             KnownFieldXPaths.Add("//*[(@data-dyn-role='Label' or @data-dyn-role='Tile') and (text()='{input}' or @title='{input}')]");
             KnownFieldXPaths.Add("//*[@aria-label='{input}']");
         }

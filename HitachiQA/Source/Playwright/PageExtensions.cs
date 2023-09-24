@@ -11,8 +11,10 @@ namespace HitachiQA.Playwright
 {
     public static class PageExtensions
     {
-        public static ILocator GetField(this IPage page, string indentifier)
+        public async static Task<ILocator> GetFieldAsync(this IPage page, string indentifier)
         {
+            await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+
             var tasks = new Dictionary<string, Task<bool>>();
             var ct = new CancellationTokenSource();
             //invoking all trials
@@ -23,42 +25,47 @@ namespace HitachiQA.Playwright
                 
                 //adding running task
                 tasks.Add(identifier, InvokeTrial(page, field, ct.Token));
-                
 
             }
             
-            var completed = Task.WhenAny(tasks.Values).Result;
+            var completed = await Task.WhenAny(tasks.Values);
                         
-            if (completed.Result== true)
+            if ((await completed)== true)
             {
                 var identifierFound = tasks.First(it => it.Value.IsCompletedSuccessfully).Key;
                 ct.Cancel();
+                await Task.WhenAll(tasks.Values);
                 return page.Locator(identifierFound);
             }
             throw new Exception($"Not found in UI: {indentifier}");
 
 
         }
-        [DebuggerHidden]
-        private static Task<bool> InvokeTrial(IPage page, ILocator fieldTrial, CancellationToken ct)
-        {
-            var retry = Policy.HandleResult<int>(0).WaitAndRetry(5 * 30, _ => TimeSpan.FromMilliseconds(200));
-            
-            var task = new Task<bool>(() => {
 
-                var count =  retry.Execute(() =>
+        [DebuggerHidden]
+        private async static Task<bool> InvokeTrial(IPage page, ILocator fieldTrial, CancellationToken ct)
+        {
+            var retry = Policy.HandleResult<int>(0).WaitAndRetryAsync(5 * 30, _ => TimeSpan.FromMilliseconds(200));
+            
+            
+            var count = await retry.ExecuteAsync(async () =>
+            {
+                if(ct.IsCancellationRequested)
                 {
-                    if(ct.IsCancellationRequested)
-                    {
-                        return -1;
-                    }
-                    return fieldTrial.CountAsync().Result;
-                });
-                return count != 0;
-                
+                    return -1;
+                }
+                try
+                {
+                    return await fieldTrial.CountAsync();
+                }
+                catch(Exception)
+                {
+                    return 0;
+                }
             });
-            task.Start();
-            return task??throw new Exception("error invoking trial, task was null");
+
+            return count != 0;
+
         }
 
         public static List<string> KnownFieldXPaths = new List<string>()
@@ -70,15 +77,15 @@ namespace HitachiQA.Playwright
             "//button[.//*[normalize-space(text())='{input}']]",
             "//a[.//*[normalize-space(text())='{input}']]",
             "//a[normalize-space(text())='{input}']",
-            "//a[@title='{input}']",
             "//button[@data-id='{input}']",
             "//*[@aria-label='{input}']",
-            "//li[@title='{input}']",
             "//td[@data-hslcolumnname='{input}']",
             "//button[@id='{input}']",
-            "//button[@title='{input}']",
             "//label[normalize-space(text())='{input}']/following-sibling::input",
-            "//input[@title='{input}']"
+            "//*[@data-value='{input}']",
+            "//*[@name='{input}']",
+            "//*[@title='{input}']",
+
         };
     }
 }
