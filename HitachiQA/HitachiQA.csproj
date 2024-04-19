@@ -7,7 +7,7 @@
 	 <ImplicitUsings>enable</ImplicitUsings>
 	 <UserSecretsId>e241d6ae-1e24-44cf-810e-59bf9f6f4aa2</UserSecretsId>
 	 <IsPackable>true</IsPackable>
-	 <Version>1.0.3</Version>
+	 <Version>1.0.4</Version>
   </PropertyGroup>
 
 	<ItemGroup>

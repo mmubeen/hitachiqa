@@ -26,7 +26,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             await this.Page.Locator("xpath=//*[contains(text(), 'Hitachi')]").AssertIsPresentAsync();
             await this.Page.GetFieldAsync("open-global-search").ClickAsync();
             await this.Page.GetFieldAsync("site-search-keyword").SetFieldValueAsync("automation");
-            await this.Page.Locator("xpath=//*[@role='submit']").ClickAsync();
+            await this.Page.Locator("xpath=//*[@aria-label='search']").ClickAsync();
         }
 
     }
