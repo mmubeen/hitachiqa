@@ -26,7 +26,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Given(@"Browser is up")]
         public void GivenBrowserIsUp()
         {
-            this.ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Should().NotBeNull();
+            ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>().Should().NotBeNull();
         }
 
         [Then(@"user should land on HSAL homepage selenium")]
@@ -53,7 +53,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             //DriverManager.SwitchWindowContext();
             firstNameFormInput.assertElementNotPresent(5);
 
-            this.ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
+            ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }
 
 
