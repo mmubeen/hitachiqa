@@ -110,7 +110,7 @@ namespace HitachiQA
 
                 string screenshotFilePath = Path.Combine(ArtifactDirectory, FileNameBase + "_screenshot.png");
 
-                screenshot.SaveAsFile(screenshotFilePath, ScreenshotImageFormat.Png);
+                screenshot.SaveAsFile(screenshotFilePath);
                 return true;
             }
             else
