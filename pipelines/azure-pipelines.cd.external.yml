@@ -9,12 +9,13 @@ parameters:
   - name: TargetServiceConnection
     displayName: Target Service Connection
     type: string
-    default: Biberk_MA_ServiceConnection
+    default: MMO_MS_ServiceConnection
     values:
     - BB_MS_ServiceConnection
     - CPI_SV_ServiceConnection
     - Deere_MA_ServiceConnection
     - RKH_FA_ServiceConnection
+    - MMO_MS_ServiceConnection
 
 jobs:
   - job: 
