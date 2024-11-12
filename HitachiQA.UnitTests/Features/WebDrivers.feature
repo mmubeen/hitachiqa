@@ -15,7 +15,6 @@ Examples:
 	| browser |
 	| Chrome  |
 	| Firefox |
-	| Edge    |
 
 
 Scenario: Navigating to a site
