@@ -22,6 +22,7 @@ using NetDriverManager = WebDriverManager.DriverManager;
 using HitachiQA.Playwright;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace HitachiQA.Hooks.Browsers
 {
@@ -45,6 +46,17 @@ namespace HitachiQA.Hooks.Browsers
         {
             this.TestContext = tc;
             BrowserIndicator= bi;
+        }
+
+        [BeforeTestRun]
+        public static void InstallPlaywright(IObjectContainer oc)
+        {
+            var framework = Main.Configuration.GetVariable("FRAMEWORK", true);
+            var installPlaywright = Main.Configuration.GetVariable("INSTALL_PLAYWRIGHT", true);
+            if (installPlaywright?.ToUpper()=="TRUE" || framework?.ToUpper()=="PLAYWRIGHT")
+            {
+                Microsoft.Playwright.Program.Main(["install", "--with-deps"]);
+            }
         }
 
         [BeforeScenario(Order = 2)]

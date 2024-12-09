@@ -1,0 +1,28 @@
+{
+  "default.targetFrameworkOptions": [ "net8.0", "net9.0" ],
+  "default.targetHost": "https://www.hitachi.us",
+  "default.driverOptions": ["Selenium", "Playwright"],
+
+  "selenium": {
+    "dependencies": {
+      "HitachiQA": "1.8",
+      "SpecFlow.MsTest": "3.9.74",
+      "FluentAssertions": "7.0.0",
+      "MSTest.TestAdapter": "3.6.4",
+      "MSTest.TestFramework": "3.6.4",
+      "Microsoft.NET.Test.Sdk": "17.12.0"
+    }
+  },
+  "playwright": {
+    "dependencies": {
+      "HitachiQA": "1.8",
+      "SpecFlow.MsTest": "3.9.74",
+      "FluentAssertions": "7.0.0",
+      "MSTest.TestAdapter": "3.6.4",
+      "MSTest.TestFramework": "3.6.4",
+      "Microsoft.NET.Test.Sdk": "17.12.0",
+      "Microsoft.Playwright.MSTest": "1.49.0",
+      "Microsoft.Playwright": "1.49.0"
+    }
+  }
+}

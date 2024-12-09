@@ -5,6 +5,7 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
+
 parameters:
   - name: TargetServiceConnection
     displayName: Target Service Connection
@@ -20,6 +21,7 @@ parameters:
 jobs:
   - job: 
     steps:
+    - checkout: none
     - template: ./templates/downloadbuild.template.yml
     - task: NuGetAuthenticate@1
       inputs:

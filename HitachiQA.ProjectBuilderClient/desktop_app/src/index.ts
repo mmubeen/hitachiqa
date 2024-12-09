@@ -1,9 +1,10 @@
 //import { app, BrowserWindow } from 'electron';
-import { app, BrowserWindow, dialog, ipcMain, session } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron'
 import { OpenDialogOptions } from 'electron/main';
-import { PowerShell } from 'node-powershell';
+import { InvocationResult, PowerShell } from 'node-powershell';
 import path from 'path';
 import { readFile } from 'fs/promises';
+import { existsSync, mkdirSync} from 'fs';
 
 
 
@@ -35,9 +36,9 @@ const createWindow = (): void => {
   }); 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  
+
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -74,39 +75,57 @@ app.on('activate', () => {
 
 ipcMain.handle('dialog:openFile', handleFileOpen)
 ipcMain.handle('script:run', runScript)
-ipcMain.handle('script:runBuild', runBuildScript)
 ipcMain.handle('app:close', closeApp)
 ipcMain.handle('app:minimize', minimizeApp)
 ipcMain.handle('file:readme', getReadme)
 ipcMain.handle('validate:toolInstalled', validateCommandLineToolInstalled)
 ipcMain.handle('devTools:open', openDevTools)
+ipcMain.handle("info:loadDefaults", loadDefaults)
+ipcMain.handle('open-browser', (event, url) => {
+  shell.openExternal(url);
+});
 
-async function runBuildScript(event: any, script: string){
-  const rendererPath = path.join(app.getAppPath(), '.webpack/renderer')
-  const assets = path.join(app.getAppPath(), '.webpack/renderer/assets')
-  script = script+` -assetsDir ${assets}`
-  const filePath = path.join(rendererPath, script)
-
-  console.log(filePath)
-  return await runScript(event, filePath)
-}
-
-async function runScript(event: any, script: string){
+async function runScript(event: any, script: string): Promise<InvocationResult> {
   const ps = new PowerShell({
-    debug: true,
+    debug: false, // Disable debug logs to avoid unnecessary output
     executableOptions: {
       '-ExecutionPolicy': 'Bypass',
       '-NoProfile': true,
-      "-NonInteractive": false
-    }});
-  
+      '-NonInteractive': false,
+    },
+  });
 
-  let result = await ps.invoke(script).catch(e=> {
-      return e;
-      }
-    )
-  return result;
+  console.log('PowerShell instance created.');
+  console.log('Running script:', script);
+
+  return new Promise<InvocationResult>((resolve, reject) => {
+    // Listen for stdout events
+    ps.streams.stdout.on('data', (data: string) => {
+      event.sender.send('powershell-output', data.trim()); // Send to renderer process
+    });
+
+    // Listen for stderr events
+    ps.streams.stderr.on('data', (data: string) => {
+      event.sender.send('powershell-error', data.trim()); // Send to renderer process
+    });
+
+    // Invoke the script
+    ps.invoke(script)
+      .then((result: InvocationResult) => {
+        event.sender.send('powershell-done', 0); // Send success event
+        resolve(result); // Return the full InvocationResult
+      })
+      .catch((err: Error) => {
+        event.sender.send('powershell-done', 1); // Send failure event
+        reject(err); // Reject with the error
+      })
+      .finally(() => {
+        ps.dispose(); // Dispose of the PowerShell instance
+      });
+  });
 }
+
+
 
 
 async function handleFileOpen () {
@@ -167,5 +186,34 @@ function minimizeApp () {
   mainWindow.minimize();
 }
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+async function loadDefaults(event: any) {
+  const ps = new PowerShell({
+    debug: true,
+    executableOptions: {
+      '-ExecutionPolicy': 'Bypass',
+      '-NoProfile': true,
+      '-NonInteractive': true, // Ensure it runs in non-interactive mode
+    },
+  });
+
+  const outputPath = path.join(app.getAppPath(), '.webpack/renderer/assets/versions.json');
+  const command = `hitachiqabuilder info -o "${outputPath}"`;
+
+  try {
+    // Ensure the assets directory exists
+    const assetsDir = path.dirname(outputPath);
+    if (!existsSync(assetsDir)) {
+      mkdirSync(assetsDir, { recursive: true });
+    }
+
+    console.log("executing", command);
+    await ps.invoke(command); // Run the command
+
+    // Read the JSON file and return its contents
+    const fileContents = await readFile(outputPath, 'utf8');
+    return JSON.parse(fileContents);
+  } catch (error) {
+    console.error('Error running hitachiqabuilder info:', error);
+    throw error;
+  }
+}

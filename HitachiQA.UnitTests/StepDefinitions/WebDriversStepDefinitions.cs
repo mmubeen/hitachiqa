@@ -102,6 +102,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         {
             WebDriverHook.ChromeOptions = new ChromeOptions();
             WebDriverHook.ChromeOptions.AddArgument("--headless");
+            WebDriverHook.ChromeOptions.AddArgument("--force-device-scale-factor=1");
             WebDriverHook.ChromeOptions.AddArgument(option);
         }
 
@@ -119,8 +120,8 @@ namespace HitachiQA.UnitTests.StepDefinitions
                 case "--window-size=840,640":
                     var height = (long)js.execute("return window.outerHeight");
                     var width = (long)js.execute("return window.outerWidth");
-                    height.Should().Be(640);
-                    width.Should().Be(840);
+                    var actual = $"{width},{height}";
+                    actual.Should().Be("840,640");
                     break;
                 default: throw new NotImplementedException(option);
             }

@@ -16,12 +16,17 @@ steps:
     echo "##vso[task.setvariable variable=OPTIONS;]--headless;--window-size=1800,1200"
     echo "##vso[task.setvariable variable=Playwright.Headless;]true"
 
+- task: DotNetCoreCLI@2
+  displayName: "Build Unit Tests"
+  inputs:
+    command: "build"
+    arguments: '--configuration Release'
+    projects: "**/HitachiQA.UnitTests.csproj"
+
 - task: FileTransform@1
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net6.0'
+    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0'
     fileType: 'json'
-
-- pwsh: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net6.0/playwright.ps1 install --with-deps'
 
 - task: DotNetCoreCLI@2
   displayName: "Unit Tests"

@@ -7,9 +7,6 @@ trigger:
   branches:
     include:
     - master
-  paths:
-    exclude:
-    - '*.yml'
     
 pool:
   vmImage: 'ubuntu-latest'
@@ -34,33 +31,61 @@ stages:
         vmImage: 'ubuntu-latest'
       displayName: 'Build Test Publish'
       steps:
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+                $xml = [Xml] (Get-Content .\HitachiQA\HitachiQA.csproj)
+                $version = $xml.Project.PropertyGroup.Version
+                $buildId = "$(Build.BuildNumber)" -replace "\.", ""
+                echo "MajorReleaseVersion $version"
+                echo "MinorReleaseVersion $version.$buildId"
+                echo "##vso[task.setvariable variable=MajorReleaseVersion]$version"
+                echo "##vso[task.setvariable variable=MinorReleaseVersion]$version.$buildId"
+                exit 0
+
         - template: templates/build.template.yml
         - template: templates/run-tests.template.yml
 
         - task: DotNetCoreCLI@2
           condition: 'not(${{ parameters.MajorRelease }})'
-          displayName: 'pack'
+          displayName: 'HitachiQA pack minor release'
           inputs:
             command: 'pack'
-            projects: '$(solution)'
-            searchPatternPack: '$(project)'
-            nobuild: true
-            outputDir: '$(System.DefaultWorkingDirectory)'
-            versioningScheme: 'byPrereleaseNumber'
-            majorVersion: '1'
-            minorVersion: '0.1'
+            packagesToPack: '**/HitachiQA.csproj'
+            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            versioningScheme: 'byEnvVar'
+            versionEnvVar: "MinorReleaseVersion"
+            includesource: true
+
+        - task: DotNetCoreCLI@2
+          condition: 'not(${{ parameters.MajorRelease }})'
+          displayName: 'Builder pack minor release'
+          inputs:
+            command: 'pack'
+            packagesToPack: '**/Hsl.HitachiQA.Builder.csproj'
+            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            versioningScheme: 'byEnvVar'
+            versionEnvVar: "MinorReleaseVersion"
             includesource: true
 
         - task: DotNetCoreCLI@2
           condition: ${{ parameters.MajorRelease }}
-          displayName: 'pack'
+          displayName: 'pack major release HitachiQA'
           inputs:
             command: 'pack'
-            projects: '$(solution)'
-            searchPatternPack: '$(project)'
-            nobuild: true
-            outputDir: '$(System.DefaultWorkingDirectory)'
-            versioningScheme: off
+            packagesToPack: '**/HitachiQA.csproj'
+            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            versioningScheme: 'off'
+
+        - task: DotNetCoreCLI@2
+          condition: ${{ parameters.MajorRelease }}
+          displayName: 'pack major release Builder'
+          inputs:
+            command: 'pack'
+            packagesToPack: '**/Hsl.HitachiQA.Builder.csproj'
+            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            versioningScheme: 'off'
 
         - template: templates/publish.template.yml
 

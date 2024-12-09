@@ -143,7 +143,7 @@ namespace HitachiQA
         }
 
 
-        private static Assembly ExecutingAssembly
+        public static Assembly ExecutingAssembly
         {
             get {
                 StackFrame[] frames = new StackTrace().GetFrames();

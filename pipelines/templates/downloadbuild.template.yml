@@ -38,3 +38,14 @@ steps:
     downloadType: 'single'
     artifactName: 'drop'
     downloadPath: '$(System.DefaultWorkingDirectory)'
+
+- task: ExtractFiles@1
+  displayName: 'Extract files from zip'
+  inputs:
+    archiveFilePatterns: '**/HitachiQA.zip'
+    destinationFolder: '$(System.DefaultWorkingDirectory)/HitachiQA'
+- task: ExtractFiles@1
+  displayName: 'Extract files from zip'
+  inputs:
+    archiveFilePatterns: '**/Hsl.HitachiQA.Builder.zip'
+    destinationFolder: '$(System.DefaultWorkingDirectory)/Hsl.HitachiQA.Builder'

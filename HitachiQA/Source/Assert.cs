@@ -5,6 +5,7 @@ using HitachiQA.Helpers;
 using HitachiQA.Driver;
 using NUnit.Framework;
 using NUnitAssert = NUnit.Framework.Assert;
+using FluentAssertions;
 namespace HitachiQA
 {
     [Obsolete("please use FluentAssertions")]
@@ -100,7 +101,7 @@ namespace HitachiQA
             {
                 try
                 {
-                    CollectionAssert.AreEqual(expected, actual);
+                    expected.Should().Equal(actual);
                     success("Are Equal - @expected & @actual", parameters);
                     return true;
                 }

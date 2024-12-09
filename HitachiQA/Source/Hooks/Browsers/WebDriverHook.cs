@@ -112,6 +112,7 @@ namespace HitachiQA.Hooks.Browsers
                         ChromeOptions.AddArgument("--no-sandbox"); // Bypass OS security model
                         ChromeOptions.AddArgument("--disable-dev-shm-usage");
                         ChromeOptions.AddArgument("--disable-extensions");
+                        ChromeOptions.AddArgument("--force-device-scale-factor=1");
                         ChromeOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
                         ChromeOptions.AddArguments(optionsList);
                     }
@@ -136,7 +137,7 @@ namespace HitachiQA.Hooks.Browsers
                     break;
 
                 case "edge":
-                    _ = new NetDriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
+                    _ = new NetDriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.Latest);
                     if(EdgeOptions==null)
                     {
                         EdgeOptions = new EdgeOptions();

@@ -5,6 +5,7 @@
 			<HOST>https://global.hitachi-solutions.com/</HOST>
 			<SERVER_HOST>TBD</SERVER_HOST>
 			<BROWSER>Chrome</BROWSER>
+			<INSTALL_PLAYWRIGHT>True</INSTALL_PLAYWRIGHT>
 		</EnvironmentVariables>
 	</RunConfiguration>
 </RunSettings>
