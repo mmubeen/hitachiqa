@@ -24,6 +24,7 @@ steps:
       $buildId = $filteredBuilds[0].id
       Write-Host "##vso[task.setvariable variable=buildId]$buildId"
       Write-Host "result buildId: $buildId"
+      exit 0
       
 - task: DownloadBuildArtifacts@1
   displayName: 'Download artifact'

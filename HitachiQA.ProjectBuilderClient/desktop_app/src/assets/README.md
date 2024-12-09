@@ -5,7 +5,7 @@
 The objective is to create another project and then use HitachiQA as a nuget package. Example [Here](https://github.com/Hitachi-SolutionsQA/Demo)
 1. Download `Visual Studio 2022`
 2. Install `Specflow for visual Studio` extension
-3. Create a new specflow project for *.NET6 using MSTest* 
+3. Create a new specflow project for *.NET8 using MSTest* 
 4. download the following [specflow.json](README_FILES\specflow.json) file to the project folder
 5. download the following [default.runsettings](README_FILES\default.runsettings) file to the project folder and modify it to your projects specifics 
 	* It is recommend to rename it to the environment is pointing to like `qa.runsettings` 

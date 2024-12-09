@@ -35,14 +35,26 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-                $xml = [Xml] (Get-Content .\HitachiQA\HitachiQA.csproj)
+                $xml = [Xml](Get-Content .\HitachiQA\HitachiQA.csproj)
                 $version = $xml.Project.PropertyGroup.Version
+
+                # Extract major and minor parts of the version
+                if ($version -match '^(\d+\.\d+)(?:\.\d+)?$') {
+                    $majorMinorVersion = $matches[1] # This will capture "1.x" from "1.x.x"
+                } else {
+                    Write-Error "Version format is not recognized: $version"
+                    exit 1
+                }
+
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
-                echo "MajorReleaseVersion $version"
-                echo "MinorReleaseVersion $version.$buildId"
-                echo "##vso[task.setvariable variable=MajorReleaseVersion]$version"
-                echo "##vso[task.setvariable variable=MinorReleaseVersion]$version.$buildId"
-                exit 0
+                $minorReleaseVersion = "$majorMinorVersion.$buildId"
+
+                echo "MajorReleaseVersion $majorMinorVersion"
+                echo "MinorReleaseVersion $minorReleaseVersion"
+
+                # Set Azure DevOps pipeline variables
+                echo "##vso[task.setvariable variable=MajorReleaseVersion]$majorMinorVersion"
+                echo "##vso[task.setvariable variable=MinorReleaseVersion]$minorReleaseVersion"
 
         - template: templates/build.template.yml
         - template: templates/run-tests.template.yml
