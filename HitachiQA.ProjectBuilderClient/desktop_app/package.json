@@ -1,6 +1,6 @@
 {
-  "name": "client-app",
-  "productName": "client-app",
+  "name": "hitachiqa-projectbuilder",
+  "productName": "HitachiQA-ProjectBuilder",
   "version": "2.0.0",
   "description": "Tool used to build new projects implementing the HitachiQA test automation framework",
   "main": ".webpack/main",

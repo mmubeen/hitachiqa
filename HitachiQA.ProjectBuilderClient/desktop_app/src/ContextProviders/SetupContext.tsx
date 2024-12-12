@@ -210,7 +210,7 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 {deviceCode && (
                     <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: '4px', mt: 2, backgroundColor: '#f9f9f9' }}>
                         <Typography variant="h6">Device Login Required</Typography>
-                        <Typography>Open the following URL in your browser:</Typography>
+                        <Typography>Open the following URL in your browser (sign in with Hitachi account):</Typography>
                         <Typography color="primary" sx={{ mt: 1 }}>{deviceLoginURL}</Typography>
                         <Button variant="contained" color="primary" onClick={openLoginURL} sx={{ mt: 1 }}>
                             Open in Browser
