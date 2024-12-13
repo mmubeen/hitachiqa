@@ -66,7 +66,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [When(@"""([^""]*)"" is invoked")]
         public void WhenIsInvoked(string browser)
         {
-            WebDriverHook.invokeNewSeleniumDriver(ObjectContainer, browser);
+            WebDriverHook.InvokeNewSeleniumDriver(browser);
         }
 
 
@@ -74,7 +74,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Then(@"verify ""([^""]*)"" is open")]
         public void ThenVerifyIsOpen(string browser)
         {
-            var driver = ObjectContainer.Resolve<OpenQA.Selenium.IWebDriver>();
+            var driver = WebDriverHook.WebDriver;
             switch (browser?.ToLower())
             {
                 case "chrome":
@@ -109,7 +109,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Then(@"""([^""]*)"" should be set to the browser")]
         public void ThenShouldBeSet(string option)
         {
-            var js = ObjectContainer.Resolve<JSExecutor>();
+            var js = new JSExecutor(WebDriverHook.WebDriver);
             switch (option)
             {
                 case "--start-maximized":

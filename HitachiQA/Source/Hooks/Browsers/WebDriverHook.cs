@@ -1,9 +1,6 @@
 ﻿using BoDi;
-using DocumentFormat.OpenXml.Bibliography;
 using HitachiQA.Helpers;
-using HitachiQA.Driver;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -23,7 +20,7 @@ namespace HitachiQA.Hooks.Browsers
         public static List<String>? optionsList;
 
         public BrowserIndicator BrowserIndicator = new BrowserIndicator();
-        private IWebDriver? WebDriver { get; set; }
+        public IWebDriver? WebDriver { get; set; }
         private TestContext TestContext { get;  }
         public WebDriverHook(IObjectContainer oc,
             FeatureContext fc,
@@ -32,12 +29,12 @@ namespace HitachiQA.Hooks.Browsers
             BrowserIndicator bi
             ) : base(oc, fc, config)
         {
-            this.TestContext = tc;
+            TestContext = tc;
             BrowserIndicator = bi;
         }
 
         [BeforeScenario(Order = 2)]
-        public void invokeDriver(FeatureContext FT, ScenarioContext SC, IObjectContainer oc)
+        public void InvokeDriver(FeatureContext FT, ScenarioContext SC, IObjectContainer oc)
         {
 
             if (!FT.FeatureInfo.Tags.Contains("NoBrowser") && !SC.ScenarioInfo.Tags.Contains("NoBrowser"))
@@ -52,9 +49,10 @@ namespace HitachiQA.Hooks.Browsers
                 if (ShouldUseSelenium(oc))
                 {
                    
-                    invokeNewSeleniumDriver(oc, browser);
+                    var driver = InvokeNewSeleniumDriver(browser);
                     WebDriver.NullGuard();
-                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(WebDriver, TestContext));
+                    oc.RegisterInstanceAs(driver);
+                    oc.RegisterInstanceAs(new ScreenShot(driver, TestContext));
                 }
 
 
@@ -81,7 +79,7 @@ namespace HitachiQA.Hooks.Browsers
         public static FirefoxOptions? FirefoxOptions;
         public static EdgeOptions? EdgeOptions;
 
-        public IWebDriver invokeNewSeleniumDriver(IObjectContainer oc, string browser)
+        public IWebDriver InvokeNewSeleniumDriver(string browser)
         {
             IWebDriver driver;
             List<string> optionsList= new List<string>();
@@ -156,8 +154,7 @@ namespace HitachiQA.Hooks.Browsers
                     }
                     throw new NotImplementedException($"Environment variable BROWSER value={browser} is not supported");
             }
-            oc.RegisterInstanceAs<IWebDriver>(driver, null, true);
-            this.WebDriver = driver;
+            WebDriver = driver;
 
             try
             {
@@ -181,7 +178,7 @@ namespace HitachiQA.Hooks.Browsers
                 {
                     return;
                 }
-                try {this.WebDriver?.Dispose(); }catch(Exception) { }
+                try {WebDriver?.Dispose(); }catch(Exception) { }
             }
         }
     }

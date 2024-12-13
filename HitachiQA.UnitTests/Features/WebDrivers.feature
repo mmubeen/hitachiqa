@@ -15,7 +15,6 @@ Examples:
 	| browser |
 	| Chrome  |
 	| Firefox |
-	| Edge    |
 
 
 Scenario: Navigating to a site
@@ -32,3 +31,9 @@ Examples:
 	| --start-maximized     |
 	| --window-size=840,640 |
 	
+
+@NoBrowser @ignore
+Scenario: Selenium Interactive Login
+	Given Configuration object is created for 'Selenium'
+	When User gets a bearer token
+	Then user should be able to successfully call the API

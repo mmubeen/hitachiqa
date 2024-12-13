@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using HitachiQA.Source.HttpClients;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 
 
@@ -16,8 +17,6 @@ namespace HitachiQA.Source.Hooks.HttpClientExtras
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var host = Configuration.GetVariable("SERVER_HOST", true);
-
             if (isAuthRequired(request.RequestUri))
             {
                 var bearer = await Client.GetBearerTokenAsync();

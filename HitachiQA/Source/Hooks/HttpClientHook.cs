@@ -2,9 +2,8 @@
 using HitachiQA.Helpers;
 using HitachiQA.Hooks;
 using HitachiQA.Source.Hooks.HttpClientExtras;
+using HitachiQA.Source.HttpClients;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Headers;
 using TechTalk.SpecFlow;
 

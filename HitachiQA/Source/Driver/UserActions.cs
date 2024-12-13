@@ -25,9 +25,9 @@ namespace HitachiQA.Driver
         private readonly JSExecutor JSExecutor;
         public UserActions(ObjectContainer objectContainer)
         {
-            this.WebDriver = objectContainer.Resolve<IWebDriver>();
-            this.Configuration = objectContainer.Resolve<IConfiguration>();
-            this.JSExecutor = objectContainer.Resolve<JSExecutor>();
+            WebDriver = objectContainer.Resolve<IWebDriver>();
+            Configuration = objectContainer.Resolve<IConfiguration>();
+            JSExecutor = objectContainer.Resolve<JSExecutor>();
 
             var configKeys = this.Configuration.GetChildren();
             var wait = configKeys.FirstOrDefault(it => it.Key == "DEFAULT_WAIT_SECONDS");

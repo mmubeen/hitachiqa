@@ -16,6 +16,10 @@ namespace HitachiQA.Helpers
             }
         }
 
+        public static JObject ToJObject(this object obj) => JObject.FromObject(obj);
+        public static JToken ToJToken(this object obj) => JToken.FromObject(obj);
+        public static JArray ToJArray(this object obj) => JArray.FromObject(obj);
+
         public static T ToObject<T>(this object obj)
         {
             if (obj.GetType()==typeof(T))
@@ -63,6 +67,18 @@ namespace HitachiQA.Helpers
             }
 
             return false;
+        }
+        public static object ExecuteScript(this IWebDriver driver, string script, params object[] args)
+        {
+            return ((IJavaScriptExecutor)driver).ExecuteScript(script, args);
+        }
+
+        public static DateTime UnixTimeStampToDateTime(this long unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            var dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dateTime;
         }
     }
 }

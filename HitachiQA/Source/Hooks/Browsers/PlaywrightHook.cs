@@ -23,6 +23,7 @@ using HitachiQA.Playwright;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using System.Diagnostics;
 
 namespace HitachiQA.Hooks.Browsers
 {
@@ -32,9 +33,10 @@ namespace HitachiQA.Hooks.Browsers
         public static List<String>? optionsList;
 
         public BrowserIndicator BrowserIndicator { get; init; }
-        private IPage? PlaywrightPage { get; set; }
-        private IBrowser? PlaywrightBrowser { get; set; }
-        private IBrowserContext? PlaywrightBrowserContext { get; set; }
+        public IPlaywright? Playwright { get; set; }
+        public IPage? PlaywrightPage { get; set; }
+        public IBrowser? PlaywrightBrowser { get; set; }
+        public IBrowserContext? PlaywrightBrowserContext { get; set; }
         private TestContext TestContext { get;  }
         public PlaywrightHook(
             IObjectContainer oc, 
@@ -44,12 +46,21 @@ namespace HitachiQA.Hooks.Browsers
             BrowserIndicator bi
             ) : base(oc, fc, config)
         {
-            this.TestContext = tc;
+            TestContext = tc;
             BrowserIndicator= bi;
         }
 
+        public async Task InvokeBrowserAsync(string browserName)
+        {
+            Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+            PlaywrightBrowser = await InvokeNewPlaywrightBrowserAsync(browserName);
+            PlaywrightBrowserContext = await PlaywrightBrowser.CreateNewContextAsync(Configuration.GetVariable("HOST"));
+            PlaywrightPage = await PlaywrightBrowserContext.CreateNewPageAsync();
+        }
+
+
         [BeforeTestRun]
-        public static void InstallPlaywright(IObjectContainer oc)
+        public static void InstallPlaywright()
         {
             var framework = Main.Configuration.GetVariable("FRAMEWORK", true);
             var installPlaywright = Main.Configuration.GetVariable("INSTALL_PLAYWRIGHT", true);
@@ -60,83 +71,56 @@ namespace HitachiQA.Hooks.Browsers
         }
 
         [BeforeScenario(Order = 2)]
-        public void invokeDriver(FeatureContext FT, ScenarioContext SC, IObjectContainer oc)
+        public async Task InvokeBrowserAsync(FeatureContext fc, ScenarioContext sc, IObjectContainer oc)
         {
-            if (!FT.FeatureInfo.Tags.Contains("NoBrowser") && !SC.ScenarioInfo.Tags.Contains("NoBrowser"))
+            if (!fc.FeatureInfo.Tags.Contains("NoBrowser") && !sc.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
 
                 BrowserIndicator.IsBrowserFeature = true;
                 //if no selenium tag
                 //and either driver is playwright or feature tag contains playwright
                 //           
-                if (ShouldUsePlaywright(oc))
+                if (ShouldUsePlaywright(fc, sc, Configuration))
                 {
-
-                    PlaywrightBrowser = oc.Resolve<IBrowser>();
-                    PlaywrightBrowserContext = PlaywrightBrowser.CreateNewContext(Configuration.GetVariable("HOST"));
-                    PlaywrightPage = PlaywrightBrowserContext.CreateNewPage();
+                    var browser = Configuration.GetVariable("BROWSER");
+                    await InvokeBrowserAsync(browser);
+                    oc.RegisterInstanceAs<IPlaywright>(Playwright);
+                    oc.RegisterInstanceAs<IBrowser>(PlaywrightBrowser);
                     oc.RegisterInstanceAs<IBrowserContext>(PlaywrightBrowserContext);
                     oc.RegisterInstanceAs<IPage>(PlaywrightPage);
                     oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(PlaywrightPage, TestContext));
-                    PlaywrightPage.GotoAsync("/");
+                    await PlaywrightPage.GotoAsync("/");
                 }
             }
 
         }
 
-        private static bool ShouldUsePlaywright(IObjectContainer oc)
-        {
-            IConfiguration config = oc.Resolve<IConfiguration>();
-            FeatureContext FT = oc.Resolve<FeatureContext>();
-            var featureTags = FT.FeatureInfo.Tags;
-            var ignorecase = StringComparer.InvariantCultureIgnoreCase;
-            var framework = config.GetVariable("FRAMEWORK", true);
-            return !featureTags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || featureTags.Contains("Playwright", ignorecase));
-        }
-
-        [BeforeFeature(Order = 2)]
-        public static async Task invokePlaywrightBrowser(FeatureContext FT, IObjectContainer oc)
-        {
-
-            var tags = FT.FeatureInfo.Tags;
-            var ignorecase = StringComparer.InvariantCultureIgnoreCase;
-            if (!tags.Contains("NoBrowser", ignorecase))
-            { 
-
-                IConfiguration config = oc.Resolve<IConfiguration>();
-                var browser = config.GetVariable("BROWSER");
-                
-                if(ShouldUsePlaywright(oc))
-                {
-                    oc.RegisterInstanceAs<IPlaywright>(await Microsoft.Playwright.Playwright.CreateAsync());
-
-                    var b = InvokeNewPlaywrightBrowser(oc, browser);
-                    oc.RegisterInstanceAs<IBrowser>(b);
-
-                }
-            }
-        }
         [AfterScenario]
-        public void closeContext()
+        public async Task closeContext()
         {
-            if(this.PlaywrightPage != null && PlaywrightPage.Video!=null)
+            if (this.PlaywrightPage != null && PlaywrightPage.Video != null)
             {
-                var videoPath = PlaywrightPage.Video.PathAsync().Result;
+                var videoPath = await PlaywrightPage.Video.PathAsync();
                 this.TestContext.AddResultFile(videoPath);
-                PlaywrightBrowserContext?.CloseAsync().Wait();
+                await PlaywrightBrowserContext?.CloseAsync();
                 Console.WriteLine($"\nVideo: {new Uri(videoPath)}\n");
 
             }
         }
 
-        public static IBrowser InvokeNewPlaywrightBrowser(IObjectContainer oc, string browserName)
+        public async Task<IBrowser> InvokeNewPlaywrightBrowserAsync(string browserName)
         {
-            var engine = oc.Resolve<IPlaywright>();
+            if (Playwright == null)
+                throw new Exception("Playwright must be initialized before invoking browser");
+
             IBrowser browser;
             switch (browserName.ToLower())
             {
                 case "chrome":
-                        browser = engine.Chromium.LaunchAsync(GetPlaywrightOptions(oc)).Result;
+                    browser =  await Playwright.Chromium.LaunchAsync(GetPlaywrightOptions("chrome"));
+                    break;
+                case "msedge":
+                    browser = await Playwright.Chromium.LaunchAsync(GetPlaywrightOptions("msedge"));
                     break;
                 default:
                     if (string.IsNullOrWhiteSpace(browserName))
@@ -151,9 +135,16 @@ namespace HitachiQA.Hooks.Browsers
 
         }
 
-        private static BrowserTypeLaunchOptions GetPlaywrightOptions(IObjectContainer oc)
+        private static bool ShouldUsePlaywright(FeatureContext fc, ScenarioContext sc, IConfiguration config)
         {
-            var config = oc.Resolve<IConfiguration>();
+            var tags = fc.FeatureInfo.Tags.Concat(sc.ScenarioInfo.Tags);
+            var ignorecase = StringComparer.InvariantCultureIgnoreCase;
+            var framework = config.GetVariable("FRAMEWORK", true);
+            return !tags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase));
+        }
+
+        private BrowserTypeLaunchOptions GetPlaywrightOptions(string channel="chrome")
+        {
             var options = new BrowserTypeLaunchOptions();
             var props = options.GetType().Properties();
             foreach (var prop in props)
@@ -161,7 +152,7 @@ namespace HitachiQA.Hooks.Browsers
                 if(prop.GetSetMethod()==null) {
                     continue;
                 }
-                var value = config.GetVariable($"Playwright.{prop.Name}", true);
+                var value = Configuration.GetVariable($"Playwright.{prop.Name}", true);
                 if (string.IsNullOrWhiteSpace(value))
                 {
                     continue;
@@ -190,11 +181,9 @@ namespace HitachiQA.Hooks.Browsers
             }
 
             options.Headless ??= false;
-            options.Channel ??= "chrome";
+            options.Channel ??= channel;
             
             return options;
-            
-
         }
 
     }

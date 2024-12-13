@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using Azure.Messaging.EventGrid.SystemEvents;
+using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,12 @@ namespace HitachiQA.Playwright
 {
     public static class BrowserExtensions
     {
-        public static IPage CreateNewPage(this IBrowserContext context) {
-           return context.NewPageAsync().Result;
+        public async static Task<IPage> CreateNewPageAsync(this IBrowserContext context) {
+           return await context.NewPageAsync();
         }
-        public static IBrowserContext CreateNewContext(this IBrowser browser, string baseURL="")
+        public async static Task<IBrowserContext> CreateNewContextAsync(this IBrowser browser, string baseURL="")
         {
-            return browser.NewContextAsync(new() { RecordVideoDir = Path.Join(Directory.GetCurrentDirectory(),"/Videos/"), StrictSelectors = false, BaseURL=baseURL }).Result;
+            return await browser.NewContextAsync(new() { RecordVideoDir = Path.Join(Directory.GetCurrentDirectory(),"/Videos/"), StrictSelectors = false, BaseURL=baseURL });
 
         }
     }

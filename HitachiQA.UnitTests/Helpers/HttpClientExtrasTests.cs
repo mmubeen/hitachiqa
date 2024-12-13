@@ -1,4 +1,5 @@
 ﻿using HitachiQA.Source.Hooks.HttpClientExtras;
+using HitachiQA.Source.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
