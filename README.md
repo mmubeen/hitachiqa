@@ -35,7 +35,8 @@ The objective is to create another project and then use HitachiQA as a nuget pac
 >5. kick off the pipeline with the three arguments above
 >6. Add the feed on step 1 to Visual Studio (Options > NuGet Package Manager > Package Sources, similar to Approach 1->Step 3)
 
-
+## dotnet builder tool install command
+```dotnet tool install --global --add-source "https://tfs-hisol-crm.pkgs.visualstudio.com/_packaging/HitachiFeed/nuget/v3/index.json" hsl.hitachiqa.builder --interactive --prerelease```
 <br /><br />
 <br /><br />
 
