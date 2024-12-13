@@ -82,7 +82,7 @@ namespace HitachiQA.Source.HttpClients.Authorization
 
                 foreach (var entry in accessTokens) {
                     if (entry.Key.Contains(identifierKey, StringComparison.InvariantCultureIgnoreCase))
-                        return entry.Value;
+                        return entry.Value.Value<string>();
                 }
 
                 if (accessTokens.Count == 0)
