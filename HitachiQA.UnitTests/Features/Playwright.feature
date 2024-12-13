@@ -10,6 +10,6 @@ Scenario: Navigating to a site
 
 @NoBrowser @ignore
 Scenario: Playwright Interactive Login
-	Given Configuration object is created for 'Selenium'
+	Given Configuration object is created for 'Playwright'
 	When User gets a bearer token
 	Then user should be able to successfully call the API

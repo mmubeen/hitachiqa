@@ -1,9 +1,11 @@
-﻿using HitachiQA.Helpers;
+﻿using Azure.Core;
+using HitachiQA.Helpers;
 using HitachiQA.Hooks.Browsers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Playwright;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
+using OpenQA.Selenium.BiDi.Communication;
 using Polly;
 using System.Diagnostics;
 
@@ -27,21 +29,26 @@ namespace HitachiQA.Source.HttpClients.Authorization
             var retry = Polly.Policy
                 .HandleResult(false)
                 .WaitAndRetryAsync(10, _ => TimeSpan.FromSeconds(1));
-
+            var idleTimeMilis = 2000;
             await retry.ExecuteAsync(async () => {
-                var idleTimeMilis = 1000;
+               
                 await page.WaitForLoadStateAsync(Microsoft.Playwright.LoadState.NetworkIdle);
 
                 var isNetworkIdle = await page.EvaluateAsync<bool>(
-                     @"return performance.getEntriesByType('resource').map(x => x.startTime + x.duration).every(x => x < performance.now() - arguments[0])",
+                     @"idleTimeMilis=> performance.getEntriesByType('resource').map(x => x.startTime + x.duration).every(x => x < performance.now() - idleTimeMilis)",
                         idleTimeMilis);
                 return isNetworkIdle;
             });
             //if user is already authenticated, then the below clicks the first account with biberk.com email
-            await page.EvaluateAsync($"document.evaluate(\"//small[contains(text(),'{emailIdentifierKey}')]/../..\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE).singleNodeValue?.click()");
+            var userXPath = $"//small[contains(text(),'{emailIdentifierKey}')]";
+            if(await page.IsVisibleAsync(userXPath))
+            {
+                await page.ClickAsync(userXPath);
+                await page.WaitForLoadStateAsync(LoadState.Load);
+            }            
         }
 
-     
+
 
         public override async Task<BrowserCredential> GetAccessTokenCredsAsync(string identifierKey)
         {
@@ -49,25 +56,39 @@ namespace HitachiQA.Source.HttpClients.Authorization
             ?? throw new NullReferenceException("[GetAccessTokenCreds] PlaywrightHook.PlaywrightBrowser was null, driver is expectd at this point");
             var retry = Polly.Policy
               .HandleResult<object?>(r => r == null)
-              .OrInner<PlaywrightException>()
-              .WaitAndRetryAsync(120, _ => TimeSpan.FromSeconds(2));
+              .WaitAndRetryAsync(30, _ => TimeSpan.FromSeconds(1));
 
+            var host = Config.GetVariable("HOST");
+            var server = new Uri(host).Host;
+            await browser.WaitForURLAsync($"**/{server}/**", new() { Timeout=120000});
 
             var accessToken = await retry.ExecuteAsync(async () => {
-                var data = await _playwrightHook.PlaywrightBrowserContext.StorageStateAsync();
-                var obj = JObject.Parse(data);
-                var origins = obj["origins"];
-                var accessTokens = new JArray();
-                foreach (var origin in origins)
-                {
-                    var localStorage = origin.Value<JArray>("localStorage");
-                    var accessTokensForOrigin = localStorage.Where(it => it.Value<string>("name").Contains("accesstoken"));
-                    accessTokens = accessTokens.Concat(accessTokensForOrigin).ToJArray();
+                var sessionRaw = await browser.EvaluateAsync("sessionStorage");
+                var session = JObject.Parse(sessionRaw?.ToString());
+                var localRaw = await browser.EvaluateAsync("localStorage");
+                var local = JObject.Parse(localRaw?.ToString());
+                var accessTokens = new JObject();
+
+                foreach (var entry in session) {
+                    if (entry.Key.Contains("accesstoken", StringComparison.InvariantCultureIgnoreCase))
+                        accessTokens.Add(entry.Key, entry.Value);
+                    
                 }
 
-                var matchingToken = accessTokens.FirstOrDefault(it => it.Value<string>("name").Contains(identifierKey));
-                matchingToken ??= accessTokens.FirstOrDefault();
-                return matchingToken?.Value<string?>("value");
+                foreach (var entry in local) {
+                    if (entry.Key.Contains("accesstoken", StringComparison.InvariantCultureIgnoreCase))
+                        accessTokens.Add(entry.Key, entry.Value);
+                }
+
+                foreach (var entry in accessTokens) {
+                    if (entry.Key.Contains(identifierKey, StringComparison.InvariantCultureIgnoreCase))
+                        return entry.Value;
+                }
+
+                if (accessTokens.Count == 0)
+                    return null;
+
+                return accessTokens.Properties().First().Value.Value<string>();
             }
             );
             
@@ -76,9 +97,9 @@ namespace HitachiQA.Source.HttpClients.Authorization
                 ?? throw new NotFoundException("Attempted to get bearer token for 2 minutes but was unsuccessful"); 
         }
 
-        public override async Task InvokeBrowserAsync()
+        public override async Task InvokeBrowserAsync(string profile)
         {
-            await _playwrightHook.InvokeBrowserAsync("msedge");
+            await _playwrightHook.InvokeBrowserAsync("msedge", Config.GetVariable("HOST"), profile);
         }
 
         public override async Task DisposeAsync()

@@ -16,8 +16,12 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
     }
     public override bool IsBrowserRunning => _webDriverHook.WebDriver != null; 
 
-    public override Task InvokeBrowserAsync()
+    public override Task InvokeBrowserAsync(string? profile = null)
     {
+        if(profile!=null)
+        {
+            throw new NotImplementedException("profile sign in not implemented for selenium, use playwright");
+        }
         _webDriverHook.InvokeNewSeleniumDriver("edge");
         return Task.CompletedTask;
     }

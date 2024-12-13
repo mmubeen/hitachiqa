@@ -5,6 +5,10 @@ namespace HitachiQA.Source.Hooks.HttpClientExtras
 {
     public class HttpLoggingHandler : DelegatingHandler
     {
+        public HttpLoggingHandler()
+            : base(new HttpClientHandler())
+        {
+        }
         public HttpLoggingHandler(HttpMessageHandler innerHandler)
             : base(innerHandler)
         {
@@ -12,9 +16,11 @@ namespace HitachiQA.Source.Hooks.HttpClientExtras
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var timer = Stopwatch.StartNew();
+            var uri = string.Empty;
             HttpResponseMessage response;
             try
             {
+                uri = request.RequestUri.ToString();
                 response = await base.SendAsync(request, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)
@@ -33,7 +39,7 @@ namespace HitachiQA.Source.Hooks.HttpClientExtras
             finally
             {
                 timer.Stop();
-                Write($"\nRequest=>[{request.Method.Method}] {request.RequestUri} took: {timer.Elapsed.TotalSeconds:0.00} Seconds\n");
+                Write($"\nRequest=>[{request.Method.Method}] {uri} took: {timer.Elapsed.TotalSeconds:0.00} Seconds\n");
 
             }
             return response;

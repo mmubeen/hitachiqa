@@ -12,7 +12,7 @@ public abstract class InteractiveAuthBase
 
     public abstract bool IsBrowserRunning { get;}
 
-    public abstract Task InvokeBrowserAsync();
+    public abstract Task InvokeBrowserAsync(string? profile);
     public abstract Task AttemptAutoSigninAsync(string? emailIdentifierKey);
     public abstract Task<BrowserCredential> GetAccessTokenCredsAsync(string identifierKey);
     public abstract Task NavigateToHostIfNeededAsync();
@@ -27,12 +27,14 @@ public abstract class InteractiveAuthBase
         var disposeDriverAfterTokenAcquisition = false;
         //if no driver has been ever invoked, then we invoke and attempt to auto sign in
         if (!IsBrowserRunning)
-        {  
+        {
+            var profile = Config.GetVariable("AUTH_INTERACTIVE_PROFILE_NAME", true);
+
             disposeDriverAfterTokenAcquisition = true;
-            await InvokeBrowserAsync();
+            await InvokeBrowserAsync(profile);
             await NavigateToHostIfNeededAsync();
             var emailIdentifier = Config.GetVariable("AUTH_INTERACTIVE_EMAIL_IDENTIFIER", true);
-            if (string.IsNullOrWhiteSpace(emailIdentifier))
+            if (!string.IsNullOrWhiteSpace(emailIdentifier))
                 await AttemptAutoSigninAsync(emailIdentifier);
         }
         //else
