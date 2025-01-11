@@ -49,11 +49,11 @@ stages:
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
                 $minorReleaseVersion = "$majorMinorVersion.$buildId"
 
-                echo "MajorReleaseVersion $majorMinorVersion"
+                echo "MajorReleaseVersion $version"
                 echo "MinorReleaseVersion $minorReleaseVersion"
 
                 # Set Azure DevOps pipeline variables
-                echo "##vso[task.setvariable variable=MajorReleaseVersion]$majorMinorVersion"
+                echo "##vso[task.setvariable variable=MajorReleaseVersion]$version"
                 echo "##vso[task.setvariable variable=MinorReleaseVersion]$minorReleaseVersion"
 
         - template: templates/build.template.yml
