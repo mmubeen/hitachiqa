@@ -10,6 +10,12 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
+parameters:
+  - name: MajorRelease
+    displayName: Push as major release
+    type: boolean
+    default: false
+
 variables:
   solution: '**/*.sln'
   project: '**/*.csproj'
@@ -24,10 +30,23 @@ stages:
         steps:
         - checkout: none
         - template: ./templates/downloadbuild.template.yml
+
         - task: DotNetCoreCLI@2
+          condition: 'not(${{ parameters.MajorRelease }})'
+          displayName: 'Push Minor Release'
           inputs:
             command: 'push'
-            packagesToPush: '**/*.nupkg; !**/*.symbols.nupkg;'
+            packagesToPush: '**/minor/*.nupkg; !**/*.symbols.nupkg;'
+            nuGetFeedType: 'internal'
+            publishVstsFeed: 'ae37399a-6d13-479d-85f6-0257203b84b1'
+            arguments: '--skip-duplicate'
+
+        - task: DotNetCoreCLI@2
+          condition: '${{ parameters.MajorRelease }}'
+          displayName: 'Push Major Release'
+          inputs:
+            command: 'push'
+            packagesToPush: '**/major/*.nupkg; !**/*.symbols.nupkg;'
             nuGetFeedType: 'internal'
             publishVstsFeed: 'ae37399a-6d13-479d-85f6-0257203b84b1'
             arguments: '--skip-duplicate'

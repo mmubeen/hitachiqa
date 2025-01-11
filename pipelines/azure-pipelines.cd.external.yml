@@ -5,6 +5,12 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
+parameters:
+  - name: MajorRelease
+    displayName: Push as major release
+    type: boolean
+    default: false
+
 
 parameters:
   - name: TargetServiceConnection
@@ -28,8 +34,17 @@ jobs:
         nuGetServiceConnections: ${{ parameters.TargetServiceConnection }}
 
     - task: NuGetCommand@2
+      displayName: 'Push minor Release'
       inputs:
         command: 'push'
-        packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
+        packagesToPush: '$**/minor/*.nupkg; !**/*.symbols.nupkg'
+        nuGetFeedType: 'external'
+        publishFeedCredentials: ${{ parameters.TargetServiceConnection }}
+    
+    - task: NuGetCommand@2
+      displayName: 'Push major Release'
+      inputs:
+        command: 'push'
+        packagesToPush: '**/major/*.nupkg; !**/*.symbols.nupkg'
         nuGetFeedType: 'external'
         publishFeedCredentials: ${{ parameters.TargetServiceConnection }}

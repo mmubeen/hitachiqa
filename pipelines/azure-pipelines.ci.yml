@@ -11,17 +11,13 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-parameters:
-  - name: MajorRelease
-    displayName: Build a major release
-    type: boolean
-    default: false
-
 variables:
   solution: '**/*.sln'
   project: '**/*.csproj'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  majorPackageOutputdir: '$(Build.ArtifactStagingDirectory)/packages/major'
+  minorPackageOutputdir: '$(Build.ArtifactStagingDirectory)/packages/minor'
 
 stages:
   - stage: Build
@@ -56,7 +52,7 @@ stages:
           inputs:
             command: 'pack'
             packagesToPack: '**/HitachiQA.csproj'
-            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            outputDir: '$(minorPackageOutputdir)'
             versioningScheme: 'byEnvVar'
             versionEnvVar: "MinorReleaseVersion"
             includesource: true
@@ -66,7 +62,7 @@ stages:
           inputs:
             command: 'pack'
             packagesToPack: '**/Hsl.HitachiQA.Builder.csproj'
-            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            outputDir: '$(minorPackageOutputdir)'
             versioningScheme: 'byEnvVar'
             versionEnvVar: "MinorReleaseVersion"
             includesource: true
@@ -76,7 +72,7 @@ stages:
           inputs:
             command: 'pack'
             packagesToPack: '**/HitachiQA.csproj'
-            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            outputDir: '$(majorPackageOutputdir)'
             versioningScheme: 'off'
 
         - task: DotNetCoreCLI@2
@@ -84,7 +80,7 @@ stages:
           inputs:
             command: 'pack'
             packagesToPack: '**/Hsl.HitachiQA.Builder.csproj'
-            outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+            outputDir: '$(majorPackageOutputdir)'
             versioningScheme: 'off'
 
         - template: templates/publish.template.yml
