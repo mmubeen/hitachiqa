@@ -28,7 +28,7 @@ namespace HitachiQA
             }
             else
             {
-                Functions.handleFailure(new Exception($"List { list.ToString() } does not Contain\n[{ value}]"));
+                Functions.HandleFailure(new Exception($"List { list.ToString() } does not Contain\n[{ value}]"));
                 return false;
             }
         }
@@ -37,7 +37,7 @@ namespace HitachiQA
         {
             if(text== null || value == null)
             {
-                Functions.handleFailure(new Exception($"Assert - text: [{text}] does not Contain  value: [{value}]"), optional);
+                Functions.HandleFailure(new Exception($"Assert - text: [{text}] does not Contain  value: [{value}]"), optional);
                 return false;
             }
             if(text.Contains(value))
@@ -45,7 +45,7 @@ namespace HitachiQA
                 success($"text: {text} contains value: {value}");
                 return true;
             }
-            Functions.handleFailure(new Exception($"Assert - text: [{text}] does not Contain  value: [{value}]"), optional);
+            Functions.HandleFailure(new Exception($"Assert - text: [{text}] does not Contain  value: [{value}]"), optional);
             return false;
         }
 
@@ -63,7 +63,7 @@ namespace HitachiQA
             }
             else if(A == null || B==null)
             {
-                Functions.handleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   does not Equal  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
+                Functions.HandleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   does not Equal  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
                 return false;
             }
             else if (A.Equals(B))
@@ -73,7 +73,7 @@ namespace HitachiQA
             }
             else
             {
-                Functions.handleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   does not Equal  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
+                Functions.HandleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   does not Equal  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
                 return false;
             }
         }
@@ -94,7 +94,7 @@ namespace HitachiQA
             }
             else if (expected == null || actual == null)
             {
-                Functions.handleFailure(new Exception($"Assert - type:[{actual?.GetType()?.FullName}] value:[{(expected == null ? "null" : $"{expected}")}]   does not Equal  type: [{actual?.GetType()?.FullName}] value: [{(actual == null ? "null" : $"{actual}")}]"), optional);
+                Functions.HandleFailure(new Exception($"Assert - type:[{actual?.GetType()?.FullName}] value:[{(expected == null ? "null" : $"{expected}")}]   does not Equal  type: [{actual?.GetType()?.FullName}] value: [{(actual == null ? "null" : $"{actual}")}]"), optional);
                 return false;
             }
             else
@@ -107,7 +107,7 @@ namespace HitachiQA
                 }
                 catch (Exception ex)
                 {
-                    Functions.handleFailure("List @expected does not equal @actual", ex, optional, parameters);
+                    Functions.HandleFailure("List @expected does not equal @actual", ex, optional, parameters);
                     return false;
                 }
             }
@@ -122,7 +122,7 @@ namespace HitachiQA
             }
             else
             {
-                Functions.handleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   Equals  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
+                Functions.HandleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   Equals  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
                 return false;
             }
         }
@@ -140,7 +140,7 @@ namespace HitachiQA
             }
             else
             {
-                Functions.handleFailure(new Exception($"Assert is True - for given condition: {condition} was not true"), optional);
+                Functions.HandleFailure(new Exception($"Assert is True - for given condition: {condition} was not true"), optional);
                 return false;
             }
         }
@@ -153,7 +153,7 @@ namespace HitachiQA
         {
             if (condition.HasValue && condition.Value == true)
             {
-                Functions.handleFailure(new Exception($"Assert is False - the given condition: {condition} was not false"), optional);
+                Functions.HandleFailure(new Exception($"Assert is False - the given condition: {condition} was not false"), optional);
                 return false;
             }
             else
@@ -172,7 +172,7 @@ namespace HitachiQA
             }
             else
             {
-                Functions.handleFailure(new Exception($"Assert is Null - the given Object: {_object} was not null"), optional);
+                Functions.HandleFailure(new Exception($"Assert is Null - the given Object: {_object} was not null"), optional);
                 return false;
             }
         }
@@ -186,7 +186,7 @@ namespace HitachiQA
             }
             else
             {
-                Functions.handleFailure(new Exception($"Assert is Not Null - the given Object: {_object} was null"), optional);
+                Functions.HandleFailure(new Exception($"Assert is Not Null - the given Object: {_object} was null"), optional);
                 return false;
             }
         }

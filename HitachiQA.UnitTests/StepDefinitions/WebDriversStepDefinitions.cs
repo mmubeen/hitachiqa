@@ -45,13 +45,12 @@ namespace HitachiQA.UnitTests.StepDefinitions
                 new Element(By.XPath("(//*[contains(text(), 'Contact us')])[1]"), UserActions).Click();
             }
 
-            var firstNameFormInput = new Element(By.XPath("//*[text()='First Name']/..//input"), UserActions);
-            firstNameFormInput.assertElementIsPresent(5);
+            var HSAHeader = new Element(By.XPath("//*[text()='Hitachi Solutions America']"), UserActions);
+            HSAHeader.assertElementIsPresent(5);
 
             UserActions.SwitchContext();
             Log.Info(UserActions.Title);
-            //DriverManager.SwitchWindowContext();
-            firstNameFormInput.assertElementNotPresent(5);
+            HSAHeader.assertElementNotPresent(5);
 
             ObjectContainer.Resolve<ScreenShot>().Take(Severity.INFO);
         }

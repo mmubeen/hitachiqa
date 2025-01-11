@@ -3,7 +3,7 @@
   <PropertyGroup>
 	 <TargetFramework>net8.0</TargetFramework>
 	 <PublishChromeDriver>true</PublishChromeDriver>
-	 <Nullable>enable</Nullable>
+	 <Nullable>disable</Nullable>
 	 <ImplicitUsings>enable</ImplicitUsings>
 	 <UserSecretsId>e241d6ae-1e24-44cf-810e-59bf9f6f4aa2</UserSecretsId>
 	 <IsPackable>true</IsPackable>

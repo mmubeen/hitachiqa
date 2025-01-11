@@ -42,7 +42,7 @@ namespace HitachiQA
         /// <summary>
         /// Selenium
         /// </summary>
-        public static KeyValuePair<string, string> FindKnownXPathMatchingPair(HtmlDocument fieldDoc, out HtmlNode? node, By by)
+        public static KeyValuePair<string, string> FindKnownXPathMatchingPair(HtmlDocument fieldDoc, out HtmlNode node, string criteria)
         {
             KeyValuePair<string, string>? matchingPair = null;
             node = null;
@@ -63,7 +63,7 @@ namespace HitachiQA
             if (node == null)
             {
                 Log.Error($"Couldn't find a a match on any of the following xpaths: {string.Join("\n", KnownXPaths.Select(it => $"{it.Value} => {it.Key}"))}");
-                throw new Exception($"error finding known xpath match for field located by {by.Locator}");
+                throw new Exception($"error finding known xpath match for field located by {criteria}");
 
             }
             return matchingPair ?? throw new ArgumentNullException();

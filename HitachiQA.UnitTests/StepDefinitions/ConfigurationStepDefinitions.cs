@@ -1,11 +1,8 @@
 using BoDi;
 using HitachiQA.Driver;
-using HitachiQA.Hooks;
 using HitachiQA.Hooks.Browsers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
-using System;
-using TechTalk.SpecFlow;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {

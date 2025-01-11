@@ -79,7 +79,7 @@ namespace HitachiQA.Helpers
         //
         //  Failure Handling
         //
-        public static System.Exception handleFailure(string message, Exception ex = null, bool optional = false)
+        public static System.Exception HandleFailure(string message, Exception ex = null, bool optional = false)
         {
             if (optional)
             { Log.Info(message); }
@@ -88,7 +88,7 @@ namespace HitachiQA.Helpers
                 Log.Error(message);
                 if (ex != null)
                 {
-                    handleFailure(ex, optional);
+                    HandleFailure(ex, optional);
                 }
                 else
                 {
@@ -98,7 +98,7 @@ namespace HitachiQA.Helpers
             return ex ?? new Exception(message);
         }
 
-        public static System.Exception handleFailure(string message, Exception ex = null, bool optional = false, params (string key, dynamic value)[] parameters)
+        public static System.Exception HandleFailure(string message, Exception ex = null, bool optional = false, params (string key, dynamic value)[] parameters)
         {
             if (optional)
             { Log.Info(message, parameters); }
@@ -107,7 +107,7 @@ namespace HitachiQA.Helpers
                 Log.Error(message, parameters);
                 if (ex != null)
                 {
-                    handleFailure(ex, optional);
+                    HandleFailure(ex, optional);
                 }
                 else
                 {
@@ -117,7 +117,7 @@ namespace HitachiQA.Helpers
             return ex ?? new Exception(message);
         }
 
-        public static System.Exception handleFailure(Exception ex, bool optional = false)
+        public static System.Exception HandleFailure(Exception ex, bool optional = false)
         {
             if (optional)
             {
@@ -174,7 +174,7 @@ namespace HitachiQA.Helpers
 
             if( !File.Exists(filePath))
             {
-                handleFailure($"File {filePath} does not exist");
+                HandleFailure($"File {filePath} does not exist");
             }
             filePath = Path.IsPathFullyQualified(filePath) ? filePath : Path.GetFullPath(filePath);
 
@@ -283,7 +283,7 @@ namespace HitachiQA.Helpers
             }
             catch (Exception ex)
             {
-                throw handleFailure($"String {IntegerString} Failed to parse into int", ex);
+                throw HandleFailure($"String {IntegerString} Failed to parse into int", ex);
             }
         }
 
@@ -341,7 +341,7 @@ namespace HitachiQA.Helpers
                     return "38000000000006";
 
                 default:
-                    throw handleFailure($"Credit Card Type: {cardType} is not supported");
+                    throw HandleFailure($"Credit Card Type: {cardType} is not supported");
             }
         }
 

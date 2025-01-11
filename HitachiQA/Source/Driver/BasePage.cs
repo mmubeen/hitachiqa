@@ -15,11 +15,12 @@ namespace HitachiQA.Driver
         public readonly UserActions UserActions;
         public readonly ScreenShot ScreenShot;
         protected readonly ObjectContainer ObjectContainer;
-        public BasePage(ObjectContainer ObjectContainer)
+        public BasePage(ObjectContainer objectContainer)
         {
-            this.ObjectContainer = ObjectContainer;
-            this.UserActions = ObjectContainer.Resolve<UserActions>();
-            this.ScreenShot = ObjectContainer.Resolve<ScreenShot>();
+            ObjectContainer = objectContainer;
+            UserActions = objectContainer.Resolve<UserActions>();
+            ScreenShot = objectContainer.Resolve<ScreenShot>();
+
         }
 
         public Element Element(string xpath)
@@ -28,11 +29,24 @@ namespace HitachiQA.Driver
         }
         public Element Element(By locator)
         {
-            if(this.IFrame!=null && locator.IFrameLocator==null)
+            if(IFrame!=null && locator.IFrameLocator==null)
             {
-                locator.IFrameLocator = this.IFrame;
+                locator.IFrameLocator = IFrame;
             }
             return new Element(locator, UserActions);
+        }
+        public Element Element(string[] xpaths)
+        {
+            return Element(xpaths.Select(x=>By.XPath(x)).ToArray());
+        }
+        public Element Element(By[] locators)
+        {
+            if (IFrame != null && locators.First().IFrameLocator == null) {
+                foreach(var locator in locators) {
+                    locator.IFrameLocator = IFrame;
+                }
+            }
+            return new Element(locators, UserActions);
         }
 
         public void ScrollToBottom()

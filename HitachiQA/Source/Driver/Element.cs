@@ -8,44 +8,34 @@ namespace HitachiQA.Driver
 {
     public class Element
     {
-        public By locator;
+        public By[] locators;
+
         private readonly UserActions UserActions;
         public Element(string xpath, UserActions userActions)
         {
-            this.UserActions = userActions;
-            this.locator = By.XPath(xpath);
+            UserActions = userActions;
+            locators = new By[] { By.XPath(xpath) };
         }
         public Element(OpenQA.Selenium.By locator, UserActions userActions)
         {
-            this.UserActions = userActions;
-            this.locator = new By(locator);
+            UserActions = userActions;
+            locators = new By[] { new By(locator)};
         }
 
         public Element(By locator, UserActions userActions)
         {
-            this.UserActions = userActions;
-            this.locator = locator;
+            UserActions = userActions;
+            locators = new By[] { locator };
+        }
+        public Element(By[] locator, UserActions userActions)
+        {
+            UserActions = userActions;
+            locators = locator;
         }
 
         public override string ToString()
         {
-            return this.locator.ToString();
-        }
-
-        public string Xpath
-        {
-            get
-            {
-                string loc = locator.ToString();
-                if (loc.Contains("By.XPath:"))
-                {
-                    return loc.Substring(10);
-                }
-                else
-                {
-                    throw Functions.handleFailure(new NotImplementedException($"Locator string [{loc}] xpath conversion not built"));
-                }
-            }
+            return string.Join(",", locators.Select(l=> l.ToString()));
         }
 
 
@@ -53,39 +43,39 @@ namespace HitachiQA.Driver
         //  General Element Actions
         //
 
-        public bool ElementExists() => UserActions.ElementExists(locator);
+        public bool ElementExists() => UserActions.ElementExists(locators);
         public void Click()
         {
-            UserActions.Click(locator);
+            UserActions.Click(locators);
         }
 
         public void DoubleClick()
         {
-            UserActions.DoubleClick(locator);
+            UserActions.DoubleClick(locators);
         }
 
         public bool Click(int? wait_Seconds = null, bool optional = false)
         {
-            return UserActions.Click(locator, UserActions.ProcessWaitParam(wait_Seconds), optional);
+            return UserActions.Click(locators, UserActions.ProcessWaitParam(wait_Seconds), optional);
         }
 
         public bool TryClick(double waitSeconds=0)
         {
-            return UserActions.TryClick(locator, waitSeconds);
+            return UserActions.TryClick(locators, waitSeconds);
         }
 
         public string GetAttribute(string attributeName)
         {
-            return UserActions.GetAttribute(locator, attributeName);
+            return UserActions.GetAttribute(locators, attributeName);
         }
 
-        public bool IsDisabled => UserActions.GetIsDisabled(locator);
+        public bool IsDisabled => UserActions.GetIsDisabled(locators);
 
         public string Text => GetElementText();
 
         public string GetElementText()
         {
-            return UserActions.getElementText(locator);
+            return UserActions.getElementText(locators);
         }
 
         public string GetInnerText()
@@ -95,14 +85,14 @@ namespace HitachiQA.Driver
 
         public List<String> GetInnerTexts()
         {
-            return UserActions.FindElementsWaitUntilVisible(locator).Select(it => it.Text.Trim()).ToList();
+            return UserActions.FindElementsWaitUntilVisible(locators).Select(it => it.Text.Trim()).ToList();
         }
 
         public void assertElementContainsText(string text)
         {
             string elementText = this.GetElementText();
 
-            elementText.Should().Contain(text, $"Element {locator} \ntext: {elementText}  did not contain expected \ntext: {text}");
+            elementText.Should().Contain(text, $"Element {locators} \ntext: {elementText}  did not contain expected \ntext: {text}");
         }
 
         [Obsolete("please use  assertElementContainsText(string text)")]
@@ -114,14 +104,14 @@ namespace HitachiQA.Driver
             {
                 return true;
             }
-            Functions.handleFailure(new Exception($"Element {locator.ToString()} \ntext: {elementText}  did not contain expected \ntext: {text}"), optional);
+            Functions.HandleFailure(new Exception($"Element {locators.ToString()} \ntext: {elementText}  did not contain expected \ntext: {text}"), optional);
             return false;
         }
 
         public void assertElementTextEquals(string text)
         {
             string elementText = this.GetElementText();
-            elementText.Should().Be(text, $"Element {locator} \ntext: {elementText}  did not contain expected \ntext: {text}");
+            elementText.Should().Be(text, $"Element {locators} \ntext: {elementText}  did not contain expected \ntext: {text}");
 
         }
 
@@ -133,7 +123,7 @@ namespace HitachiQA.Driver
             {
                 return true;
             }
-            Functions.handleFailure(new Exception($"Element {locator.ToString()} \ntext: {elementText} did not equal expected\ntext: {text}"), optional);
+            Functions.HandleFailure(new Exception($"Element {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {text}"), optional);
             return false;
         }
 
@@ -141,7 +131,7 @@ namespace HitachiQA.Driver
         {
             string innerText = this.GetInnerText();
 
-            innerText.Should().Be(text, $"Element {locator.ToString()} \ninner text: {innerText} did not equal expected\n      text: {text}");
+            innerText.Should().Be(text, $"Element {locators.ToString()} \ninner text: {innerText} did not equal expected\n      text: {text}");
 
         }
 
@@ -153,7 +143,7 @@ namespace HitachiQA.Driver
             {
                 return true;
             }
-            Functions.handleFailure(new Exception($"Element {locator.ToString()} \ninner text: {innerText} did not equal expected\n      text: {text}"), optional);
+            Functions.HandleFailure(new Exception($"Element {locators.ToString()} \ninner text: {innerText} did not equal expected\n      text: {text}"), optional);
             return false;
         }
 
@@ -163,12 +153,12 @@ namespace HitachiQA.Driver
         /// <param name="optional">if set to true failure will be contained and no exception will be thrown </param>
         public bool assertElementIsVisible(int? wait_Seconds = null, bool optional = false)
         {
-            try { UserActions.FindElementWaitUntilVisible(locator, UserActions.ProcessWaitParam(wait_Seconds));
+            try { UserActions.FindElementWaitUntilVisible(locators, UserActions.ProcessWaitParam(wait_Seconds));
                 return true;
             }
             catch (Exception ex)
             {
-                Functions.handleFailure($"Element located {locator.ToString()} was not vissible in the UI", ex, optional);
+                Functions.HandleFailure($"Element located {locators.ToString()} was not vissible in the UI", ex, optional);
             }
             return false;
         }
@@ -180,12 +170,12 @@ namespace HitachiQA.Driver
 
         public bool assertElementIsPresent(int? wait_Seconds = null, bool optional = false)
         {
-            try { UserActions.FindElementWaitUntilPresent(locator, UserActions.ProcessWaitParam(wait_Seconds));
+            try { UserActions.FindElementWaitUntilPresent(locators, UserActions.ProcessWaitParam(wait_Seconds));
                 return true;
             }
             catch (Exception ex)
             {
-                Functions.handleFailure($"Element located {locator.ToString()} was not present in the HTML", ex, optional);
+                Functions.HandleFailure($"Element located {locators.ToString()} was not present in the HTML", ex, optional);
             }
             return false;
         }
@@ -198,12 +188,12 @@ namespace HitachiQA.Driver
 
         public bool assertElementNotPresent(int? wait_Seconds = null, bool optional = false)
         {
-            try { UserActions.WaitForElementToDisappear(locator, UserActions.ProcessWaitParam(wait_Seconds));
+            try { UserActions.WaitForElementToDisappear(locators, UserActions.ProcessWaitParam(wait_Seconds));
                 return true;
             }
             catch (Exception ex)
             {
-                Functions.handleFailure($"Element located {locator.ToString()} was still vissible in the UI after {wait_Seconds} seconds", ex, optional);
+                Functions.HandleFailure($"Element located {locators.ToString()} was still vissible in the UI after {wait_Seconds} seconds", ex, optional);
             }
             return false;
         }
@@ -217,7 +207,7 @@ namespace HitachiQA.Driver
             }
             else if (state != isSelected)
             {
-                throw Functions.handleFailure($"Radio Button state did not match expected {state} \n {this}");
+                throw Functions.HandleFailure($"Radio Button state did not match expected {state} \n {this}");
             }
             else
             {
@@ -227,7 +217,7 @@ namespace HitachiQA.Driver
 
         public OpenQA.Selenium.IWebElement WaitUntilClickable(int? wait_Seconds = null, bool optional = false)
         {
-            return UserActions.FindElementWaitUntilClickable(locator, UserActions.ProcessWaitParam(wait_Seconds));
+            return UserActions.FindElementWaitUntilClickable(locators, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
         [Obsolete("please use SetFieldValue(string value) instead")]
@@ -250,23 +240,25 @@ namespace HitachiQA.Driver
 
         public void SetFieldValue(string value)
         {
-            UserActions.SetFieldValue(locator, value);
+            UserActions.SetFieldValue(locators, value);
         }
         public string GetFieldValue()
         {
-            return UserActions.GetFieldValue(locator);
+            return UserActions.GetFieldValue(locators);
         }
         public List<string> GetFieldOptions()
         {
-            return UserActions.GetFieldOptions(locator);
+            return UserActions.GetFieldOptions(locators);
         }
         public void OpenFieldValue()
         {
-            UserActions.OpenFieldValue(locator);
+            UserActions.OpenFieldValue(locators);
         }
         public void AssertFieldIsReadOnlyDynamics()
         {
-            new Element(By.XPath(this.locator.Locator.Criteria+"//*[contains(@data-id,'locked-icon')]", this.locator.IFrameLocator), UserActions).assertElementIsPresent();
+            var readonlyField = locators.Select(l => By.XPath(l.Locator.Criteria + "//*[contains(@data-id,'locked-icon')]", l.IFrameLocator)).ToArray();
+
+            new Element(readonlyField, UserActions).assertElementIsPresent();
         }
         public void AssertFieldIsNotReadOnlyDynamics()
         {
@@ -275,9 +267,9 @@ namespace HitachiQA.Driver
             //so we add //*[(self::<xpath>)] around xpath 
             //allowing it to end with a condition so we can attach the 2nd condition
             //
-            var non_readonlyFieldXPath = $"//*[(self::{this.locator.Locator.Criteria.Substring(2)})][not(.//*[contains(@data-id,'locked-icon')])]";
+            var non_readonlyFieldXPath = locators.Select(l=> By.XPath($"//*[(self::{l.Locator.Criteria[2..]})][not(.//*[contains(@data-id,'locked-icon')])]", l.IFrameLocator)).ToArray();
             
-            new Element(By.XPath(non_readonlyFieldXPath, this.locator.IFrameLocator), UserActions).assertElementIsPresent();
+            new Element(non_readonlyFieldXPath, UserActions).assertElementIsPresent();
         }
 
         //
@@ -286,19 +278,19 @@ namespace HitachiQA.Driver
         [Obsolete("please use SetFieldValue(string value) instead")]
         public void setText(String TextToEnter, int? wait_Seconds = null)
         {
-            UserActions.setText(locator, TextToEnter, UserActions.ProcessWaitParam(wait_Seconds));
+            UserActions.setText(locators, TextToEnter, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
         [Obsolete("please use GetFieldValue() instead")]
         public string getTextFieldText(int? wait_Seconds = null)
         {
-           return  UserActions.getTextFieldText(locator, UserActions.ProcessWaitParam(wait_Seconds));
+           return  UserActions.getTextFieldText(locators, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
         [Obsolete("please use SetFieldValue(string.empty) instead")]
         public void clearTextField()
         {
-            UserActions.clearTextField(locator);
+            UserActions.clearTextField(locators);
         }
 
         [Obsolete("please use GetFieldValue().should().be(expected) instead")]
@@ -306,7 +298,7 @@ namespace HitachiQA.Driver
         {
             string elementText = this.getTextFieldText();
 
-            elementText.Should().Be(expected, $"Text Field {locator.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}");
+            elementText.Should().Be(expected, $"Text Field {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}");
 
         }
 
@@ -318,7 +310,7 @@ namespace HitachiQA.Driver
             {
                 return true;
             }
-            Functions.handleFailure(new Exception($"Text Field {locator.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}"), optional);
+            Functions.HandleFailure(new Exception($"Text Field {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}"), optional);
             return false;
         }
        
@@ -328,7 +320,7 @@ namespace HitachiQA.Driver
         //
         public Boolean IsRadioButtonSelected()
         {
-            return UserActions.IsRadioButtonSelected(locator);
+            return UserActions.IsRadioButtonSelected(locators);
         }
 
         //
@@ -336,7 +328,7 @@ namespace HitachiQA.Driver
         //
         public void setMattCheckboxState(bool state)
         {
-            UserActions.SetMattCheckboxState(locator, state);
+            UserActions.SetMattCheckboxState(locators, state);
         }
 
         //
@@ -345,12 +337,16 @@ namespace HitachiQA.Driver
 
         public IEnumerable<Dictionary<String, String>> parseUITable()
         {
-            return UserActions.parseUITable(locator);
+            if(locators.Count()>1)
+            {
+                throw new NotImplementedException("parseUITable for more than 1 locator not implemented");
+            }
+            return UserActions.parseUITable(locators.First());
         }
 
         public List<Dictionary<String, String?>> GetGridItems()
         {
-            return UserActions.GetGridItems(locator);
+            return UserActions.GetGridItems(locators);
         }
         /// <summary>
         /// To be executed on a Grid element of dynamics
@@ -359,7 +355,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void OpenGridRecord(string columnName, string value)
         {
-            UserActions.OpenGridRecord(locator, columnName, value); 
+            UserActions.OpenGridRecord(locators, columnName, value); 
         }
         /// <summary>
         /// To be executed on a Grid element of dynamics
@@ -368,7 +364,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void OpenGridRecord(int LogicalIndex)
         {
-            UserActions.OpenGridRecord(locator, "index", (LogicalIndex+1).ToString());
+            UserActions.OpenGridRecord(locators, "index", (LogicalIndex+1).ToString());
         }
         /// <summary>
         /// To be executed on a Grid element of dynamics
@@ -377,7 +373,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void SelectGridRecord(string columnName, string value)
         {
-            UserActions.SelectGridRecord(locator, columnName, value);
+            UserActions.SelectGridRecord(locators, columnName, value);
         }
 
         /// <summary>
@@ -387,7 +383,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void SelectGridRecord(int LogicalIndex)
         {
-            UserActions.SelectGridRecord(locator, "index", (LogicalIndex + 1).ToString());
+            UserActions.SelectGridRecord(locators, "index", (LogicalIndex + 1).ToString());
         }
 
         /// <summary>
@@ -396,7 +392,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void SelectAllGridRecords()
         {
-            this.UserActions.SelectAllGridRecords(locator);
+            this.UserActions.SelectAllGridRecords(locators);
         }
 
         /// <summary>
@@ -405,7 +401,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void SortGridColumn(string columnName, string filterByString = "", bool descendingSort = false, string comparisonOperation = "")
         {
-            this.UserActions.SortGridColumn(locator, columnName, filterByString, descendingSort, comparisonOperation); 
+            this.UserActions.SortGridColumn(locators, columnName, filterByString, descendingSort, comparisonOperation); 
         }
 
         /// <summary>
@@ -413,7 +409,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void UploadFile(string filePath)
         {
-            UserActions.UploadFile(locator, filePath);
+            UserActions.UploadFile(locators, filePath);
         }
 
     }

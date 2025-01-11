@@ -19,7 +19,7 @@ namespace HitachiQA.Helpers
             String value;
             if(String.IsNullOrWhiteSpace(KEY_VAULT_URI))
             {
-                Functions.handleFailure(new ArgumentNullException("Helpers.KeyVault - KEY_VAULT_URI was not set properly"));
+                Functions.HandleFailure(new ArgumentNullException("Helpers.KeyVault - KEY_VAULT_URI was not set properly"));
             }
 
                 try
@@ -37,7 +37,7 @@ namespace HitachiQA.Helpers
                     }
                     else
                     {
-                        value = Functions.handleFailure("Error while retrieving secrets from azure KeyVault", ex).ToString();
+                        value = Functions.HandleFailure("Error while retrieving secrets from azure KeyVault", ex).ToString();
                     }
                 }
             return value;

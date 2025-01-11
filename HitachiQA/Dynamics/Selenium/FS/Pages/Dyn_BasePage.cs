@@ -111,7 +111,8 @@ namespace HitachiQA.Dynamics.FS.Pages
 
         public Element GetGrid(string gridName_or_logicalName) => Element($"//*[ (@aria-label='{gridName_or_logicalName}' or @data-control-name='{gridName_or_logicalName}' or @data-id='{gridName_or_logicalName}') and (.//*[contains(@id, '-pcf_grid_control_container')]//*[@data-id='grid-container']  | .//*[@data-id='data-set-body-container' and //*[@class='wj-cells'] ] )] ");
 
-        public Element GetGridCommandBarButton(string gridName_or_logicalName, string displayName) => this.GetField(this.GetGrid(gridName_or_logicalName).locator, displayName);
+        public Element GetGridCommandBarButton(string gridName_or_logicalName, string displayName) => this.GetField(this.GetGrid(gridName_or_logicalName).locators.First(), displayName);
+
         public void ClickGridCommandBarButton(string gridName_or_logicalName, string displayName)
         {
             this.GetGrid(gridName_or_logicalName).assertElementIsPresent();
@@ -156,7 +157,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         public void CreateLookupFieldRecord(string DisplayText_Or_LogicalName, Table inputs)
         {
             var field = this.GetField(DisplayText_Or_LogicalName);
-            this.Element(field.locator.Locator.Criteria+ "//*[@class='fa fa-search' or self::button[contains(@aria-label, 'Lookup')]]").Click();
+            this.Element(field.locators.Select(l=> l.Locator.Criteria+ "//*[@class='fa fa-search' or self::button[contains(@aria-label, 'Lookup')]]").ToArray()).Click();
             Thread.Sleep(500);
             this.Element("//button[contains(@id,'addNewBtn')]").TryClick();
             foreach(var row in inputs.Rows)
