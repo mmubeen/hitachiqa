@@ -37,7 +37,7 @@ stages:
                 $versionArr = $version.Split('.')
                 $nextPatch = ([int]$versionArr[-1])
                 $nextPatch++
-                $nextVersion = "$versionArr[0].$versionArr[1].$nextPatch"
+                $nextVersion = "$($versionArr[0]).$($versionArr[1]).$nextPatch"
                 
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
                 $minorReleaseVersion = "$nextVersion+$buildId"
