@@ -62,7 +62,7 @@ namespace HitachiQA.Driver
                 var gridElement = this.FindElementWaitUntilPresent(by);
 
                 var gridDoc = new HtmlDocument();
-                gridDoc.LoadHtml(gridElement.GetDomAttribute("innerHTML"));
+                gridDoc.LoadHtml(gridElement.GetDomProperty("innerHTML"));
 
                 var headers = gridDoc.DocumentNode.SelectNodes(gridCellXPath);
                 var iteration = 0;
@@ -119,7 +119,7 @@ namespace HitachiQA.Driver
             {
                 var gridElement = this.FindElementWaitUntilPresent(by);
                 var gridDoc = new HtmlDocument();
-                gridDoc.LoadHtml(gridElement.GetDomAttribute("innerHTML"));
+                gridDoc.LoadHtml(gridElement.GetDomProperty("innerHTML"));
 
                 var rows = gridDoc.DocumentNode.SelectNodes(rowXPath);
                 //remove header (1st row)
@@ -278,7 +278,7 @@ namespace HitachiQA.Driver
             {
                 var gridElement = this.FindElementWaitUntilPresent(by);
                 var gridDoc = new HtmlDocument();
-                gridDoc.LoadHtml(gridElement.GetDomAttribute("innerHTML"));
+                gridDoc.LoadHtml(gridElement.GetDomProperty("innerHTML"));
 
                 var headers = gridDoc.DocumentNode.SelectNodes(gridCellXPath);
 

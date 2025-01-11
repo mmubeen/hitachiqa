@@ -218,7 +218,7 @@ namespace HitachiQA.Driver
         public string getTextFieldText(By[] TextFieldLocator, int? wait_Seconds = null)
         {
             var textField = FindElementWaitUntilVisible(TextFieldLocator, ProcessWaitParam(wait_Seconds));
-            return textField.GetDomAttribute("value");
+            return textField.GetDomProperty("value");
         }
 
         public void clearTextField(By[] TextFieldLocator, int? wait_Seconds = null)
@@ -332,7 +332,7 @@ namespace HitachiQA.Driver
                 else
                 {
                     var tableDoc = new HtmlDocument();
-                    tableDoc.LoadHtml(tableElement.GetDomAttribute("innerHTML"));
+                    tableDoc.LoadHtml(tableElement.GetDomProperty("innerHTML"));
                     var rows = tableDoc.DocumentNode.SelectNodes(rowsXPath);
                     var rowIndex = 0;
                     foreach (var rowNode in rows)
@@ -379,7 +379,7 @@ namespace HitachiQA.Driver
             var tableElement = FindElementWaitUntilPresent(table);
 
             var tableDoc = new HtmlDocument();
-            tableDoc.LoadHtml(tableElement.GetDomAttribute("innerHTML"));
+            tableDoc.LoadHtml(tableElement.GetDomProperty("innerHTML"));
             var headersXPath = "//th[text()]/..//th";
             var headers = tableDoc.DocumentNode.SelectNodes(headersXPath);
             if (headers == null || headers.Count == 0)

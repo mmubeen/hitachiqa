@@ -5,7 +5,7 @@
 
   "selenium": {
     "dependencies": {
-      "HitachiQA": "1.8.4",
+      "HitachiQA": "1.8.5",
       "Reqnroll.MsTest": "2.2.1",
       "FluentAssertions": "7.0.0",
       "MSTest.TestAdapter": "3.6.4",
@@ -15,7 +15,7 @@
   },
   "playwright": {
     "dependencies": {
-      "HitachiQA": "1.8.4",
+      "HitachiQA": "1.8.5",
       "Reqnroll.MsTest": "2.2.1",
       "FluentAssertions": "7.0.0",
       "MSTest.TestAdapter": "3.6.4",

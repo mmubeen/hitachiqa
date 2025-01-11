@@ -58,7 +58,7 @@
         {
             var mattCheckBox = FindElementWaitUntilVisible(MattCheckBoxLocator);
 
-            while (GetCheckboxState(By.Id(mattCheckBox.GetDomAttribute("id") + "-input")) != state)
+            while (GetCheckboxState(By.Id(mattCheckBox.GetDomProperty("id") + "-input")) != state)
             {
                 mattCheckBox.Click();
             }
@@ -67,7 +67,7 @@
         public bool GetMattCheckboxState(By[] MattCheckBoxLocator)
         {
             var mattCheckBox = FindElementWaitUntilClickable(MattCheckBoxLocator);
-            return GetCheckboxState(By.Id(mattCheckBox.GetDomAttribute("id") + "-input"));
+            return GetCheckboxState(By.Id(mattCheckBox.GetDomProperty("id") + "-input"));
         }
 
         #endregion Checkbox
