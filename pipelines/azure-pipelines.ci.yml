@@ -40,7 +40,7 @@ stages:
                 $nextVersion = "$($versionArr[0]).$($versionArr[1]).$nextPatch"
                 
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
-                $minorReleaseVersion = "$nextVersion+$buildId"
+                $minorReleaseVersion = "$nextVersion-$buildId"
 
                 Write-Host "##[section]MajorReleaseVersion: $version"
                 Write-Host "##[section]MinorReleaseVersion: $minorReleaseVersion"
