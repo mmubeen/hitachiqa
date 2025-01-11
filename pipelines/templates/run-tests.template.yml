@@ -27,7 +27,10 @@ steps:
   inputs:
     folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0'
     fileType: 'json'
-
+- task: FileTransform@2
+  inputs:
+    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/*/'
+    enableXmlTransform: false
 - task: DotNetCoreCLI@2
   displayName: "Unit Tests"
   inputs:
