@@ -50,6 +50,7 @@ Command: build
     Description:
       Builds a project with the specified parameters.";
     }
+
     private async Task<bool> CheckTemplateExistsAsync(string templateName)
     {
         var process = new Process

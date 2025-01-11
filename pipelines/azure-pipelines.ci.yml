@@ -38,29 +38,20 @@ stages:
                 $xml = [Xml](Get-Content .\HitachiQA\HitachiQA.csproj)
                 $version = $xml.Project.PropertyGroup.Version
 
-                # Extract major and minor parts of the version
-                if ($version -match '^(\d+\.\d+)(?:\.\d+)?$') {
-                    $majorMinorVersion = $matches[1] # This will capture "1.x" from "1.x.x"
-                } else {
-                    Write-Error "Version format is not recognized: $version"
-                    exit 1
-                }
-
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
-                $minorReleaseVersion = "$majorMinorVersion.$buildId"
+                $minorReleaseVersion = "$version+$buildId"
 
-                echo "MajorReleaseVersion $version"
-                echo "MinorReleaseVersion $minorReleaseVersion"
+                Write-Host "##[section]MajorReleaseVersion: $version"
+                Write-Host "##[section]MinorReleaseVersion: $minorReleaseVersion"
 
-                # Set Azure DevOps pipeline variables
-                echo "##vso[task.setvariable variable=MajorReleaseVersion]$version"
-                echo "##vso[task.setvariable variable=MinorReleaseVersion]$minorReleaseVersion"
+                # Set the versions as Azure Pipeline variables
+                Write-Host "##vso[task.setvariable variable=MajorReleaseVersion]$version"
+                Write-Host "##vso[task.setvariable variable=MinorReleaseVersion]$minorReleaseVersion"
 
         - template: templates/build.template.yml
         - template: templates/run-tests.template.yml
 
         - task: DotNetCoreCLI@2
-          condition: 'not(${{ parameters.MajorRelease }})'
           displayName: 'HitachiQA pack minor release'
           inputs:
             command: 'pack'
@@ -71,7 +62,6 @@ stages:
             includesource: true
 
         - task: DotNetCoreCLI@2
-          condition: 'not(${{ parameters.MajorRelease }})'
           displayName: 'Builder pack minor release'
           inputs:
             command: 'pack'
@@ -82,7 +72,6 @@ stages:
             includesource: true
 
         - task: DotNetCoreCLI@2
-          condition: ${{ parameters.MajorRelease }}
           displayName: 'pack major release HitachiQA'
           inputs:
             command: 'pack'
@@ -91,7 +80,6 @@ stages:
             versioningScheme: 'off'
 
         - task: DotNetCoreCLI@2
-          condition: ${{ parameters.MajorRelease }}
           displayName: 'pack major release Builder'
           inputs:
             command: 'pack'

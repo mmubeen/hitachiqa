@@ -8,10 +8,9 @@ namespace HitachiQA.Playwright
         {
             return await context.NewPageAsync();
         }
-        public async static Task<IBrowserContext> CreateNewContextAsync(this IBrowser browser, string baseURL = "")
+        public async static Task<IBrowserContext> CreateNewContextAsync(this IBrowser browser, string baseURL)
         {
             return await browser.NewContextAsync(new() { RecordVideoDir = Path.Join(Directory.GetCurrentDirectory(), "/Videos/"), StrictSelectors = false, BaseURL = baseURL });
-
         }
     }
 }

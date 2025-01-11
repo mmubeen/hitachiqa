@@ -26,6 +26,11 @@ static class Program
                 commandName = null;
                 commandArgs = null;
             }
+            else if (args[0].ToLower().Trim('-')=="version")
+            {
+                commandName = "version";
+                commandArgs = null;
+            }
             else
             {
                 commandName = args[0].ToLower();

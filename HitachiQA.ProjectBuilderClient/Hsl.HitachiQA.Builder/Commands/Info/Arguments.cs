@@ -8,7 +8,7 @@ public class Arguments : ArgumentsBase
 
     [ParameterKey("version-file-destination", "o")]
     [ParameterDescription(
-        "Specifies the destination file path to save the version information. \n" +
+        "Specifies the destination file path to save the version information." +
         "Must be a valid path and a JSON file.")]
     public string VersionDestination { get; set; }
 }

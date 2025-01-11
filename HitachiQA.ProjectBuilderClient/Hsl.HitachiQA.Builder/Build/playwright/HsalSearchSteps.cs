@@ -45,7 +45,7 @@ namespace {{ProjectName}}.StepDefinition
         [Then(@"user should be presented with search results from HSAL")]
         public async Task ThenUserShouldBePresentedWithSearchResultsFromHSAL()
         {
-            var result = await HsalHome.ResultSearchInput.InputValueAsync();
+            var result = await HsalHome.ResultSearchInput.First.InputValueAsync();
             result.Should().Be(this.searchCriteria);
             Log.Info("This is an infomrmaitonal Message");
             HsalHome.ScreenShot.Info();

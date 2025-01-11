@@ -13,7 +13,7 @@ namespace {{ProjectName}}.Pages
         public async Task navigate() => await this.GotoAsync(URL_PATH);
         public ILocator OpenSearch => Locator("xpath=//*[@id='SupportNaviSearch']");
         public ILocator SearchInput => Locator("xpath=//*[@id='MF_form_phrase']");
-        public ILocator SearchButton => Locator("xpath=//*[@class='SearchBtn']");
+        public ILocator SearchButton => Locator("xpath=//*[contains(@class, 'SearchBtn')]");
         public ILocator ResultSearchInput => Locator("xpath=//input[@title='search query']");
 
     }
