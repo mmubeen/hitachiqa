@@ -35,7 +35,7 @@ stages:
                 $version = $xml.Project.PropertyGroup.Version
 
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
-                $minorReleaseVersion = "$version+$buildId"
+                $minorReleaseVersion = "$version-$buildId"
 
                 Write-Host "##[section]MajorReleaseVersion: $version"
                 Write-Host "##[section]MinorReleaseVersion: $minorReleaseVersion"
