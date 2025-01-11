@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Reqnroll.BoDi;
 using System.Reflection;
+using System.Text;
 
 namespace HitachiQA
 {
@@ -164,7 +165,15 @@ namespace HitachiQA
                         throw new Exception("CONFIG_SOURCE keyvault URI is required when using Keyvault as a config source");
                     attemptLoadKeyVault(builder, configSource, "Keyvault Config Source", IsCachedSecrets(config));
 
-                    //this keyvault is persisted across all environments
+                    //this keyvault is supposed to be automation sepcific keyvault persisted across all environments
+                    attemptLoadKeyVault(builder, config.GetVariable("KEYVAULT_URI", true), "Automaion Keyvault", IsCachedSecrets(config));
+                    break;
+                case "APPCONFIG":
+                    if (!IsValid(configSource))
+                        throw new Exception("CONFIG_SOURCE keyvault URI is required when using Keyvault as a config source");
+                    attemptLoadAppConfig(builder, configSource, "Keyvault Config Source");
+
+                    //this keyvault is supposed to be automation sepcific keyvault persisted across all environments
                     attemptLoadKeyVault(builder, config.GetVariable("KEYVAULT_URI", true), "Automaion Keyvault", IsCachedSecrets(config));
                     break;
                 case "LOCALSETTINGS":
@@ -176,7 +185,7 @@ namespace HitachiQA
                     builder.AddInMemoryCollection(obj.Value<JObject>("Values").ToObject<IDictionary<string, string>>());
                     builder.AddInMemoryCollection(obj.Value<JObject>("ConnectionStrings").ToObject<IDictionary<string, string>>());
 
-                    //this keyvault is persisted across all environments
+                    //this keyvault is supposed to be automation sepcific keyvault persisted across all environments
                     attemptLoadKeyVault(builder, config.GetVariable("KEYVAULT_URI", true), "Automaion Keyvault", IsCachedSecrets(config));
                     break;
 
@@ -199,14 +208,48 @@ namespace HitachiQA
                     {
                         builder.LoadConfigurationSource("LOCALSETTINGS", "local.settings.json");
                     }
-                    else if ("HitachiQA.UnitTests" == GetExecutingAssembly().GetName().Name)
+                    else if (GetExecutingAssembly() == typeof(Main).Assembly)
                     {
                         //unit test - no config needed
                     }
                     else
                     {
-                        throw new Exception("\nplease select a .runsetting file \n "
-                        + new Uri("https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2022"));
+                        var message = new StringBuilder();
+
+                        message.AppendLine("Aborting test execution.");
+                        message.AppendLine();
+                        message.AppendLine("Please select a .runsettings file:");
+                        message.AppendLine("https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2022");
+                        message.AppendLine();
+                        message.AppendLine("If a .runsettings file was selected, add one of the following options:");
+                        message.AppendLine();
+                        message.AppendLine("Options:");
+                        message.AppendLine("1. None");
+                        message.AppendLine("----------------------");
+                        message.AppendLine("    <CONFIG_SOURCE_TYPE>None</CONFIG_SOURCE_TYPE>");
+                        message.AppendLine("----------------------");
+                        message.AppendLine();
+                        message.AppendLine("2. JSON File");
+                        message.AppendLine("----------------------");
+                        message.AppendLine("    <CONFIG_SOURCE_TYPE>Json</CONFIG_SOURCE_TYPE>");
+                        message.AppendLine("    <CONFIG_SOURCE>jsonFile.json</CONFIG_SOURCE>");
+                        message.AppendLine("----------------------");
+                        message.AppendLine();
+                        message.AppendLine("3. Azure Key Vault");
+                        message.AppendLine("----------------------");
+                        message.AppendLine("    <CONFIG_SOURCE_TYPE>Keyvault</CONFIG_SOURCE_TYPE>");
+                        message.AppendLine("    <CONFIG_SOURCE>https://keyvault.uri.com</CONFIG_SOURCE>");
+                        message.AppendLine("----------------------");
+                        message.AppendLine();
+                        message.AppendLine("4. Azure App Configuration");
+                        message.AppendLine("----------------------");
+                        message.AppendLine("    <CONFIG_SOURCE_TYPE>AppConfig</CONFIG_SOURCE_TYPE>");
+                        message.AppendLine("    <CONFIG_SOURCE>https://appconfig.uri.com</CONFIG_SOURCE>");
+                        message.AppendLine("----------------------");
+
+                        throw new Exception(message.ToString());
+
+
                     }
                     break;
             }

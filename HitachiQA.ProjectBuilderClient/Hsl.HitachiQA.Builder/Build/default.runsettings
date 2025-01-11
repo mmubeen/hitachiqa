@@ -6,6 +6,7 @@
 			<SERVER_HOST>TBD</SERVER_HOST>
 			<BROWSER>Chrome</BROWSER>
 			<OPTIONS>--incognito</OPTIONS>
+			<CONFIG_SOURCE_TYPE>None</CONFIG_SOURCE_TYPE>
 		</EnvironmentVariables>
 	</RunConfiguration>
 </RunSettings>
