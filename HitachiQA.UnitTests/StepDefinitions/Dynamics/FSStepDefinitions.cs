@@ -30,7 +30,7 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
         [Then(@"user should be in the previously navigated app")]
         public void ThenUserShouldBeInThePreviouslyNavigatedApp()
         {
-            Page.AppBreadCrumb.GetAttribute("aria-label").Should().BeEquivalentTo(SharedData.GetValue("Application", "CurrentApplication"));
+            Page.AppBreadCrumb.GetDomProperty("aria-label").Should().BeEquivalentTo(SharedData.GetValue("Application", "CurrentApplication"));
         }
         [When(@"user opens left pane '([^']*)' entity")]
         public void WhenUserOpensLeftPaneEntity(string entityName)

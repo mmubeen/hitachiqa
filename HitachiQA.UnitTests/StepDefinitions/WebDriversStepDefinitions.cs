@@ -35,6 +35,9 @@ namespace HitachiQA.UnitTests.StepDefinitions
             UserActions.OpenNewTab();
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
 
+            var el = new Element(By.XPath("//button[@id]"), UserActions);
+            var title = el.GetDomProperty("id");
+
             if (new Element(By.XPath("//*[@title='Open mobile navigation']"), UserActions).TryClick())
             {
                 new Element(By.XPath("(//*[contains(text(), 'Contact us')])[2]"), UserActions).Click();
@@ -45,6 +48,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             }
 
             var HSAHeader = new Element(By.XPath("//*[text()='Hitachi Solutions America']"), UserActions);
+            var outerhtml = HSAHeader.GetDomProperty("outerHTML");
             HSAHeader.assertElementIsPresent(5);
 
             UserActions.SwitchContext();

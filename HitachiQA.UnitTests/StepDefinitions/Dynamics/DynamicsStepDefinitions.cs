@@ -49,7 +49,7 @@ namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
             }
 
             //Yes (stay signed in)
-            if (Page.SubmitButton.GetAttribute("value") == "Sign in")
+            if (Page.SubmitButton.GetDomProperty("value") == "Sign in")
             {
                 throw new Exception($"Sign In Failed, UI Message: {Page.Element("//*[@id='passwordError']").GetElementText()}");
             }

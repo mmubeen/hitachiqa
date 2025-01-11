@@ -155,9 +155,9 @@ namespace HitachiQA.Driver
             return element.Displayed;
         }
 
-        public string GetAttribute(By[] ElementLocator, string attributeName)
+        public string GetDomProperty(By[] ElementLocator, string attributeName)
         {
-            return FindElementWaitUntilClickable(ElementLocator).GetDomAttribute(attributeName);
+            return FindElementWaitUntilClickable(ElementLocator).GetDomProperty(attributeName);
         }
 
         private void switchToIFrame(By[] bys)

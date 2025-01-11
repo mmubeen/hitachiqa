@@ -17,7 +17,7 @@ namespace HitachiQA.Dynamics.FS.Pages
 
         public Element SaveAndCloseButton => this.GetField("quickCreateSaveAndCloseBtn");
 
-        public string EntityLogicalName => this.Dialog.GetAttribute("data-lp-id").Replace("quick-create|quickCreateRoot|", string.Empty);
+        public string EntityLogicalName => this.Dialog.GetDomProperty("data-lp-id").Replace("quick-create|quickCreateRoot|", string.Empty);
 
 
     }

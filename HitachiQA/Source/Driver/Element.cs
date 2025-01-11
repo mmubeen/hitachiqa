@@ -60,9 +60,9 @@ namespace HitachiQA.Driver
             return UserActions.TryClick(locators, waitSeconds);
         }
 
-        public string GetAttribute(string attributeName)
+        public string GetDomProperty(string attributeName)
         {
-            return UserActions.GetAttribute(locators, attributeName);
+            return UserActions.GetDomProperty(locators, attributeName);
         }
 
         public bool IsDisabled => UserActions.GetIsDisabled(locators);
