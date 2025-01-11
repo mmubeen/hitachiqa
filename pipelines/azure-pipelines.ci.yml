@@ -33,9 +33,14 @@ stages:
             script: |
                 $xml = [Xml](Get-Content .\HitachiQA\HitachiQA.csproj)
                 $version = $xml.Project.PropertyGroup.Version
-
+                
+                $versionArr = $version.Split('.')
+                $nextPatch = ([int]versionArr[-1])
+                $nextPatch++
+                $nextVersion = '$versionArr[0].$versionArr[1].$nextPatch'
+                
                 $buildId = "$(Build.BuildNumber)" -replace "\.", ""
-                $minorReleaseVersion = "$version+$buildId"
+                $minorReleaseVersion = "$nextVersion+$buildId"
 
                 Write-Host "##[section]MajorReleaseVersion: $version"
                 Write-Host "##[section]MinorReleaseVersion: $minorReleaseVersion"

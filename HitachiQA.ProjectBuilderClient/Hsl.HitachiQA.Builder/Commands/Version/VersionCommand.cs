@@ -15,8 +15,9 @@ public class VersionCommand : ICommand
                             .Assembly
                             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
                             .InformationalVersion ?? "Unknown version";
-
-        Console.WriteLine(versionInfo.ToString());
+        var cleanVersion = versionInfo.Split('+')[0];
+        Console.WriteLine("Version:");
+        Console.WriteLine(cleanVersion);
         return Task.CompletedTask;
     }
 
