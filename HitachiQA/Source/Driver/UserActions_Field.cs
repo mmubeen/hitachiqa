@@ -1,12 +1,8 @@
-﻿using HtmlAgilityPack;
+﻿using HitachiQA.Helpers;
+using HtmlAgilityPack;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using Polly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using HitachiQA.Helpers;
 
 namespace HitachiQA.Driver
 {
@@ -310,7 +306,7 @@ namespace HitachiQA.Driver
             var dateTime = DateTime.Parse(date + " " + time);
             return dateTime.ToString("O");
         }
-        
+
         public List<string> GetFieldOptions(By[] by)
         {
             this.WaitForTransaction();

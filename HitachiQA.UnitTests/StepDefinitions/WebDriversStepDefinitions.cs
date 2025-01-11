@@ -1,11 +1,10 @@
-using BoDi;
 using HitachiQA.Driver;
+using HitachiQA.Helpers;
 using HitachiQA.Hooks.Browsers;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
-using HitachiQA.Helpers;
-using FluentAssertions.Extensions;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {
@@ -35,8 +34,8 @@ namespace HitachiQA.UnitTests.StepDefinitions
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
             UserActions.OpenNewTab();
             new Element(By.XPath("//*[contains(text(), 'Hitachi')]"), UserActions).assertElementIsPresent();
-            
-            if(new Element(By.XPath("//*[@title='Open mobile navigation']"), UserActions).TryClick())
+
+            if (new Element(By.XPath("//*[@title='Open mobile navigation']"), UserActions).TryClick())
             {
                 new Element(By.XPath("(//*[contains(text(), 'Contact us')])[2]"), UserActions).Click();
             }
@@ -93,7 +92,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
                 default:
                     throw new NotImplementedException($"BROWSER value={browser} is not supported");
             }
-           
+
         }
 
         [Given(@"user loads option ""([^""]*)"" into the browser")]
@@ -113,9 +112,9 @@ namespace HitachiQA.UnitTests.StepDefinitions
             {
                 case "--start-maximized":
                     var fullScreenEnabled = (bool)js.execute("return document.fullscreenEnabled");
-                    fullScreenEnabled.Should().BeTrue();    
+                    fullScreenEnabled.Should().BeTrue();
                     break;
-     
+
                 case "--window-size=840,640":
                     var height = (long)js.execute("return window.outerHeight");
                     var width = (long)js.execute("return window.outerWidth");

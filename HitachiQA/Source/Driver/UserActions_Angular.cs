@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace HitachiQA.Driver
+﻿namespace HitachiQA.Driver
 {
     public partial class UserActions
-    {         
+    {
         #region Mat Dropdown actions 
         public void SelectMatDropdownOptionByText(By[] DropdownLocator, string optionDisplayText)
         {

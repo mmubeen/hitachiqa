@@ -1,11 +1,6 @@
 ﻿using Microsoft.Playwright;
 using Polly;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HitachiQA.Playwright
 {
@@ -22,15 +17,15 @@ namespace HitachiQA.Playwright
             {
                 var identifier = $"xpath={trial.Replace("{input}", indentifier)} /self::*[not(contains(@style,'display: none'))]";
                 var field = page.Locator(identifier);
-                
+
                 //adding running task
                 tasks.Add(identifier, InvokeTrial(page, field, ct.Token));
 
             }
-            
+
             var completed = await Task.WhenAny(tasks.Values);
-                        
-            if ((await completed)== true)
+
+            if ((await completed) == true)
             {
                 var identifierFound = tasks.First(it => it.Value.IsCompletedSuccessfully).Key;
                 ct.Cancel();
@@ -46,11 +41,11 @@ namespace HitachiQA.Playwright
         private async static Task<bool> InvokeTrial(IPage page, ILocator fieldTrial, CancellationToken ct)
         {
             var retry = Policy.HandleResult<int>(0).WaitAndRetryAsync(5 * 30, _ => TimeSpan.FromMilliseconds(200));
-            
-            
+
+
             var count = await retry.ExecuteAsync(async () =>
             {
-                if(ct.IsCancellationRequested)
+                if (ct.IsCancellationRequested)
                 {
                     return -1;
                 }
@@ -58,7 +53,7 @@ namespace HitachiQA.Playwright
                 {
                     return await fieldTrial.CountAsync();
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return 0;
                 }

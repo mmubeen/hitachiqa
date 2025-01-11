@@ -1,16 +1,11 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using HitachiQA.Helpers;
-using OpenQA.Selenium.Interactions;
-using Microsoft.Extensions.Configuration;
-using BoDi;
+﻿using HitachiQA.Helpers;
 using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+using Microsoft.Extensions.Configuration;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Support.UI;
 using Polly;
-using System.IO;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Driver
 {
@@ -20,7 +15,7 @@ namespace HitachiQA.Driver
         private readonly IConfiguration Configuration;
         private readonly JSExecutor JSExecutor;
         private readonly Policy _defaultRetry;
-        
+
 
         /// <summary>
         ///Most applications have some sort of loading screen, please allow this variable to hold the that locator. please set this xpath in your appsettings.json file as LOADING_SCREEN_XPATH
@@ -425,7 +420,8 @@ namespace HitachiQA.Driver
                     }
                 );
 
-            retry.Execute(() => {
+            retry.Execute(() =>
+            {
                 var select = new SelectElement(FindElementWaitUntilPresent(selectLocator));
 
                 select.SelectByText(optionText);
@@ -486,7 +482,8 @@ namespace HitachiQA.Driver
             var interceptRetry = Policy.Handle<ElementClickInterceptedException>()
             .WaitAndRetry(2, _ => TimeSpan.FromSeconds(1));
 
-            return retry.Execute(() => {
+            return retry.Execute(() =>
+            {
                 if (this.ElementExists(locator, out IWebElement element) && element.Displayed && element.Enabled)
                 {
                     element.NullGuard();

@@ -1,11 +1,5 @@
-﻿using BoDi;
-using HitachiQA.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HitachiQA.Driver;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Dynamics.FS.Pages
 {
@@ -17,13 +11,13 @@ namespace HitachiQA.Dynamics.FS.Pages
             parentXPath = "//section[@data-id='quickCreateRoot']";
         }
 
-       public new Element GetField(string fieldName_Or_LogicalName)=> base.GetField(By.XPath(parentXPath), fieldName_Or_LogicalName);
+        public new Element GetField(string fieldName_Or_LogicalName) => base.GetField(By.XPath(parentXPath), fieldName_Or_LogicalName);
 
-       public Element Dialog => Element(parentXPath);
+        public Element Dialog => Element(parentXPath);
 
-       public Element SaveAndCloseButton => this.GetField("quickCreateSaveAndCloseBtn");
+        public Element SaveAndCloseButton => this.GetField("quickCreateSaveAndCloseBtn");
 
-       public string EntityLogicalName => this.Dialog.GetAttribute("data-lp-id").Replace("quick-create|quickCreateRoot|", string.Empty);
+        public string EntityLogicalName => this.Dialog.GetAttribute("data-lp-id").Replace("quick-create|quickCreateRoot|", string.Empty);
 
 
     }

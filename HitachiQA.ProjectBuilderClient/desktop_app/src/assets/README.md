@@ -4,9 +4,9 @@
 
 The objective is to create another project and then use HitachiQA as a nuget package. Example [Here](https://github.com/Hitachi-SolutionsQA/Demo)
 1. Download `Visual Studio 2022`
-2. Install `Specflow for visual Studio` extension
-3. Create a new specflow project for *.NET8 using MSTest* 
-4. download the following [specflow.json](README_FILES\specflow.json) file to the project folder
+2. Install `Reqnroll for visual Studio` extension
+3. Create a new reqnroll project for *.NET8 using MSTest* 
+4. download the following [reqnroll.json](README_FILES\reqnroll.json) file to the project folder
 5. download the following [default.runsettings](README_FILES\default.runsettings) file to the project folder and modify it to your projects specifics 
 	* It is recommend to rename it to the environment is pointing to like `qa.runsettings` 
 	* at a minimal should have all the required variables from the Known Variables [table](#known-variables) (environment specific)
@@ -201,7 +201,7 @@ Scenario:TC01 Verify Policy Left Nav Exists
 
 ```
 
-In the above file all 3 statements come from different specflow objects. 
+In the above file all 3 statements come from different reqnroll objects. 
 
 
 ## *Basic BDD Guidelines*

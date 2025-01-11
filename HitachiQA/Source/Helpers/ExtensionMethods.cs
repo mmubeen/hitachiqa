@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 namespace HitachiQA.Helpers
 {
@@ -22,7 +21,7 @@ namespace HitachiQA.Helpers
 
         public static T ToObject<T>(this object obj)
         {
-            if (obj.GetType()==typeof(T))
+            if (obj.GetType() == typeof(T))
             {
                 return (T)obj;
             }

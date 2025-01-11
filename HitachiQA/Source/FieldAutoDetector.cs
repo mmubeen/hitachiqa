@@ -1,11 +1,5 @@
-﻿using HitachiQA.Driver;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using Microsoft.Playwright;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HitachiQA
 {
@@ -68,7 +62,7 @@ namespace HitachiQA
             }
             return matchingPair ?? throw new ArgumentNullException();
         }
-        
+
         /// <summary>
         /// Playwright
         /// </summary>

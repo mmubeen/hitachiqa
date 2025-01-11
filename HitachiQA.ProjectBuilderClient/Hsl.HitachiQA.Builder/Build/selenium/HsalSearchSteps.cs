@@ -1,6 +1,5 @@
 ﻿using {{ProjectName}}.Pages;
 using OpenQA.Selenium;
-using TechTalk.SpecFlow;
 using HitachiQA;
 
 namespace {{ProjectName}}.StepDefinition
@@ -8,7 +7,7 @@ namespace {{ProjectName}}.StepDefinition
     [Binding]
     public sealed class HsalSearchSteps
     {
-        // For additional details on SpecFlow step definitions see https://go.specflow.org/doc-stepdef
+        // For additional details on Reqnroll step definitions see https://docs.reqnroll.net/latest/automation/step-definitions.html    
 
         public HsalHome HsalHome;
         public string searchCriteria;

@@ -1,12 +1,5 @@
-﻿using BoDi;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using HitachiQA.Hooks.Browsers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+﻿using HitachiQA.Hooks.Browsers;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Source.Hooks.Browsers
 {

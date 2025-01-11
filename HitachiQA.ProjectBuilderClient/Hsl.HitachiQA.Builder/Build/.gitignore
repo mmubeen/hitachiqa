@@ -40,7 +40,7 @@ Generated\ Files/
 *.VisualState.xml
 TestResult.xml
 
-# Specflow
+# Reqnroll
 *.feature.cs
 
 # Build Results of an ATL Project

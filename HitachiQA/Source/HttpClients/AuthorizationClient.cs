@@ -1,15 +1,9 @@
-﻿using BoDi;
-using HitachiQA.Helpers;
-using HitachiQA.Hooks.Browsers;
+﻿using HitachiQA.Helpers;
 using HitachiQA.Source.HttpClients.Authorization;
 using Microsoft.Extensions.Configuration;
-using OpenQA.Selenium;
-using Polly;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using WebDriverManager;
 
 namespace HitachiQA.Source.HttpClients
 {
@@ -59,9 +53,9 @@ namespace HitachiQA.Source.HttpClients
                 useInteractiveAuth ??= GetIsInteractiveAuthFromConfig();
 
                 //use browser for authentication (local dev)
-                if (useInteractiveAuth??false)
+                if (useInteractiveAuth ?? false)
                 {
-                    if(_interactiveAuth == null)
+                    if (_interactiveAuth == null)
                     {
                         var framework = Config.GetVariable("FRAMEWORK", true);
                         if (framework != null && framework.Equals("playwright", StringComparison.CurrentCultureIgnoreCase))
@@ -116,9 +110,9 @@ namespace HitachiQA.Source.HttpClients
             var iaStr = Config.GetVariable("ENABLE_INTERACTIVE_AUTH", true);
 
             //use browser for authentication (made for local dev)
-            if(bool.TryParse(iaStr, out var useInteractiveAuth))
+            if (bool.TryParse(iaStr, out var useInteractiveAuth))
                 return useInteractiveAuth;
-            
+
             return false;
         }
 

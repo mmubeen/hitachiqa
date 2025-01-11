@@ -10,7 +10,7 @@ public abstract class InteractiveAuthBase
         Config = config;
     }
 
-    public abstract bool IsBrowserRunning { get;}
+    public abstract bool IsBrowserRunning { get; }
 
     public abstract Task InvokeBrowserAsync(string? profile);
     public abstract Task AttemptAutoSigninAsync(string? emailIdentifierKey);

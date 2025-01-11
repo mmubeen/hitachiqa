@@ -346,7 +346,7 @@ const Form: React.FC = () => {
         <DialogContent>
           <h4>Next Steps:</h4>
           <DialogContentText id="alert-dialog-description">
-            - Install specflow for Visual Studio 2022 extension
+            - Install Reqnroll for Visual Studio 2022 extension
           </DialogContentText>
           <DialogContentText id="alert-dialog-description">
             - Build and run your first test <br />

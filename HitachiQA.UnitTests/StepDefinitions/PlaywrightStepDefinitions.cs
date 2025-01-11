@@ -1,16 +1,5 @@
-using BoDi;
-using Gherkin;
-using HitachiQA.Helpers;
-using HitachiQA.Hooks.Browsers;
 using HitachiQA.Playwright;
-using HitachiQA.Source.HttpClients;
-using HitachiQA.Source.HttpClients.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Playwright;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Net.Http.Headers;
-using TechTalk.SpecFlow;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {
@@ -40,7 +29,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             await Page.Locator("xpath=//*[@aria-label='search']").ClickAsync();
         }
 
-       
+
 
 
     }

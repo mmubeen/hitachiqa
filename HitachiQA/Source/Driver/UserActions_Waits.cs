@@ -2,11 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Polly;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
 
 namespace HitachiQA.Driver
 {
@@ -86,7 +82,8 @@ namespace HitachiQA.Driver
             WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
             var locator = WaitForElementAndFindMatchingCandidate(by);
 
-            return _defaultRetry.Execute(() => {
+            return _defaultRetry.Execute(() =>
+            {
                 var target = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
                 ScrollIntoView(target);
                 Thread.Sleep(200);
@@ -95,9 +92,9 @@ namespace HitachiQA.Driver
                 return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(locator));
             });
         }
-        
+
         public List<IWebElement> FindElementsWaitUntilVisible(By by, int? wait_Seconds = null) => FindElementsWaitUntilVisible(new[] { by }, wait_Seconds);
-       
+
         public List<IWebElement> FindElementsWaitUntilVisible(By[] by, int? wait_Seconds = null)
         {
             var locator = WaitForElementAndFindMatchingCandidate(by);
@@ -124,7 +121,8 @@ namespace HitachiQA.Driver
             WebDriverWait wait = new WebDriverWait(this.WebDriver, TimeSpan.FromSeconds(ProcessWaitParam(wait_Seconds)));
             IWebElement target = FindElementWaitUntilPresent(by, out var resultingBy);
 
-            target = _defaultRetry.Execute(() => {
+            target = _defaultRetry.Execute(() =>
+            {
                 Hover(target, true);
                 if (_highLightOn)
                 {

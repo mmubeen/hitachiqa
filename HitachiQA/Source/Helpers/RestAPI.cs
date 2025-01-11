@@ -1,7 +1,7 @@
-﻿using System.Text;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace HitachiQA.Helpers
 {

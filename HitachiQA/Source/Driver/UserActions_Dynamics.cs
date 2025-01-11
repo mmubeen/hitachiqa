@@ -1,10 +1,7 @@
-﻿using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
-using System;
+﻿using HitachiQA.Helpers;
 using HtmlAgilityPack;
-using System.Collections.Generic;
-using System.Linq;
-using HitachiQA.Helpers;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace HitachiQA.Driver
 {

@@ -1,5 +1,5 @@
-﻿using BoDi;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Dynamics.Playwright.CE
 {
@@ -7,8 +7,8 @@ namespace HitachiQA.Dynamics.Playwright.CE
     {
         public AppLandingPage(IObjectContainer oc) : base(oc)
         {
-            
+
         }
-        public ILocator GetAppButton(string title)=> FrameLocator("iframe#AppLandingPage").GetByTitle(title).First;
+        public ILocator GetAppButton(string title) => FrameLocator("iframe#AppLandingPage").GetByTitle(title).First;
     }
 }

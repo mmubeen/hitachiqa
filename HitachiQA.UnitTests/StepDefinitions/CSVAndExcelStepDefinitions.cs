@@ -1,7 +1,5 @@
 using HitachiQA.Helpers;
 using HitachiQA.UnitTests.Data.CSV_EXCEL_PARSING;
-using System;
-using TechTalk.SpecFlow;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {

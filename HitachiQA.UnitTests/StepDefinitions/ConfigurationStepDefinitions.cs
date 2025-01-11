@@ -1,8 +1,8 @@
-using BoDi;
 using HitachiQA.Driver;
 using HitachiQA.Hooks.Browsers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {
@@ -38,7 +38,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         {
             //given the known name for the variable
             this.result = this.Config.GetVariable(knownName, false);
-            
+
         }
 
         [Then(@"the system should look for the varname provided")]
@@ -57,7 +57,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         [Then(@"NoBrowser tag on this feature should cascade down to this test")]
         public void ThenNoBrowserTagOnThisFeatureShouldCascadeDownToThisTest()
         {
-            this.ObjectContainer.Resolve<BrowserIndicator>().IsBrowserFeature.Should().BeFalse();  
+            this.ObjectContainer.Resolve<BrowserIndicator>().IsBrowserFeature.Should().BeFalse();
         }
 
     }

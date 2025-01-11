@@ -1,7 +1,5 @@
 using HitachiQA.Dynamics.FS.Pages;
 using HitachiQA.Helpers;
-using System;
-using TechTalk.SpecFlow;
 
 namespace HitachiQA.UnitTests.StepDefinitions.Dynamics
 {

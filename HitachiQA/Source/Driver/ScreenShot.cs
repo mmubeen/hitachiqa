@@ -1,13 +1,8 @@
-﻿using OpenQA.Selenium;
-using System;
-using System.IO;
-using System.Text;
-using TechTalk.SpecFlow;
-using HitachiQA.Driver;
+﻿using Microsoft.Playwright;
+using OpenQA.Selenium;
 using System.Drawing;
 using System.Drawing.Imaging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Playwright;
+using System.Text;
 
 namespace HitachiQA
 {
@@ -36,7 +31,7 @@ namespace HitachiQA
         /// <summary>
         /// Take screenshot, by defualt the filename will be Severity_CurrentScenario_currentDateTime unless otherwise specified
         /// </summary>
-        public void Take(Severity severity, String? filename =null)
+        public void Take(Severity severity, String? filename = null)
         {
             var currentSev = Severity.parseLevel(Main.Configuration.GetSection("Logging").GetSection("LogLevel")["Default"]).Level;
 
@@ -45,21 +40,21 @@ namespace HitachiQA
                 return;
             }
             else if (severity.Level <= currentSev)
-            { 
+            {
 
 
                 FileNameBase = $"{severity.Name}_{FileNameBase}";
 
                 if (!Directory.Exists(ArtifactDirectory)) { Directory.CreateDirectory(ArtifactDirectory); }
-                
-                string pageSource = Driver==null? Page.ContentAsync().Result : Driver.PageSource;
+
+                string pageSource = Driver == null ? Page.ContentAsync().Result : Driver.PageSource;
                 string sourceFilePath = Path.Combine(ArtifactDirectory, FileNameBase + "_source.html");
                 File.WriteAllText(sourceFilePath, pageSource, Encoding.UTF8);
                 this.TestContext.AddResultFile(sourceFilePath);
                 Console.WriteLine($"\nPage Source: {new Uri(sourceFilePath)}\n");
 
 
-                
+
                 string screenshotFilePath = Path.Combine(ArtifactDirectory, FileNameBase + "_screenshot.png");
 
                 if (SaveScreenshot(screenshotFilePath))
@@ -91,7 +86,7 @@ namespace HitachiQA
                     Console.WriteLine($"\nScreenshot: {new Uri(screenshotFilePath)}\n");
                     this.TestContext.AddResultFile(screenshotFilePath);
                 }
-                
+
             }
         }
         private static string ArtifactDirectory => Path.Combine(Directory.GetCurrentDirectory(), "Screenshots");
@@ -115,7 +110,7 @@ namespace HitachiQA
             }
             else
             {
-                Page.ScreenshotAsync(new() { Path=filePath, FullPage= true }).Wait();
+                Page.ScreenshotAsync(new() { Path = filePath, FullPage = true }).Wait();
                 return true;
             }
         }

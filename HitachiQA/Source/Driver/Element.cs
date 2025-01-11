@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using HitachiQA.Helpers;
-using System.Linq;
-using FluentAssertions;
+﻿using HitachiQA.Helpers;
 
 namespace HitachiQA.Driver
 {
@@ -19,7 +15,7 @@ namespace HitachiQA.Driver
         public Element(OpenQA.Selenium.By locator, UserActions userActions)
         {
             UserActions = userActions;
-            locators = new By[] { new By(locator)};
+            locators = new By[] { new By(locator) };
         }
 
         public Element(By locator, UserActions userActions)
@@ -35,7 +31,7 @@ namespace HitachiQA.Driver
 
         public override string ToString()
         {
-            return string.Join(",", locators.Select(l=> l.ToString()));
+            return string.Join(",", locators.Select(l => l.ToString()));
         }
 
 
@@ -59,7 +55,7 @@ namespace HitachiQA.Driver
             return UserActions.Click(locators, UserActions.ProcessWaitParam(wait_Seconds), optional);
         }
 
-        public bool TryClick(double waitSeconds=0)
+        public bool TryClick(double waitSeconds = 0)
         {
             return UserActions.TryClick(locators, waitSeconds);
         }
@@ -153,7 +149,9 @@ namespace HitachiQA.Driver
         /// <param name="optional">if set to true failure will be contained and no exception will be thrown </param>
         public bool assertElementIsVisible(int? wait_Seconds = null, bool optional = false)
         {
-            try { UserActions.FindElementWaitUntilVisible(locators, UserActions.ProcessWaitParam(wait_Seconds));
+            try
+            {
+                UserActions.FindElementWaitUntilVisible(locators, UserActions.ProcessWaitParam(wait_Seconds));
                 return true;
             }
             catch (Exception ex)
@@ -170,7 +168,9 @@ namespace HitachiQA.Driver
 
         public bool assertElementIsPresent(int? wait_Seconds = null, bool optional = false)
         {
-            try { UserActions.FindElementWaitUntilPresent(locators, UserActions.ProcessWaitParam(wait_Seconds));
+            try
+            {
+                UserActions.FindElementWaitUntilPresent(locators, UserActions.ProcessWaitParam(wait_Seconds));
                 return true;
             }
             catch (Exception ex)
@@ -188,7 +188,9 @@ namespace HitachiQA.Driver
 
         public bool assertElementNotPresent(int? wait_Seconds = null, bool optional = false)
         {
-            try { UserActions.WaitForElementToDisappear(locators, UserActions.ProcessWaitParam(wait_Seconds));
+            try
+            {
+                UserActions.WaitForElementToDisappear(locators, UserActions.ProcessWaitParam(wait_Seconds));
                 return true;
             }
             catch (Exception ex)
@@ -267,8 +269,8 @@ namespace HitachiQA.Driver
             //so we add //*[(self::<xpath>)] around xpath 
             //allowing it to end with a condition so we can attach the 2nd condition
             //
-            var non_readonlyFieldXPath = locators.Select(l=> By.XPath($"//*[(self::{l.Locator.Criteria[2..]})][not(.//*[contains(@data-id,'locked-icon')])]", l.IFrameLocator)).ToArray();
-            
+            var non_readonlyFieldXPath = locators.Select(l => By.XPath($"//*[(self::{l.Locator.Criteria[2..]})][not(.//*[contains(@data-id,'locked-icon')])]", l.IFrameLocator)).ToArray();
+
             new Element(non_readonlyFieldXPath, UserActions).assertElementIsPresent();
         }
 
@@ -284,7 +286,7 @@ namespace HitachiQA.Driver
         [Obsolete("please use GetFieldValue() instead")]
         public string getTextFieldText(int? wait_Seconds = null)
         {
-           return  UserActions.getTextFieldText(locators, UserActions.ProcessWaitParam(wait_Seconds));
+            return UserActions.getTextFieldText(locators, UserActions.ProcessWaitParam(wait_Seconds));
         }
 
         [Obsolete("please use SetFieldValue(string.empty) instead")]
@@ -303,7 +305,7 @@ namespace HitachiQA.Driver
         }
 
         [Obsolete("please use GetFieldValue().should().be(expected) instead")]
-        public bool assertTextFieldTextEquals(string expected, bool optional=false)
+        public bool assertTextFieldTextEquals(string expected, bool optional = false)
         {
             string elementText = this.getTextFieldText();
             if (Assert.AreEqual(elementText, expected, true))
@@ -313,7 +315,7 @@ namespace HitachiQA.Driver
             Functions.HandleFailure(new Exception($"Text Field {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}"), optional);
             return false;
         }
-       
+
 
         //
         // RADIO BUTTON
@@ -337,7 +339,7 @@ namespace HitachiQA.Driver
 
         public IEnumerable<Dictionary<String, String>> parseUITable()
         {
-            if(locators.Count()>1)
+            if (locators.Count() > 1)
             {
                 throw new NotImplementedException("parseUITable for more than 1 locator not implemented");
             }
@@ -355,7 +357,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void OpenGridRecord(string columnName, string value)
         {
-            UserActions.OpenGridRecord(locators, columnName, value); 
+            UserActions.OpenGridRecord(locators, columnName, value);
         }
         /// <summary>
         /// To be executed on a Grid element of dynamics
@@ -364,7 +366,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void OpenGridRecord(int LogicalIndex)
         {
-            UserActions.OpenGridRecord(locators, "index", (LogicalIndex+1).ToString());
+            UserActions.OpenGridRecord(locators, "index", (LogicalIndex + 1).ToString());
         }
         /// <summary>
         /// To be executed on a Grid element of dynamics
@@ -401,7 +403,7 @@ namespace HitachiQA.Driver
         /// </summary>
         public void SortGridColumn(string columnName, string filterByString = "", bool descendingSort = false, string comparisonOperation = "")
         {
-            this.UserActions.SortGridColumn(locators, columnName, filterByString, descendingSort, comparisonOperation); 
+            this.UserActions.SortGridColumn(locators, columnName, filterByString, descendingSort, comparisonOperation);
         }
 
         /// <summary>

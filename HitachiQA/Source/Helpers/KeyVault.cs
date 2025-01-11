@@ -1,6 +1,4 @@
-﻿using System;
-using Azure.Core;
-using Azure.Identity;
+﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
 namespace HitachiQA.Helpers
@@ -17,35 +15,35 @@ namespace HitachiQA.Helpers
         {
             KeyVaultSecret theSecret;
             String value;
-            if(String.IsNullOrWhiteSpace(KEY_VAULT_URI))
+            if (String.IsNullOrWhiteSpace(KEY_VAULT_URI))
             {
                 Functions.HandleFailure(new ArgumentNullException("Helpers.KeyVault - KEY_VAULT_URI was not set properly"));
             }
 
-                try
-                {
-                    var secretBundle = new SecretClient(new Uri(Environment.GetEnvironmentVariable("APP_KEYVAULT_URI")), new DefaultAzureCredential());
-                    theSecret = secretBundle.GetSecret(secretName);
+            try
+            {
+                var secretBundle = new SecretClient(new Uri(Environment.GetEnvironmentVariable("APP_KEYVAULT_URI")), new DefaultAzureCredential());
+                theSecret = secretBundle.GetSecret(secretName);
 
-                    value = theSecret.Name;  
+                value = theSecret.Name;
+            }
+            catch (Exception ex)
+            {
+                if (optional)
+                {
+                    return null;
                 }
-                catch (Exception ex)
-                {       
-                    if (optional)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        value = Functions.HandleFailure("Error while retrieving secrets from azure KeyVault", ex).ToString();
-                    }
+                else
+                {
+                    value = Functions.HandleFailure("Error while retrieving secrets from azure KeyVault", ex).ToString();
                 }
+            }
             return value;
         }
 
         public String GetSecret(string secretName)
         {
             return GetSecret(secretName, false);
-        } 
+        }
     }
 }

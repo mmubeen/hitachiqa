@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HitachiQA.Helpers;
 using System.Text;
-using HitachiQA.Helpers;
-using HitachiQA.Driver;
-using NUnit.Framework;
-using NUnitAssert = NUnit.Framework.Assert;
-using FluentAssertions;
 namespace HitachiQA
 {
     [Obsolete("please use FluentAssertions")]
@@ -28,19 +22,19 @@ namespace HitachiQA
             }
             else
             {
-                Functions.HandleFailure(new Exception($"List { list.ToString() } does not Contain\n[{ value}]"));
+                Functions.HandleFailure(new Exception($"List {list.ToString()} does not Contain\n[{value}]"));
                 return false;
             }
         }
 
         public static bool TextContains(String text, String value, bool optional = false)
         {
-            if(text== null || value == null)
+            if (text == null || value == null)
             {
                 Functions.HandleFailure(new Exception($"Assert - text: [{text}] does not Contain  value: [{value}]"), optional);
                 return false;
             }
-            if(text.Contains(value))
+            if (text.Contains(value))
             {
                 success($"text: {text} contains value: {value}");
                 return true;
@@ -56,12 +50,12 @@ namespace HitachiQA
 
         public static bool AreEqual(object A, object B, bool optional = false)
         {
-            if(    (A == null || A is string && (string)A == "")     &&      (B == null || B is string && (string)B=="")     )
+            if ((A == null || A is string && (string)A == "") && (B == null || B is string && (string)B == ""))
             {
                 success($"Object {A} equals {B}");
                 return true;
             }
-            else if(A == null || B==null)
+            else if (A == null || B == null)
             {
                 Functions.HandleFailure(new Exception($"Assert - type:[{A?.GetType()?.FullName}] value:[{A}]   does not Equal  type: [{A?.GetType()?.FullName}] value: [{B}]"), optional);
                 return false;
@@ -133,7 +127,7 @@ namespace HitachiQA
         /// <returns> will return true if the condition was true</returns>
         public static bool IsTrue(bool? condition, bool optional = false)
         {
-            if(condition.HasValue && condition.Value == true)
+            if (condition.HasValue && condition.Value == true)
             {
                 success($"Condition {condition}");
                 return true;
@@ -191,7 +185,7 @@ namespace HitachiQA
             }
         }
 
-        public static bool CurrentURLEquals(string URL, bool optional=false)
+        public static bool CurrentURLEquals(string URL, bool optional = false)
         {
             throw new NotImplementedException("this funciton shouldn't live here");
             //try

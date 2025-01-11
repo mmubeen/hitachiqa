@@ -1,11 +1,5 @@
-﻿using BoDi;
-using DocumentFormat.OpenXml.Bibliography;
-using HitachiQA.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HitachiQA.Driver;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Dynamics.FO.Pages
 {

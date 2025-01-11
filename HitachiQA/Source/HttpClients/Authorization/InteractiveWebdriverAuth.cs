@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using HitachiQA.Helpers;
+﻿using HitachiQA.Helpers;
 using HitachiQA.Hooks.Browsers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
@@ -14,11 +13,11 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
     {
         _webDriverHook = webDriverHook;
     }
-    public override bool IsBrowserRunning => _webDriverHook.WebDriver != null; 
+    public override bool IsBrowserRunning => _webDriverHook.WebDriver != null;
 
     public override Task InvokeBrowserAsync(string? profile = null)
     {
-        if(profile!=null)
+        if (profile != null)
         {
             throw new NotImplementedException("profile sign in not implemented for selenium, use playwright");
         }
@@ -29,7 +28,7 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
     public override Task<BrowserCredential> GetAccessTokenCredsAsync(string keyIdentifier)
     {
         var driver = _webDriverHook.WebDriver
-            ??throw new NullReferenceException("[GetAccessTokenCreds] WebDriverHook.WebDriver was null, driver is expectd at this point");
+            ?? throw new NullReferenceException("[GetAccessTokenCreds] WebDriverHook.WebDriver was null, driver is expectd at this point");
         var retry = Polly.Policy
           .HandleResult<object>(r => r == null)
           .WaitAndRetry(120, _ => TimeSpan.FromSeconds(1));
@@ -65,7 +64,8 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
             .HandleResult(false)
             .WaitAndRetry(10, _ => TimeSpan.FromSeconds(1));
 
-        retry.Execute(() => {
+        retry.Execute(() =>
+        {
             var idleTimeMilis = 1000;
             var isNetworkIdle = (bool)driver.ExecuteScript(
                  @"return performance.getEntriesByType('resource').map(x => x.startTime + x.duration).every(x => x < performance.now() - arguments[0])",
@@ -87,11 +87,11 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
     public async override Task NavigateToHostIfNeededAsync()
     {
         var host = Config.GetVariable("HOST");
-        if(!_webDriverHook.WebDriver.Url.Contains(host))
+        if (!_webDriverHook.WebDriver.Url.Contains(host))
         {
             await _webDriverHook.WebDriver.Navigate().GoToUrlAsync(host);
         }
-        
+
     }
 
 }

@@ -1,10 +1,5 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Playwright;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HitachiQA.Playwright
 {
@@ -12,7 +7,7 @@ namespace HitachiQA.Playwright
     {
         public static async Task AssertIsPresentAsync(this ILocator locator)
         {
-            await Assertions.Expect(locator.First).ToHaveCountAsync(1, new() { Timeout=30000});
+            await Assertions.Expect(locator.First).ToHaveCountAsync(1, new() { Timeout = 30000 });
         }
         public static async Task AssertIsVissibleAsync(this ILocator locator)
         {

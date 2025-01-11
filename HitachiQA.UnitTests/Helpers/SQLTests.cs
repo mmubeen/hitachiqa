@@ -1,6 +1,4 @@
 ﻿using HitachiQA.Helpers;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
 
 namespace HitachiQA.UnitTests.Helpers

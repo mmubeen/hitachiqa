@@ -1,7 +1,4 @@
-﻿
-using Microsoft.VisualBasic;
-
-namespace HitachiQA.UnitTests
+﻿namespace HitachiQA.UnitTests
 {
     [TestClass]
     public class FieldAutoDetectorTest

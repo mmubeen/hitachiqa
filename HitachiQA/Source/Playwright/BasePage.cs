@@ -1,10 +1,5 @@
-﻿using BoDi;
-using Microsoft.Playwright;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Playwright;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Playwright
 {
@@ -13,21 +8,21 @@ namespace HitachiQA.Playwright
         public IPage PlaywrightPage { get; set; }
         public IBrowser Browser { get; set; }
         public IPlaywright Playwright { get; set; }
-        public ScreenShot ScreenShot{ get; set;}
+        public ScreenShot ScreenShot { get; set; }
 
         public BasePage(IObjectContainer oc)
         {
-            
+
             this.PlaywrightPage = oc.Resolve<IPage>();
-            this.Browser= oc.Resolve<IBrowser>();
+            this.Browser = oc.Resolve<IBrowser>();
             this.Playwright = oc.Resolve<IPlaywright>();
             this.ScreenShot = oc.Resolve<ScreenShot>();
         }
 
-        public async Task<ILocator> GetFieldAsync(string identifier)=>await PlaywrightPage.GetFieldAsync(identifier);
+        public async Task<ILocator> GetFieldAsync(string identifier) => await PlaywrightPage.GetFieldAsync(identifier);
 
         public ILocator Locator(string selector, PageLocatorOptions? options = default) => PlaywrightPage.Locator(selector, options);
-        
+
         public async Task<IResponse?> GotoAsync(string url, PageGotoOptions? options = null) => await PlaywrightPage.GotoAsync(url, options);
 
         public IFrameLocator FrameLocator(string selector) => PlaywrightPage.FrameLocator(selector);

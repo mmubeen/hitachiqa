@@ -1,6 +1,4 @@
 ﻿using OpenQA.Selenium;
-using System;
-using System.Threading;
 
 namespace HitachiQA.Helpers
 {
@@ -14,7 +12,7 @@ namespace HitachiQA.Helpers
         public object execute(String script, params object[] args)
         {
             IJavaScriptExecutor js = (IJavaScriptExecutor)Driver;
-            return js.ExecuteScript(script,args );
+            return js.ExecuteScript(script, args);
         }
 
         // Highligth Element

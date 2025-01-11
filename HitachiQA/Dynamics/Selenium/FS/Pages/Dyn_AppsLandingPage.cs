@@ -1,11 +1,5 @@
-﻿using BoDi;
-using HitachiQA.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HitachiQA.Driver;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Dynamics.FS.Pages
 {
@@ -19,7 +13,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         public Element GetModuleCard(string title) => Element($"//*[@title='{title}']");
 
 
-        
+
 
     }
 }

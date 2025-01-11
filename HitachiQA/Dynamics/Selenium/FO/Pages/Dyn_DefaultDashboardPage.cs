@@ -1,5 +1,5 @@
-﻿using BoDi;
-using HitachiQA.Driver;
+﻿using HitachiQA.Driver;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Dynamics.FO.Pages
 {

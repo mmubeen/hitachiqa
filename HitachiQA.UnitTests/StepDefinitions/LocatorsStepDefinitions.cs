@@ -1,10 +1,7 @@
-using HitachiQA.Driver;
 using HitachiQA.Helpers;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using System;
-using TechTalk.SpecFlow;
 
 namespace HitachiQA.UnitTests.StepDefinitions
 {
@@ -33,7 +30,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             }
 
             string json = File.ReadAllText(filePath);
-            var knownHTMLs = JArray.Parse(json).Select(it=> it.ToString()).ToList();
+            var knownHTMLs = JArray.Parse(json).Select(it => it.ToString()).ToList();
             this.SharedData.SetValue("knownField", "knownHTMLs", knownHTMLs);
 
 

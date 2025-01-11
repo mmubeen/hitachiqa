@@ -27,7 +27,7 @@ public class FileCoppier
         CopyFile("default.runsettings", _projectDirectory);
         CopyFile("ImplicitUsings.cs", _projectDirectory);
         CopyFile("Nuget.config", _projectDirectory);
-        CopyFile("specflow.json", _projectDirectory);
+        CopyFile("reqnroll.json", _projectDirectory);
         CopyFile("HsalSearch.feature", Path.Combine(_projectDirectory, "Features"));
 
         // Copy driver-specific assets

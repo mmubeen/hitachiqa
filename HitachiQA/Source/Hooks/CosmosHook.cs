@@ -1,7 +1,6 @@
-﻿using BoDi;
-using HitachiQA.Helpers;
+﻿using HitachiQA.Helpers;
 using Microsoft.Extensions.Configuration;
-using TechTalk.SpecFlow;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Hooks
 {

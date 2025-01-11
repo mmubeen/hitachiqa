@@ -1,13 +1,9 @@
-﻿using Azure.Core;
-using HitachiQA.Helpers;
-using HitachiQA.Hooks.Browsers;
+﻿using HitachiQA.Hooks.Browsers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Playwright;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
-using OpenQA.Selenium.BiDi.Communication;
 using Polly;
-using System.Diagnostics;
 
 namespace HitachiQA.Source.HttpClients.Authorization
 {
@@ -30,8 +26,9 @@ namespace HitachiQA.Source.HttpClients.Authorization
                 .HandleResult(false)
                 .WaitAndRetryAsync(10, _ => TimeSpan.FromSeconds(1));
             var idleTimeMilis = 2000;
-            await retry.ExecuteAsync(async () => {
-               
+            await retry.ExecuteAsync(async () =>
+            {
+
                 await page.WaitForLoadStateAsync(Microsoft.Playwright.LoadState.NetworkIdle);
 
                 var isNetworkIdle = await page.EvaluateAsync<bool>(
@@ -41,11 +38,11 @@ namespace HitachiQA.Source.HttpClients.Authorization
             });
             //if user is already authenticated, then the below clicks the first account with biberk.com email
             var userXPath = $"//small[contains(text(),'{emailIdentifierKey}')]";
-            if(await page.IsVisibleAsync(userXPath))
+            if (await page.IsVisibleAsync(userXPath))
             {
                 await page.ClickAsync(userXPath);
                 await page.WaitForLoadStateAsync(LoadState.Load);
-            }            
+            }
         }
 
 
@@ -60,27 +57,31 @@ namespace HitachiQA.Source.HttpClients.Authorization
 
             var host = Config.GetVariable("HOST");
             var server = new Uri(host).Host;
-            await browser.WaitForURLAsync($"**/{server}/**", new() { Timeout=120000});
+            await browser.WaitForURLAsync($"**/{server}/**", new() { Timeout = 120000 });
 
-            var accessToken = await retry.ExecuteAsync(async () => {
+            var accessToken = await retry.ExecuteAsync(async () =>
+            {
                 var sessionRaw = await browser.EvaluateAsync("sessionStorage");
                 var session = JObject.Parse(sessionRaw?.ToString());
                 var localRaw = await browser.EvaluateAsync("localStorage");
                 var local = JObject.Parse(localRaw?.ToString());
                 var accessTokens = new JObject();
 
-                foreach (var entry in session) {
+                foreach (var entry in session)
+                {
                     if (entry.Key.Contains("accesstoken", StringComparison.InvariantCultureIgnoreCase))
                         accessTokens.Add(entry.Key, entry.Value);
-                    
+
                 }
 
-                foreach (var entry in local) {
+                foreach (var entry in local)
+                {
                     if (entry.Key.Contains("accesstoken", StringComparison.InvariantCultureIgnoreCase))
                         accessTokens.Add(entry.Key, entry.Value);
                 }
 
-                foreach (var entry in accessTokens) {
+                foreach (var entry in accessTokens)
+                {
                     if (entry.Key.Contains(identifierKey, StringComparison.InvariantCultureIgnoreCase))
                         return entry.Value.Value<string>();
                 }
@@ -91,10 +92,10 @@ namespace HitachiQA.Source.HttpClients.Authorization
                 return accessTokens.Properties().First().Value.Value<string>();
             }
             );
-            
+
 
             return System.Text.Json.JsonSerializer.Deserialize<BrowserCredential>((string)accessToken)
-                ?? throw new NotFoundException("Attempted to get bearer token for 2 minutes but was unsuccessful"); 
+                ?? throw new NotFoundException("Attempted to get bearer token for 2 minutes but was unsuccessful");
         }
 
         public override async Task InvokeBrowserAsync(string profile)
@@ -111,7 +112,7 @@ namespace HitachiQA.Source.HttpClients.Authorization
         public async override Task NavigateToHostIfNeededAsync()
         {
             var host = Config.GetVariable("HOST");
-            if(!_playwrightHook.PlaywrightPage.Url.Contains(host))
+            if (!_playwrightHook.PlaywrightPage.Url.Contains(host))
             {
                 await _playwrightHook.PlaywrightPage?.GotoAsync(host);
             }

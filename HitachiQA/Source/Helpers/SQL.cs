@@ -1,13 +1,13 @@
-﻿using System.Text;
-using System.Data.SqlClient;
+﻿using Microsoft.Extensions.Configuration;
 using System.Collections;
-using Microsoft.Extensions.Configuration;
+using System.Data.SqlClient;
+using System.Text;
 
 namespace HitachiQA.Helpers
 {
     public class SQL
-    { 
-    
+    {
+
         private string ConnectionString { get; init; }
 
         public IConfiguration Config { get; init; }

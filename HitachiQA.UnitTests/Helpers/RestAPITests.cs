@@ -1,9 +1,7 @@
-﻿using System.Net.Http.Headers;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using HitachiQA.Helpers;
+using System.Net.Http.Headers;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
-using HitachiQA.Helpers;
 
 namespace HitachiQA.UnitTests.Helpers
 {

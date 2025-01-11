@@ -1,11 +1,4 @@
-﻿using Azure.Core;
-using Azure.Messaging.ServiceBus;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Azure.Messaging.ServiceBus;
 
 namespace HitachiQA.Helpers
 {
@@ -18,7 +11,7 @@ namespace HitachiQA.Helpers
 
         }
 
-        
+
 
         public void SendMessage(object message, string queueName, string contentType = "application/json")
         {

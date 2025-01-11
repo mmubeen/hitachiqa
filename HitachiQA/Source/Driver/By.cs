@@ -1,11 +1,4 @@
-﻿using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using seleniumBy = OpenQA.Selenium.By;
+﻿using seleniumBy = OpenQA.Selenium.By;
 namespace HitachiQA.Driver
 {
     public class By

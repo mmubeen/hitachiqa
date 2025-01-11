@@ -1,15 +1,13 @@
-﻿using BoDi;
-using HitachiQA.Helpers;
+﻿using HitachiQA.Helpers;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
-using TechTalk.SpecFlow;
+using Reqnroll.BoDi;
 using WebDriverManager.DriverConfigs.Impl;
 using WebDriverManager.Helpers;
 using NetDriverManager = WebDriverManager.DriverManager;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HitachiQA.Hooks.Browsers
 
@@ -21,7 +19,7 @@ namespace HitachiQA.Hooks.Browsers
 
         public BrowserIndicator BrowserIndicator = new BrowserIndicator();
         public IWebDriver? WebDriver { get; set; }
-        private TestContext TestContext { get;  }
+        private TestContext TestContext { get; }
         public WebDriverHook(IObjectContainer oc,
             FeatureContext fc,
             IConfiguration config,
@@ -41,14 +39,14 @@ namespace HitachiQA.Hooks.Browsers
             {
                 BrowserIndicator.IsBrowserFeature = true;
 
-                IConfiguration config= oc.Resolve<IConfiguration>();
+                IConfiguration config = oc.Resolve<IConfiguration>();
                 var browser = config.GetVariable("BROWSER");
                 //if no selenium tag
                 //and either driver is playwright or feature tag contains playwright
                 //           
                 if (ShouldUseSelenium(oc))
                 {
-                   
+
                     var driver = InvokeNewSeleniumDriver(browser);
                     WebDriver.NullGuard();
                     oc.RegisterInstanceAs(driver);
@@ -69,7 +67,7 @@ namespace HitachiQA.Hooks.Browsers
             return !featureTags.Contains("Playwright", ignorecase) && (framework?.ToUpper() != "PLAYWRIGHT" || featureTags.Contains("Selenium", ignorecase));
         }
 
-        [AfterScenario(Order =9999)]
+        [AfterScenario(Order = 9999)]
         public static void driverCleanup(ObjectContainer oc)
         {
             oc.Resolve<WebDriverHook>().Dispose();
@@ -82,7 +80,7 @@ namespace HitachiQA.Hooks.Browsers
         public IWebDriver InvokeNewSeleniumDriver(string browser)
         {
             IWebDriver driver;
-            List<string> optionsList= new List<string>();
+            List<string> optionsList = new List<string>();
             String? options = Main.Configuration.GetVariable("OPTIONS", true);
 
             if (options != null)
@@ -93,7 +91,7 @@ namespace HitachiQA.Hooks.Browsers
                 foreach (String str in listArray)
                 {
                     str.Trim();
-                    if(!string.IsNullOrEmpty(str))
+                    if (!string.IsNullOrEmpty(str))
                         optionsList.Add(str);
                 }
             }
@@ -122,7 +120,7 @@ namespace HitachiQA.Hooks.Browsers
 
                 case "firefox":
                     _ = new NetDriverManager().SetUpDriver(new FirefoxConfig(), VersionResolveStrategy.Latest);
-                    if(FirefoxOptions == null)
+                    if (FirefoxOptions == null)
                     {
                         FirefoxOptions = new FirefoxOptions();
                         FirefoxOptions.AddArgument("--no-sandbox");
@@ -136,7 +134,7 @@ namespace HitachiQA.Hooks.Browsers
 
                 case "edge":
                     _ = new NetDriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.Latest);
-                    if(EdgeOptions==null)
+                    if (EdgeOptions == null)
                     {
                         EdgeOptions = new EdgeOptions();
                         EdgeOptions.AddArgument("--no-sandbox");
@@ -148,7 +146,7 @@ namespace HitachiQA.Hooks.Browsers
                     break;
 
                 default:
-                    if(string.IsNullOrWhiteSpace(browser))
+                    if (string.IsNullOrWhiteSpace(browser))
                     {
                         throw new InvalidOperationException("BROWSER variable was not set, most likely forgot to select a .runsettings file. Refer to README for more info");
                     }
@@ -160,7 +158,7 @@ namespace HitachiQA.Hooks.Browsers
             {
                 driver.Navigate().GoToUrl(Main.Configuration.GetVariable("HOST"));
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception($"Failed navigating to Host {Main.Configuration.GetVariable("HOST", true)}", ex);
             }
@@ -171,17 +169,17 @@ namespace HitachiQA.Hooks.Browsers
 
         public void Dispose()
         {
-            if(BrowserIndicator.IsBrowserFeature)
+            if (BrowserIndicator.IsBrowserFeature)
             {
-                var currentLogSev = Severity.parseLevel(Configuration.GetSection("Logging").GetSection("LogLevel")["Default"]??"Debug");
+                var currentLogSev = Severity.parseLevel(Configuration.GetSection("Logging").GetSection("LogLevel")["Default"] ?? "Debug");
                 if (currentLogSev.Level == Severity.DEBUG.Level)
                 {
                     return;
                 }
-                try {WebDriver?.Dispose(); }catch(Exception) { }
+                try { WebDriver?.Dispose(); } catch (Exception) { }
             }
         }
     }
 
- 
+
 }

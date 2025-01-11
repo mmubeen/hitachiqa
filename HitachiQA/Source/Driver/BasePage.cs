@@ -1,12 +1,5 @@
-﻿using BoDi;
-using HitachiQA.Driver;
-using HitachiQA.Hooks;
-using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenQA.Selenium;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Driver
 {
@@ -29,7 +22,7 @@ namespace HitachiQA.Driver
         }
         public Element Element(By locator)
         {
-            if(IFrame!=null && locator.IFrameLocator==null)
+            if (IFrame != null && locator.IFrameLocator == null)
             {
                 locator.IFrameLocator = IFrame;
             }
@@ -37,12 +30,14 @@ namespace HitachiQA.Driver
         }
         public Element Element(string[] xpaths)
         {
-            return Element(xpaths.Select(x=>By.XPath(x)).ToArray());
+            return Element(xpaths.Select(x => By.XPath(x)).ToArray());
         }
         public Element Element(By[] locators)
         {
-            if (IFrame != null && locators.First().IFrameLocator == null) {
-                foreach(var locator in locators) {
+            if (IFrame != null && locators.First().IFrameLocator == null)
+            {
+                foreach (var locator in locators)
+                {
                     locator.IFrameLocator = IFrame;
                 }
             }
@@ -144,14 +139,14 @@ namespace HitachiQA.Driver
         {
             "//*[@id='jd-page-{input}']"
         };
-        public Element GetField(string displayText_or_logicalName) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Distinct().Select(it=> it.Replace("{input}", displayText_or_logicalName)))}) /self::*[not(contains(@style,'display: none'))]");
+        public Element GetField(string displayText_or_logicalName) => Element(@$"({string.Join(" | ", KnownFieldXPaths.Distinct().Select(it => it.Replace("{input}", displayText_or_logicalName)))}) /self::*[not(contains(@style,'display: none'))]");
 
         public Element GetField(string parentDisplayText_or_logicalName, string displayText_or_logicalName)
         {
             List<string> finalXPaths = new List<string>();
             var xpaths = KnownFieldXPaths.Select(it => it.Replace("{input}", displayText_or_logicalName));
 
-            foreach(var childXPath in xpaths)
+            foreach (var childXPath in xpaths)
             {
                 var possibleParents = KnownParents.Select(it => it.Replace("{input}", parentDisplayText_or_logicalName));
                 finalXPaths.AddRange(possibleParents.Select(parentXPath => parentXPath + childXPath));
@@ -161,11 +156,11 @@ namespace HitachiQA.Driver
         }
         public Element GetField(By parent, string fieldDisplayText_or_logicalName)
         {
-           
+
             List<string> finalXPaths = new List<string>();
             var xpaths = KnownFieldXPaths.Select(it => it.Replace("{input}", fieldDisplayText_or_logicalName));
 
-            foreach(var childXPath in xpaths)
+            foreach (var childXPath in xpaths)
             {
                 finalXPaths.Add(parent.Locator.Criteria + childXPath);
             }

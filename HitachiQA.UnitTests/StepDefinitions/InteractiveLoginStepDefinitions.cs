@@ -1,12 +1,11 @@
-using BoDi;
 using HitachiQA.Hooks.Browsers;
-using HitachiQA.Source.HttpClients.Authorization;
+using HitachiQA.Source.Enums;
+using HitachiQA.Source.Hooks.HttpClientExtras;
 using HitachiQA.Source.HttpClients;
+using HitachiQA.Source.HttpClients.Authorization;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
-using HitachiQA.Source.Enums;
-using HitachiQA.Source.Hooks.HttpClientExtras;
 
 namespace HitachiQA.UnitTests.StepDefinitions;
 
@@ -42,7 +41,7 @@ public class InteractiveLoginStepDefinitions
                 { "AUTH_INTERACTIVE_EMAIL_IDENTIFIER", "@hitachisolutions.com"},
                 { "AUTH_INTERACTIVE_PROFILE_NAME", "Default"},
                 { "ENABLE_INTERACTIVE_AUTH", "true" }
-                
+
             });
 
         var config = configBuilder.Build();

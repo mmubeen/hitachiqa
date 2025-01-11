@@ -1,22 +1,10 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using HitachiQA.Driver;
-using System.IO;
-using System.Threading.Tasks;
-using CsvHelper;
-using System.Globalization;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
-using System.Diagnostics.CodeAnalysis;
-using BoDi;
-using OpenQA.Selenium.DevTools;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
-using System.Runtime.CompilerServices;
-using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using OtpNet;
+using Reqnroll.BoDi;
+using System.Globalization;
 
 namespace HitachiQA.Helpers
 {
@@ -35,7 +23,7 @@ namespace HitachiQA.Helpers
             string vin;
             try
             {
-                vin = (string) await RestAPI.GETAsync("https://randomvin.com/getvin.php?type=real");
+                vin = (string)await RestAPI.GETAsync("https://randomvin.com/getvin.php?type=real");
                 if (string.IsNullOrWhiteSpace(vin))
                 {
                     return await GetRandomVIN();
@@ -48,7 +36,7 @@ namespace HitachiQA.Helpers
             }
         }
 
-       
+
 
         public static string ParseURL(string URL_OR_PATH, params (string key, string value)[] parameters)
         {
@@ -131,7 +119,7 @@ namespace HitachiQA.Helpers
             return ex;
         }
 
-        public static Dictionary<string, string> TableToDictionary(TechTalk.SpecFlow.Table table)
+        public static Dictionary<string, string> TableToDictionary(Reqnroll.Table table)
         {
             var dictionary = new Dictionary<string, string>();
             foreach (var row in table.Rows)
@@ -161,7 +149,7 @@ namespace HitachiQA.Helpers
                 }
                 return tasks.Select(it => it.Result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Debug($"File-> {filePath}");
                 throw ex;
@@ -172,7 +160,7 @@ namespace HitachiQA.Helpers
         {
             List<string> header = new List<String>();
 
-            if( !File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 HandleFailure($"File {filePath} does not exist");
             }
@@ -206,18 +194,18 @@ namespace HitachiQA.Helpers
                     while (csvReader.Read())
                     {
                         Dictionary<String, String> row = new Dictionary<String, String>();
-                        for(int col =0; col < header.Count; col++)
+                        for (int col = 0; col < header.Count; col++)
                         {
                             row.Add(header.ElementAt(col), csvReader.GetField(col));
                         }
-                        result.Add( row);
+                        result.Add(row);
                     }
                 }
             }
             return result;
         }
 
-        private static async Task<Dictionary<String, String>> parseRow(WorkbookPart workbookPart, string [] header, Row row, string filePath)
+        private static async Task<Dictionary<String, String>> parseRow(WorkbookPart workbookPart, string[] header, Row row, string filePath)
         {
             var cells = row.Elements<Cell>().ToArray<Cell>();
 
@@ -227,9 +215,9 @@ namespace HitachiQA.Helpers
                 Cell cell;
                 try
                 {
-                     cell= cells[i];
+                    cell = cells[i];
                 }
-                catch(IndexOutOfRangeException)
+                catch (IndexOutOfRangeException)
                 {
                     cell = new Cell();
                 }
@@ -237,7 +225,7 @@ namespace HitachiQA.Helpers
                 {
                     dict.Add(header[i], extractCellText(workbookPart, cell));
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     Log.Debug($"File-> {filePath}");
                     throw;
@@ -265,7 +253,7 @@ namespace HitachiQA.Helpers
             {
                 return int.MaxValue;
             }
-            else if(int.TryParse(value, out int intValue))
+            else if (int.TryParse(value, out int intValue))
             {
                 return intValue;
             }
@@ -291,14 +279,14 @@ namespace HitachiQA.Helpers
         {
             //not a great implementation but it works
 
-            char[] chars =  "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
             Random r = new Random();
 
             string licenseNo = "";
-            
-            if(state.ToUpper() == "IL")
+
+            if (state.ToUpper() == "IL")
             {
-                licenseNo = ""+chars[r.Next(chars.Length)];
+                licenseNo = "" + chars[r.Next(chars.Length)];
             }
 
             licenseNo += (r.Next(100, 1000).ToString()) + (r.Next(1000, 10000).ToString()) + (r.Next(1000, 10000).ToString());
@@ -306,7 +294,7 @@ namespace HitachiQA.Helpers
             return licenseNo;
         }
 
-        public static string getValidCreditCardNumber(string cardType="Visa")
+        public static string getValidCreditCardNumber(string cardType = "Visa")
         {
             switch (cardType)
             {
@@ -318,7 +306,7 @@ namespace HitachiQA.Helpers
 
                 case "JCB":
                     return "3088000000000017";
-           
+
                 case "Visa":
                     return "4111111111111111";
 
@@ -345,12 +333,12 @@ namespace HitachiQA.Helpers
             }
         }
 
-        public static int GetRandomInteger(int max=100)
+        public static int GetRandomInteger(int max = 100)
         {
-           return new Random().Next(max);  
+            return new Random().Next(max);
         }
-      
-       
+
+
         public static string EncryptString(string plainText)
         {
             return Cryptography.Encrypt(plainText);
@@ -366,7 +354,7 @@ namespace HitachiQA.Helpers
         /// </summary>
         public static decimal CalculateSimilarityPercent(string s, string t)
         {
-            if(string.IsNullOrWhiteSpace(s) || string.IsNullOrWhiteSpace(t)) return 0;
+            if (string.IsNullOrWhiteSpace(s) || string.IsNullOrWhiteSpace(t)) return 0;
             if (s == t) return 1;
 
             int n = s.Length;
@@ -376,11 +364,11 @@ namespace HitachiQA.Helpers
             // Step 1
             if (n == 0)
                 return m;
-            
+
 
             if (m == 0)
                 return n;
-            
+
             // Step 2
             for (int i = 0; i <= n; d[i, 0] = i++)
             {
@@ -405,7 +393,7 @@ namespace HitachiQA.Helpers
                 }
             }
             // Step 7
-            var distance =  d[n, m];
+            var distance = d[n, m];
             return (1.0M - ((decimal)distance / (decimal)Math.Max(s.Length, t.Length)));
 
         }

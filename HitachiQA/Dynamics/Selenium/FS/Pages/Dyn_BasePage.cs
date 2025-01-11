@@ -1,14 +1,6 @@
-﻿using BoDi;
-using DocumentFormat.OpenXml.Bibliography;
-using HitachiQA.Driver;
-using Newtonsoft.Json.Linq;
+﻿using HitachiQA.Driver;
 using Polly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+using Reqnroll.BoDi;
 namespace HitachiQA.Dynamics.FS.Pages
 {
     public class Dyn_BasePage : BasePage
@@ -27,7 +19,7 @@ namespace HitachiQA.Dynamics.FS.Pages
         {
             var areaSwitcher = "//*[@id='areaSwitcherId']";
             var areaSwitcherTitle = $"{areaSwitcher}/span[text()]";
-            if(Element(areaSwitcherTitle).Text!=area)
+            if (Element(areaSwitcherTitle).Text != area)
             {
                 Element(areaSwitcher).Click();
                 GetFlyoutElement(area).Click();
@@ -39,10 +31,10 @@ namespace HitachiQA.Dynamics.FS.Pages
 
         public Element CommandBarShowMoreOptionsButton => Element($"{COMMAND_BAR_XPATH} //button[contains(@id, 'OverflowButton')]/..");
 
-        public Element ToastNotificationCloseButton=> Element($"//*[@data-pa-dialog-popup]//*[@alt='close']");
+        public Element ToastNotificationCloseButton => Element($"//*[@data-pa-dialog-popup]//*[@alt='close']");
         public void ClickCommandBarButton(string displayText)
         {
-            if(ToastNotificationCloseButton.ElementExists())
+            if (ToastNotificationCloseButton.ElementExists())
             {
                 ToastNotificationCloseButton.Click();
             }
@@ -55,29 +47,30 @@ namespace HitachiQA.Dynamics.FS.Pages
                 TimeSpan.FromSeconds(3),
                 }
             );
-            
+
             this.Element(COMMAND_BAR_XPATH).assertElementIsPresent();
             var targetCommand = GetCommandBarButton(displayText);
-            
-            retry.Execute(()=>
+
+            retry.Execute(() =>
             {
-                if(targetCommand.ElementExists())
+                if (targetCommand.ElementExists())
                     return true;
 
                 showMore.Click();
-                if(targetCommand.ElementExists())
+                if (targetCommand.ElementExists())
                     return true;
 
                 showMore.Click();
                 return false;
             });
-            
+
             targetCommand.Click();
 
         }
 
         public Element GetEntityTab(string tabDisplayName) => Element($"//ul[contains(@id, 'tablist')] //li[*//text()='{tabDisplayName}']");
-        public void NavigateToEntityTab(string tabDisplayName){
+        public void NavigateToEntityTab(string tabDisplayName)
+        {
             var retry = Policy
             .HandleResult<bool>(false)
             .WaitAndRetry(new[]
@@ -89,12 +82,13 @@ namespace HitachiQA.Dynamics.FS.Pages
             this.Element("//ul[@role='tablist']//li[text()]").assertElementIsPresent();
             var targetTab = this.Element($"(//ul[@role='tablist'] | //*[@id='__flyoutRootNode']  ) //*[self::div[@role='menuitem' and .//*[text()='{tabDisplayName}']] or self::li[text()='{tabDisplayName}']]");
 
-            retry.Execute(()=>{
-                if(targetTab.ElementExists())
+            retry.Execute(() =>
+            {
+                if (targetTab.ElementExists())
                     return true;
 
                 this.Element("//ul[@role='tablist']//*[@data-id='more_button']").Click();
-                if(targetTab.ElementExists())
+                if (targetTab.ElementExists())
                     return true;
 
                 this.Element("//ul[@role='tablist']//*[@data-id='more_button']").Click();
@@ -104,7 +98,7 @@ namespace HitachiQA.Dynamics.FS.Pages
             targetTab.Click();
         }
 
-        public Element GetFlyoutElement(string text) => GetField(By.XPath($"//*[@id='__flyoutRootNode']"), text);        
+        public Element GetFlyoutElement(string text) => GetField(By.XPath($"//*[@id='__flyoutRootNode']"), text);
         public Element AppBreadCrumb => Element("//*[@data-id=\"appBreadCrumbText\"]/..");
 
         public Element Grid => Element("( //div[contains(@id, 'entity_control-pcf_grid_control_container')] //*[@data-id='grid-container']  | //*[@data-id='data-set-body-container' and //*[@class='wj-cells'] ] )");
@@ -117,11 +111,12 @@ namespace HitachiQA.Dynamics.FS.Pages
         {
             this.GetGrid(gridName_or_logicalName).assertElementIsPresent();
 
-            if(this.GetGridCommandBarButton(gridName_or_logicalName, displayName).TryClick())
+            if (this.GetGridCommandBarButton(gridName_or_logicalName, displayName).TryClick())
             {
                 return;
             }
-            else{
+            else
+            {
                 this.GetGridCommandBarButton(gridName_or_logicalName, "OverflowButton").Click();
                 this.GetFlyoutElement(displayName).Click();
                 return;
@@ -133,16 +128,16 @@ namespace HitachiQA.Dynamics.FS.Pages
             GetGrid(gridName_or_logicalName).assertElementIsPresent();
             if (GetGridCommandBarButton(gridName_or_logicalName, displayName).ElementExists())
                 return true;
-            
+
             GetGridCommandBarButton(gridName_or_logicalName, "OverflowButton").Click();
             var result = GetFlyoutElement(displayName).ElementExists();
             GetGridCommandBarButton(gridName_or_logicalName, "OverflowButton").Click();
             return result;
         }
-        public Element GetRelatedGridCommandBarButton(string displayName)=> this.GetField(By.XPath("//*[contains(@data-lp-id, 'commandbar-SubGridAssociated')]"), displayName);
-        public Dyn_EffectiveGrid GetEffectiveGrid(string gridName_or_LogicalName)=> new Dyn_EffectiveGrid(ObjectContainer, $"WebResource_{gridName_or_LogicalName}");
+        public Element GetRelatedGridCommandBarButton(string displayName) => this.GetField(By.XPath("//*[contains(@data-lp-id, 'commandbar-SubGridAssociated')]"), displayName);
+        public Dyn_EffectiveGrid GetEffectiveGrid(string gridName_or_LogicalName) => new Dyn_EffectiveGrid(ObjectContainer, $"WebResource_{gridName_or_LogicalName}");
 
-        public Dyn_QuickCreateTab QuickCreateTab =>  new Dyn_QuickCreateTab(ObjectContainer);
+        public Dyn_QuickCreateTab QuickCreateTab => new Dyn_QuickCreateTab(ObjectContainer);
         public void SaveForm()
         {
             this.ClickCommandBarButton("Save");
@@ -157,16 +152,16 @@ namespace HitachiQA.Dynamics.FS.Pages
         public void CreateLookupFieldRecord(string DisplayText_Or_LogicalName, Table inputs)
         {
             var field = this.GetField(DisplayText_Or_LogicalName);
-            this.Element(field.locators.Select(l=> l.Locator.Criteria+ "//*[@class='fa fa-search' or self::button[contains(@aria-label, 'Lookup')]]").ToArray()).Click();
+            this.Element(field.locators.Select(l => l.Locator.Criteria + "//*[@class='fa fa-search' or self::button[contains(@aria-label, 'Lookup')]]").ToArray()).Click();
             Thread.Sleep(500);
             this.Element("//button[contains(@id,'addNewBtn')]").TryClick();
-            foreach(var row in inputs.Rows)
+            foreach (var row in inputs.Rows)
             {
                 this.QuickCreateTab.GetField(row["FieldName"]).SetFieldValue(row["Value"]);
             }
         }
 
-         public Element GridViewSelector => Element($"//*[contains(@id,'ViewSelector') and contains(@id,'button')] | //button[contains(@id,'ViewSelector')]");
+        public Element GridViewSelector => Element($"//*[contains(@id,'ViewSelector') and contains(@id,'button')] | //button[contains(@id,'ViewSelector')]");
 
         public Element GridViewSelection(string displayText) => Element($"//*[contains(@id,'ViewSelector')]//*[@aria-label='{displayText}'] | //button[.//*[text()='{displayText}']]");
 

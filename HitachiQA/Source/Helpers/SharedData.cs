@@ -1,10 +1,4 @@
-﻿using BoDi;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+﻿using Reqnroll.BoDi;
 
 namespace HitachiQA.Helpers
 {
@@ -21,23 +15,23 @@ namespace HitachiQA.Helpers
 
         }
 
-        public void SetValue(Table specflowTable)
+        public void SetValue(Table table)
         {
             string parent = "ParentName";
             string child = "FieldName";
             string value = "FieldValue";
 
-            foreach (var row in specflowTable.Rows)
+            foreach (var row in table.Rows)
             {
                 this.SetValue(row[parent], row[child], row[value]);
             }
         }
-        public void SetValue(string parent, Table specflowTable)
+        public void SetValue(string parent, Table table)
         {
             string child = "FieldName";
             string value = "FieldValue";
 
-            foreach (var row in specflowTable.Rows)
+            foreach (var row in table.Rows)
             {
                 this.SetValue(parent, row[child], row[value]);
             }

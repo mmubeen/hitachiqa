@@ -1,13 +1,4 @@
-﻿using HitachiQA.Driver;
-using HitachiQA.Helpers;
-using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HitachiQA.Driver
+﻿namespace HitachiQA.Driver
 {
     public interface IUserActions
     {
@@ -57,6 +48,6 @@ namespace HitachiQA.Driver
         public string Title { get; }
 
 
-        
+
     }
 }

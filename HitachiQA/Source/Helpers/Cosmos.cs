@@ -29,7 +29,7 @@ namespace HitachiQA.Helpers
             return result;
         }
 
-        public void setProperty(string containerA, string identifierQuery,  string key, dynamic value)
+        public void setProperty(string containerA, string identifierQuery, string key, dynamic value)
         {
             var database = this.GetDatabase(DatabaseName);
             var container = database.GetContainer(containerA);
@@ -38,9 +38,9 @@ namespace HitachiQA.Helpers
 
             List<dynamic> recordsToUpdate = GetQuery(containerA, identifierQuery).Result;
 
-            foreach(var record in recordsToUpdate)
+            foreach (var record in recordsToUpdate)
             {
-               record[key] = value;
+                record[key] = value;
                 _ = container.ReplaceItemAsync(record, (string)record.id).Result;
             }
         }

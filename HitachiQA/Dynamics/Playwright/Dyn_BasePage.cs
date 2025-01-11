@@ -1,11 +1,11 @@
-﻿using BoDi;
-using HitachiQA.Playwright;
+﻿using HitachiQA.Playwright;
 using Microsoft.Playwright;
 using Polly;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Dynamics.Playwright
 {
-    public class Dyn_BasePage:BasePage
+    public class Dyn_BasePage : BasePage
     {
         public Dyn_BasePage(IObjectContainer oc) : base(oc)
         {
@@ -59,8 +59,9 @@ namespace HitachiQA.Dynamics.Playwright
 
     public class MicrosoftSignInPage : BasePage
     {
-        public MicrosoftSignInPage(IObjectContainer oc) : base(oc) {
-            
+        public MicrosoftSignInPage(IObjectContainer oc) : base(oc)
+        {
+
         }
         public ILocator UsernameTextField => Locator("xpath=//input[@name='loginfmt']");
         public ILocator PasswordTextField => Locator("xpath=//input[@name='passwd']");

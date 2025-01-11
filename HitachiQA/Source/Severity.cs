@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace HitachiQA
+﻿namespace HitachiQA
 {
     public class Severity
     {
@@ -22,7 +18,7 @@ namespace HitachiQA
           ERROR = new Severity(INT_ERROR),
           CRITICAL = new Severity(INT_CRITICAL),
           DEFAULT = INFO;
-       
+
 
         public static readonly Dictionary<int, string> SEVERITIES = new Dictionary<int, string>()
         {
@@ -36,13 +32,13 @@ namespace HitachiQA
 
         public static Severity parseLevel(String level)
         {
-            if(String.IsNullOrWhiteSpace(level))
+            if (String.IsNullOrWhiteSpace(level))
             {
                 return DEFAULT;
             }
             try
             {
-                if(int.TryParse(level, out int int_level))
+                if (int.TryParse(level, out int int_level))
                 {
                     return new Severity(int_level);
                 }
@@ -58,7 +54,7 @@ namespace HitachiQA
         public string Name { get { return SEVERITIES[Level]; } }
         public Severity(int level)
         {
-            if (level>=0 || level<=5)
+            if (level >= 0 || level <= 5)
             {
                 this.Level = level;
             }

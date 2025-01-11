@@ -1,11 +1,5 @@
-﻿using BoDi;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+﻿using Microsoft.Extensions.Configuration;
+using Reqnroll.BoDi;
 
 namespace HitachiQA.Hooks
 {
@@ -19,7 +13,7 @@ namespace HitachiQA.Hooks
             ObjectContainer = ojectContainer;
             FeatureContext = fc;
             Configuration = config;
-            
+
         }
     }
 }

@@ -1,13 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
-using HitachiQA.Helpers;
-using Microsoft.Azure.Cosmos.Linq;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using HitachiQA.Helpers;
 
 namespace HitachiQA
 {
@@ -56,13 +47,13 @@ namespace HitachiQA
         {
             try
             {
-                if(text==null)
+                if (text == null)
                 {
                     return "NULL";
                 }
                 return text.ToObject<string>();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return text?.ToString() ?? "NULL";
             }
@@ -70,13 +61,13 @@ namespace HitachiQA
 
         public static void Write(Severity severity, string text, params (string key, dynamic value)[] parameters)
         {
-            foreach(var parameter in parameters)
+            foreach (var parameter in parameters)
             {
                 text = text.Replace(parameter.key, parameter.value);
             }
 
             Log.Write(severity, (object)text);
-        
+
         }
 
 

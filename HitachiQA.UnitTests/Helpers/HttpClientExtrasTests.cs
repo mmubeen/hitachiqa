@@ -2,7 +2,6 @@
 using HitachiQA.Source.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Telerik.JustMock;
-using Telerik.JustMock.Helpers;
 
 namespace HitachiQA.UnitTests.Helpers
 {

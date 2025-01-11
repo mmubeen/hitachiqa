@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HitachiQA.UnitTests.Data.CSV_EXCEL_PARSING
+﻿namespace HitachiQA.UnitTests.Data.CSV_EXCEL_PARSING
 {
     public static class InputData
     {
