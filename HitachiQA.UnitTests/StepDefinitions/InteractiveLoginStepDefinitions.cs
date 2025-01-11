@@ -33,7 +33,7 @@ public class InteractiveLoginStepDefinitions
     public void GivenConfigurationObjectIsCreatedFor(FrameworkEnum framework)
     {
         var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+        configBuilder.AddInMemoryCollection(new Dictionary<string, string>
             {
                 { "HOST", "https://tfs-hisol-crm.visualstudio.com/" },
                 { "FRAMEWORK", framework.ToString() },

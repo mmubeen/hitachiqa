@@ -6,7 +6,7 @@
         public string LOADING_SCREEN_XPATH { get; }
 
         public int ProcessWaitParam(int? wait) => (int)(wait == null ? DEFAULT_WAIT_SECONDS : wait);
-        public void waitForPageLoad(By? iframe = null);
+        public void waitForPageLoad(By iframe = null);
         public bool WaitForTransaction(int? wait_Seconds = null);
         public void Navigate(string URL_OR_PATH);
         public string GetCurrentURL();
@@ -22,13 +22,13 @@
         public bool GetIsDisabled(By elementLocator);
         public bool GetIsDisplayed(By elementLocator);
         public string GetAttribute(By ElementLocator, string attributeName);
-        public void Hover(By by, int? wait_Seconds = null, bool optional = false);
+        public void Hover(By by, int wait_Seconds = 0, bool optional = false);
         public void ScrollToBottom();
         public void ScrollToTop();
         public IEnumerable<Dictionary<string, string>> parseUITable(By datatable);
-        public Dictionary<int, string?> GetUITableHeaders(By table);
-        public Dictionary<int, string?> GetDynamicsGridHeader(By by);
-        public List<Dictionary<string, string?>> GetDynamicsGridItems(By by);
+        public Dictionary<int, string> GetUITableHeaders(By table);
+        public Dictionary<int, string> GetDynamicsGridHeader(By by);
+        public List<Dictionary<string, string>> GetDynamicsGridItems(By by);
         public void OpenDynamicsGridRecord(By by, string columnName, string value);
         public void SelectDynamicsGridRecord(By by, string columnName, string value);
         public void SelectAllDynamicsGridRecords(By by);
@@ -38,7 +38,7 @@
         public List<string> GetFieldOptions(By by);
         public void OpenFieldValue(By by);
         public bool ElementExists(By locator);
-        public bool ElementExists(By locator, out OpenQA.Selenium.IWebElement? element);
+        public bool ElementExists(By locator, out OpenQA.Selenium.IWebElement element);
         public bool TryClick(By locator, double waitSeconds = 0);
         public void SendKeys(string key);
         public void UploadFile(By dropZone, string filePath);

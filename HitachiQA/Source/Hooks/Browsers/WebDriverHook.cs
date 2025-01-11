@@ -15,10 +15,10 @@ namespace HitachiQA.Hooks.Browsers
     [Binding]
     public class WebDriverHook : HookBase, IDisposable
     {
-        public static List<String>? optionsList;
+        public static List<string> optionsList;
 
         public BrowserIndicator BrowserIndicator = new BrowserIndicator();
-        public IWebDriver? WebDriver { get; set; }
+        public IWebDriver WebDriver { get; set; }
         private TestContext TestContext { get; }
         public WebDriverHook(IObjectContainer oc,
             FeatureContext fc,
@@ -50,7 +50,7 @@ namespace HitachiQA.Hooks.Browsers
                     var driver = InvokeNewSeleniumDriver(browser);
                     WebDriver.NullGuard();
                     oc.RegisterInstanceAs(driver);
-                    oc.RegisterInstanceAs(new ScreenShot(driver, TestContext));
+                    oc.RegisterInstanceAs(new ScreenShot(FT, SC, driver, TestContext));
                 }
 
 
@@ -73,22 +73,22 @@ namespace HitachiQA.Hooks.Browsers
             oc.Resolve<WebDriverHook>().Dispose();
         }
 
-        public static ChromeOptions? ChromeOptions;
-        public static FirefoxOptions? FirefoxOptions;
-        public static EdgeOptions? EdgeOptions;
+        public static ChromeOptions ChromeOptions;
+        public static FirefoxOptions FirefoxOptions;
+        public static EdgeOptions EdgeOptions;
 
         public IWebDriver InvokeNewSeleniumDriver(string browser)
         {
             IWebDriver driver;
             List<string> optionsList = new List<string>();
-            String? options = Main.Configuration.GetVariable("OPTIONS", true);
+            string options = Main.Configuration.GetVariable("OPTIONS", true);
 
             if (options != null)
             {
                 //separator is ;
-                String[] listArray = options.Split('\x3B');
+                string[] listArray = options.Split('\x3B');
 
-                foreach (String str in listArray)
+                foreach (string str in listArray)
                 {
                     str.Trim();
                     if (!string.IsNullOrEmpty(str))

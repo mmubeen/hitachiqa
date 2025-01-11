@@ -21,7 +21,7 @@ namespace HitachiQA.Hooks
             if (connectionString != null)
             {
                 connectionString = connectionString.Replace(";ProviderName=system.data.sqlclient", "");
-                var client = new SQL(config, connectionString);
+                var client = new SQL(connectionString);
                 oc.RegisterInstanceAs<SQL>(client);
                 Console.WriteLine("Loaded SQL Client");
             }

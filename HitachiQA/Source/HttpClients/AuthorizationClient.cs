@@ -11,7 +11,7 @@ namespace HitachiQA.Source.HttpClients
     {
         private readonly SemaphoreSlim _semaphore = new(1, 1);
 
-        private InteractiveAuthBase? _interactiveAuth = null;
+        private InteractiveAuthBase _interactiveAuth = null;
         private readonly InteractivePlaywrightAuth _playwrightInteractive;
         private readonly InteractiveWebdriverAuth _webDriverInteractive;
 
@@ -20,11 +20,11 @@ namespace HitachiQA.Source.HttpClients
 
         public HttpClient HttpClient { get; init; }
         public IConfiguration Config { get; init; }
-        public string? TenantId { get; init; }
-        public string? ClientId { get; init; }
-        public string? ClientSecret { get; init; }
-        public string? Username { get; init; }
-        public string? Password { get; init; }
+        public string TenantId { get; init; }
+        public string ClientId { get; init; }
+        public string ClientSecret { get; init; }
+        public string Username { get; init; }
+        public string Password { get; init; }
 
 
 

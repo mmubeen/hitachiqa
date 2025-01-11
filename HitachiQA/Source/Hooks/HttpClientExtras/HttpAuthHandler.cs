@@ -28,7 +28,7 @@ namespace HitachiQA.Source.Hooks.HttpClientExtras
             return response;
         }
 
-        public bool isAuthRequired(Uri? requestUri)
+        public bool isAuthRequired(Uri requestUri)
         {
             if (requestUri == null)
             {

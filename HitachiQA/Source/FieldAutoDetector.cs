@@ -69,7 +69,7 @@ namespace HitachiQA
         public static KeyValuePair<string, string> FindKnownXPathMatchingPair(HtmlDocument fieldDoc, ILocator locator)
         {
             KeyValuePair<string, string>? matchingPair = null;
-            HtmlNode? node = null;
+            HtmlNode node = null;
             foreach (var pair in KnownXPaths)
             {
                 var xpath = pair.Key;

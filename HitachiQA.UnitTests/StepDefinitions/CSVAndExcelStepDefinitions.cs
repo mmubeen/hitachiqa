@@ -6,17 +6,17 @@ namespace HitachiQA.UnitTests.StepDefinitions
     [Binding]
     public class CSVAndExcelStepDefinitions
     {
-        private List<Dictionary<String, String>>? csvResults;
-        private IEnumerable<Dictionary<String, String>>? excelResult;
-        private readonly HashSet<String> keys = new();
-        private readonly HashSet<String> values = new();
+        private List<Dictionary<string, string>> csvResults;
+        private IEnumerable<Dictionary<string, string>> excelResult;
+        private readonly HashSet<string> keys = new();
+        private readonly HashSet<string> values = new();
         public List<string> KVPairs { get; } = new();
 
         [Given(@"User parses the input CSV file from Data folder")]
         public void GivenUserParsesTheInputCSVFileFromDataFolder()
         {
             string filePath = "./Data/CSV_EXCEL_PARSING/addresses.csv";
-            csvResults = Functions.parseCSV(filePath);
+            csvResults = Functions.ParseCSV(filePath);
         }
 
         [When(@"User gets the data present in the CSV")]
@@ -28,8 +28,8 @@ namespace HitachiQA.UnitTests.StepDefinitions
             {
                 for (int i = 0; i < collection.Count; i++)
                 {
-                    Dictionary<String, String> dict = collection.ElementAt(i);
-                    foreach (KeyValuePair<String, String> kvp in dict)
+                    Dictionary<string, string> dict = collection.ElementAt(i);
+                    foreach (KeyValuePair<string, string> kvp in dict)
                     {
                         Console.WriteLine("Key: {0} Value: {1}", kvp.Key, kvp.Value); //Key Value Pairs for Parsed CSV data
                         KVPairs.Add($"Key: {kvp.Key}, Value: {kvp.Value}");
@@ -45,10 +45,10 @@ namespace HitachiQA.UnitTests.StepDefinitions
         }
 
         [Given(@"User parses the input Excel file from Data folder")]
-        public void GivenUserParsesTheInputExcelFileFromDataFolder()
+        public async Task GivenUserParsesTheInputExcelFileFromDataFolder()
         {
             string filePath = "./Data/CSV_EXCEL_PARSING/CountryCapitals.xlsx";
-            excelResult = Functions.parseExcel(filePath);
+            excelResult = await Functions.ParseExcelAsync(filePath);
         }
 
         [When(@"User gets the data present in the Excel sheet")]
@@ -59,8 +59,8 @@ namespace HitachiQA.UnitTests.StepDefinitions
             {
                 for (int i = 0; i < collection.Count(); i++)
                 {
-                    Dictionary<String, String> dict = collection.ElementAt(i);
-                    foreach (KeyValuePair<String, String> kvp in dict)
+                    Dictionary<string, string> dict = collection.ElementAt(i);
+                    foreach (KeyValuePair<string, string> kvp in dict)
                     {
                         Console.WriteLine("Key: {0}, Value: {1}", kvp.Key, kvp.Value);
                         keys.Add(kvp.Key);

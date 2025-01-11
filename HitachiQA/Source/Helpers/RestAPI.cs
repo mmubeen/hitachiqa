@@ -15,7 +15,7 @@ namespace HitachiQA.Helpers
 
 
         }
-        public async Task<object> SENDAsync(HttpMethod method, String URL, dynamic body, Dictionary<string, string> headers)
+        public async Task<object> SENDAsync(HttpMethod method, string URL, dynamic body, Dictionary<string, string> headers)
         {
             return await SENDAsync(method, URL, body, null, headers);
         }
@@ -65,7 +65,7 @@ namespace HitachiQA.Helpers
             }
             if (body != null)
             {
-                String bodyString = body is string ? body : ((JToken)JToken.FromObject(body)).ToString(Formatting.None);
+                string bodyString = body is string ? body : ((JToken)JToken.FromObject(body)).ToString(Formatting.None);
                 HttpContent content = new StringContent(bodyString, Encoding.UTF8, "application/json");
                 request.Content = content;
             }
@@ -73,19 +73,19 @@ namespace HitachiQA.Helpers
             return request;
         }
 
-        public async Task<object> GETAsync(String URL, Dictionary<string, string> headers) => await GETAsync(URL, null, headers);
+        public async Task<object> GETAsync(string URL, Dictionary<string, string> headers) => await GETAsync(URL, null, headers);
 
 
-        public async Task<object> GETAsync(String URL, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+        public async Task<object> GETAsync(string URL, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
             => await SENDAsync(HttpMethod.Get, URL, null, auth, headers);
 
-        public async Task<object> POSTAsync(String URL, dynamic body, Dictionary<string, string> headers)
+        public async Task<object> POSTAsync(string URL, dynamic body, Dictionary<string, string> headers)
             => await POSTAsync(URL, body, null, headers);
 
-        public async Task<object> POSTAsync(String URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+        public async Task<object> POSTAsync(string URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
             => await SENDAsync(HttpMethod.Post, URL, body, auth, headers);
 
-        public async Task<object> POSTAsync(String URL, AuthenticationHeaderValue auth, HttpContent content)
+        public async Task<object> POSTAsync(string URL, AuthenticationHeaderValue auth, HttpContent content)
         {
 
             var request = new HttpRequestMessage();
@@ -104,11 +104,11 @@ namespace HitachiQA.Helpers
         }
 
 
-        public async Task<object> PATCHAsync(String URL, dynamic body, Dictionary<string, string> headers)
+        public async Task<object> PATCHAsync(string URL, dynamic body, Dictionary<string, string> headers)
             => await PATCHAsync(URL, body, null, headers);
 
 
-        public async Task<object> PATCHAsync(String URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
+        public async Task<object> PATCHAsync(string URL, dynamic body, AuthenticationHeaderValue auth = null, Dictionary<string, string> headers = null)
             => await SENDAsync(HttpMethod.Patch, URL, body, auth, headers);
 
 

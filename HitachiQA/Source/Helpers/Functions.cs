@@ -129,46 +129,54 @@ namespace HitachiQA.Helpers
             return dictionary;
         }
 
-        public static IEnumerable<Dictionary<String, String>> parseExcel(String filePath, int headerRow = 0)
+        public static async Task<IEnumerable<Dictionary<String, String>>> ParseExcelAsync(String filePath, int headerRow = 0)
         {
             var tasks = new List<Task<Dictionary<String, String>>>();
             try
             {
-                using (SpreadsheetDocument doc = SpreadsheetDocument.Open(filePath, false))
+                using (var doc = SpreadsheetDocument.Open(filePath, false))
                 {
-                    WorkbookPart workbookPart = doc.WorkbookPart;
+                    WorkbookPart workbookPart = doc?.WorkbookPart;
+                    workbookPart.NullGuard();
                     WorksheetPart worksheetPart = workbookPart.WorksheetParts.First();
                     Row[] sheetData = worksheetPart.Worksheet.Elements<SheetData>().First().Elements<Row>().ToArray<Row>();
 
-                    var header = sheetData[0].Elements<Cell>().Select(cell => extractCellText(workbookPart, cell)).ToArray<string>();
+                    var header = sheetData[headerRow].Elements<Cell>().Select(cell => ExtractCellText(workbookPart, cell)).ToArray<string>();
 
-                    for (int rowIndex = 1; rowIndex < sheetData.Length; rowIndex++)
+                    for (var rowIndex = 1; rowIndex < sheetData.Length; rowIndex++)
                     {
-                        tasks.Add(parseRow(workbookPart, header, sheetData[rowIndex], filePath));
+                        tasks.Add(ParseRow(workbookPart, header, sheetData[rowIndex], filePath));
                     }
                 }
-                return tasks.Select(it => it.Result);
+
+                var results = await Task.WhenAll(tasks);
+                return results;
             }
-            catch (Exception ex)
+            catch (FileNotFoundException)
             {
-                Log.Debug($"File-> {filePath}");
-                throw ex;
+                Log.Error($"file not found parsing {filePath}");
+                throw;
+            }
+            catch (Exception)
+            {
+                Log.Error($"error parsing {filePath}");
+                throw;
             }
         }
 
-        public static List<Dictionary<String, String>> parseCSV(String filePath, int headerRow = 0)
+        public static List<Dictionary<String, String>> ParseCSV(String filePath, int headerRow = 0)
         {
-            List<string> header = new List<String>();
+            List<string> header = new();
 
             if (!File.Exists(filePath))
             {
                 HandleFailure($"File {filePath} does not exist");
             }
-            filePath = Path.IsPathFullyQualified(filePath) ? filePath : Path.GetFullPath(filePath);
+            filePath = System.IO.Path.IsPathFullyQualified(filePath) ? filePath : System.IO.Path.GetFullPath(filePath);
 
             Log.Debug(filePath);
 
-            List<Dictionary<String, String>> result = new List<Dictionary<String, String>>();
+            List<Dictionary<String, String>> result = new();
 
             using (TextReader reader = new StreamReader(filePath))
             {
@@ -176,65 +184,82 @@ namespace HitachiQA.Helpers
                 {
                     MissingFieldFound = null,
                 };
-                using (var csvReader = new CsvReader(reader, config))
+                using var csvReader = new CsvReader(reader, config);
+                // calculate number of columns
+                csvReader.Read();
+                var i = 0;
+
+                var columnName = csvReader.GetField(i);
+
+                while (!String.IsNullOrEmpty(columnName))
                 {
-                    // calculate number of columns
-                    csvReader.Read();
-                    int i = 0;
+                    header.Add(columnName);
+                    i++;
+                    columnName = csvReader.GetField(i);
+                }
 
-                    var columnName = csvReader.GetField(i);
-
-                    while (!String.IsNullOrEmpty(columnName))
+                while (csvReader.Read())
+                {
+                    Dictionary<String, String> row = new();
+                    for (var col = 0; col < header.Count; col++)
                     {
-                        header.Add(columnName);
-                        i++;
-                        columnName = csvReader.GetField(i);
+                        row.Add(header.ElementAt(col), csvReader.GetField(col));
                     }
-
-                    while (csvReader.Read())
-                    {
-                        Dictionary<String, String> row = new Dictionary<String, String>();
-                        for (int col = 0; col < header.Count; col++)
-                        {
-                            row.Add(header.ElementAt(col), csvReader.GetField(col));
-                        }
-                        result.Add(row);
-                    }
+                    result.Add(row);
                 }
             }
             return result;
         }
 
-        private static async Task<Dictionary<String, String>> parseRow(WorkbookPart workbookPart, string[] header, Row row, string filePath)
+        private static async Task<Dictionary<String, String>> ParseRow(WorkbookPart workbookPart, string[] header, Row row, string filePath)
         {
-            var cells = row.Elements<Cell>().ToArray<Cell>();
-
-            var dict = new Dictionary<String, String>();
-            for (int i = 0; i < header.Length; i++)
+            return await Task.Run<Dictionary<string, string>>(() =>
             {
-                Cell cell;
-                try
+                var cells = row.Elements<Cell>().ToArray<Cell>();
+
+                var dict = new Dictionary<String, String>();
+                for (var i = 0; i < header.Length; i++)
                 {
-                    cell = cells[i];
+                    Cell cell;
+                    try
+                    {
+
+                        cell = cells.Length > i ? cells[i] : new Cell();
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        cell = new Cell();
+                    }
+                    try
+                    {
+                        dict.Add(header[i], ExtractCellText(workbookPart, cell));
+                    }
+                    catch (Exception)
+                    {
+                        Log.Debug($"File-> {filePath}");
+                        throw;
+                    }
                 }
-                catch (IndexOutOfRangeException)
-                {
-                    cell = new Cell();
-                }
-                try
-                {
-                    dict.Add(header[i], extractCellText(workbookPart, cell));
-                }
-                catch (Exception)
-                {
-                    Log.Debug($"File-> {filePath}");
-                    throw;
-                }
+                return dict ?? throw new NullReferenceException();
             }
-            return dict;
+            );
         }
 
-        private static String extractCellText(WorkbookPart workbookPart, Cell cell)
+        private static String ExtractCellText(WorkbookPart workbookPart, Cell cell)
+        {
+            var cellValue = cell.CellValue;
+            var text = (cellValue == null) ? cell.InnerText : cellValue.Text;
+            if ((cell.DataType != null) && (cell.DataType == CellValues.SharedString))
+            {
+                workbookPart.SharedStringTablePart.NullGuard();
+                text = workbookPart.SharedStringTablePart.SharedStringTable
+                    .Elements<SharedStringItem>().ElementAt(
+                        Convert.ToInt32(cell.CellValue?.Text)).InnerText;
+            }
+            return (text ?? string.Empty).Trim();
+        }
+
+        private static string extractCellText(WorkbookPart workbookPart, Cell cell)
         {
             var cellValue = cell.CellValue;
             var text = (cellValue == null) ? cell.InnerText : cellValue.Text;
@@ -247,7 +272,7 @@ namespace HitachiQA.Helpers
             return (text ?? string.Empty).Trim();
         }
 
-        public static dynamic parseRatingFactorNumericalValues(String value)
+        public static dynamic parseRatingFactorNumericalValues(string value)
         {
             if (value.Contains("+"))
             {
@@ -271,7 +296,7 @@ namespace HitachiQA.Helpers
             }
             catch (Exception ex)
             {
-                throw HandleFailure($"String {IntegerString} Failed to parse into int", ex);
+                throw HandleFailure($"string {IntegerString} Failed to parse into int", ex);
             }
         }
 

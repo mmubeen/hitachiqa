@@ -5,7 +5,7 @@ namespace HitachiQA
     [Obsolete("please use FluentAssertions")]
     public class Assert
     {
-        public static bool Contains(List<String> _object, string value, bool optional = false)
+        public static bool Contains(List<string> _object, string value, bool optional = false)
         {
             var list = new StringBuilder();
             list.Append("[\n");
@@ -27,7 +27,7 @@ namespace HitachiQA
             }
         }
 
-        public static bool TextContains(String text, String value, bool optional = false)
+        public static bool TextContains(string text, string value, bool optional = false)
         {
             if (text == null || value == null)
             {
@@ -72,12 +72,12 @@ namespace HitachiQA
             }
         }
 
-        public static bool SoftAreEqual(IEnumerable<String> expected, IEnumerable<String> actual)
+        public static bool SoftAreEqual(IEnumerable<string> expected, IEnumerable<string> actual)
         {
             return AreEqual(expected, actual, true);
         }
 
-        public static bool AreEqual(IEnumerable<String> expected, IEnumerable<String> actual, bool optional = false)
+        public static bool AreEqual(IEnumerable<string> expected, IEnumerable<string> actual, bool optional = false)
         {
             (string key, dynamic value)[] parameters = new (string key, dynamic value)[] { ("@expected", expected), ("@actual", actual) };
 
@@ -217,7 +217,7 @@ namespace HitachiQA
             //}
         }
 
-        private static void success(String message, params (string key, dynamic value)[] parameters)
+        private static void success(string message, params (string key, dynamic value)[] parameters)
         {
             Log.Info("Success - Assert: " + message, parameters);
         }

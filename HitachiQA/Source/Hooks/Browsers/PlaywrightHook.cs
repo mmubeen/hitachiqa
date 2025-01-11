@@ -10,13 +10,13 @@ namespace HitachiQA.Hooks.Browsers
     [Binding]
     public class PlaywrightHook : HookBase
     {
-        public static List<String>? optionsList;
+        public static List<string> optionsList;
 
         public BrowserIndicator BrowserIndicator { get; init; }
-        public IPlaywright? Playwright { get; set; }
-        public IPage? PlaywrightPage { get; set; }
-        public IBrowser? PlaywrightBrowser { get; set; }
-        public IBrowserContext? PlaywrightBrowserContext { get; set; }
+        public IPlaywright Playwright { get; set; }
+        public IPage PlaywrightPage { get; set; }
+        public IBrowser PlaywrightBrowser { get; set; }
+        public IBrowserContext PlaywrightBrowserContext { get; set; }
         private TestContext TestContext { get; }
         public PlaywrightHook(
             IObjectContainer oc,
@@ -77,7 +77,7 @@ namespace HitachiQA.Hooks.Browsers
                     oc.RegisterInstanceAs<IBrowser>(PlaywrightBrowser);
                     oc.RegisterInstanceAs<IBrowserContext>(PlaywrightBrowserContext);
                     oc.RegisterInstanceAs<IPage>(PlaywrightPage);
-                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(PlaywrightPage, TestContext));
+                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(fc, sc, PlaywrightPage, TestContext));
                     await PlaywrightPage.GotoAsync("/");
                 }
             }
@@ -97,7 +97,7 @@ namespace HitachiQA.Hooks.Browsers
             }
         }
 
-        public async Task<IBrowser> InvokeNewPlaywrightBrowserAsync(string browserName, string? profile = null)
+        public async Task<IBrowser> InvokeNewPlaywrightBrowserAsync(string browserName, string profile = null)
         {
             if (Playwright == null)
                 throw new Exception("Playwright must be initialized before invoking browser");

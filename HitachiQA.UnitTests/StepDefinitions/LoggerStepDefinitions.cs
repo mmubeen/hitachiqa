@@ -15,8 +15,8 @@ namespace HitachiQA.UnitTests.StepDefinitions
             {"long", 1231231232 },
             {"decimal", 123123234234.9034m }
         };
-        string[] strArr = new string[] { "apple", "strawberry", "banana" };
-        JArray nullArr = new JArray() { null, null, null };
+        private readonly string[] strArr = ["apple", "strawberry", "banana"];
+        private readonly JArray nullArr = new JArray() { null, null, null };
 
         object value;
         string result;

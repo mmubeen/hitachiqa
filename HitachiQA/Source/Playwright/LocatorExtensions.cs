@@ -34,7 +34,7 @@ namespace HitachiQA.Playwright
             await loc.ClickAsync();
         }
 
-        public static async Task<string?> TextContentAsync(this Task<ILocator> locatorTask)
+        public static async Task<string> TextContentAsync(this Task<ILocator> locatorTask)
         {
             var loc = await locatorTask;
             return await loc.TextContentAsync();

@@ -15,7 +15,7 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
     }
     public override bool IsBrowserRunning => _webDriverHook.WebDriver != null;
 
-    public override Task InvokeBrowserAsync(string? profile = null)
+    public override Task InvokeBrowserAsync(string profile = null)
     {
         if (profile != null)
         {
@@ -56,7 +56,7 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
         return Task.FromResult(res);
 
     }
-    public override Task AttemptAutoSigninAsync(string? emailIdentifierKey)
+    public override Task AttemptAutoSigninAsync(string emailIdentifierKey)
     {
         var driver = _webDriverHook.WebDriver
             ?? throw new NullReferenceException("[GetAccessTokenCreds] WebDriverHook.WebDriver was null, driver is expectd at this point");

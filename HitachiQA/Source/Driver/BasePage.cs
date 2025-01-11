@@ -96,8 +96,8 @@ namespace HitachiQA.Driver
             this.UserActions.waitForPageLoad(_iFrame);
         }
 
-        protected By? _iFrame;
-        public By? IFrame
+        protected By _iFrame;
+        public By IFrame
         {
             get
             {

@@ -18,7 +18,7 @@ namespace HitachiQA.Source.HttpClients.Authorization
 
         public override bool IsBrowserRunning => _playwrightHook.PlaywrightPage != null;
 
-        public async override Task AttemptAutoSigninAsync(string? emailIdentifierKey)
+        public async override Task AttemptAutoSigninAsync(string emailIdentifierKey)
         {
             var page = _playwrightHook.PlaywrightPage
              ?? throw new NullReferenceException("[GetAccessTokenCreds] WebDriverHook.WebDriver was null, driver is expectd at this point");
@@ -52,7 +52,7 @@ namespace HitachiQA.Source.HttpClients.Authorization
             var browser = _playwrightHook.PlaywrightPage
             ?? throw new NullReferenceException("[GetAccessTokenCreds] PlaywrightHook.PlaywrightBrowser was null, driver is expectd at this point");
             var retry = Polly.Policy
-              .HandleResult<object?>(r => r == null)
+              .HandleResult<object>(r => r == null)
               .WaitAndRetryAsync(30, _ => TimeSpan.FromSeconds(1));
 
             var host = Config.GetVariable("HOST");

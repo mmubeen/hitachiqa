@@ -7,7 +7,7 @@ namespace HitachiQA.Helpers
 {
     public static class ExtensionMethods
     {
-        public static void NullGuard([NotNull] this object? obj, string paramName = "")
+        public static void NullGuard([NotNull] this object obj, string paramName = "")
         {
             if (obj == null)
             {
@@ -33,14 +33,14 @@ namespace HitachiQA.Helpers
             return JToken.FromObject(obj).ToObject<T>() ?? throw new NullReferenceException();
         }
 
-        public static Dictionary<string, string?>? GetDictionaryByIndex(this List<Dictionary<string, string?>> dictionaryListWithIndexKey, int index)
+        public static Dictionary<string, string> GetDictionaryByIndex(this List<Dictionary<string, string>> dictionaryListWithIndexKey, int index)
         {
             return dictionaryListWithIndexKey.GetDictionaryByIndex(index.ToString());
 
         }
-        public static Dictionary<string, string?>? GetDictionaryByIndex(this List<Dictionary<string, string?>> dictionaryListWithIndexKey, string index)
+        public static Dictionary<string, string> GetDictionaryByIndex(this List<Dictionary<string, string>> dictionaryListWithIndexKey, string index)
         {
-            return dictionaryListWithIndexKey.FirstOrDefault(dict => dict.TryGetValue("index", out string? k) && k == index);
+            return dictionaryListWithIndexKey.FirstOrDefault(dict => dict.TryGetValue("index", out string k) && k == index);
 
         }
 

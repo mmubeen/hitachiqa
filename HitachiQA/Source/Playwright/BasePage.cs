@@ -21,9 +21,9 @@ namespace HitachiQA.Playwright
 
         public async Task<ILocator> GetFieldAsync(string identifier) => await PlaywrightPage.GetFieldAsync(identifier);
 
-        public ILocator Locator(string selector, PageLocatorOptions? options = default) => PlaywrightPage.Locator(selector, options);
+        public ILocator Locator(string selector, PageLocatorOptions options = default) => PlaywrightPage.Locator(selector, options);
 
-        public async Task<IResponse?> GotoAsync(string url, PageGotoOptions? options = null) => await PlaywrightPage.GotoAsync(url, options);
+        public async Task<IResponse> GotoAsync(string url, PageGotoOptions options = null) => await PlaywrightPage.GotoAsync(url, options);
 
         public IFrameLocator FrameLocator(string selector) => PlaywrightPage.FrameLocator(selector);
 

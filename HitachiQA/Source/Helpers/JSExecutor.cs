@@ -9,7 +9,7 @@ namespace HitachiQA.Helpers
         {
             this.Driver = driver;
         }
-        public object execute(String script, params object[] args)
+        public object execute(string script, params object[] args)
         {
             IJavaScriptExecutor js = (IJavaScriptExecutor)Driver;
             return js.ExecuteScript(script, args);

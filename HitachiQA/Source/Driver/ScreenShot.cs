@@ -8,30 +8,39 @@ namespace HitachiQA
 {
     public class ScreenShot
     {
-        IWebDriver? Driver;
-        IPage? Page;
-        TestContext TestContext;
-        public ScreenShot(IWebDriver driver, TestContext testContext)
+        private readonly IPage _page;
+        private readonly IWebDriver _driver;
+        private readonly TestContext _testContext;
+        private readonly FeatureContext _featureCtx;
+        private readonly ScenarioContext _scenarioCtx;
+        public ScreenShot(FeatureContext fctx, ScenarioContext sctx)
         {
-            Driver = driver;
-            TestContext = testContext;
+            _featureCtx = fctx;
+            _scenarioCtx = sctx;
         }
-        public ScreenShot(IPage page, TestContext testContext)
+
+        public ScreenShot(FeatureContext fctx, ScenarioContext sctx, IWebDriver driver, TestContext testContext):this(fctx, sctx)
         {
-            Page = page;
-            TestContext = testContext;
+            _driver = driver;
+            _testContext = testContext;
         }
-        public void Info(String? filename = null) => Take(Severity.INFO, filename!);
-        public void Debug(String? filename = null) => Take(Severity.DEBUG, filename!);
-        public void Warn(String? filename = null) => Take(Severity.WARN, filename!);
-        public void Error(String? filename = null) => Take(Severity.ERROR, filename!);
-        public void Critical(String? filename = null) => Take(Severity.CRITICAL, filename!);
+        public ScreenShot(FeatureContext fctx, ScenarioContext sctx, IPage page, TestContext testContext) : this(fctx, sctx)
+        {
+            _page = page;
+            _testContext = testContext;
+        }
+        public void Info(string filename = null) => Take(Severity.INFO, filename!);
+        public void Debug(string filename = null) => Take(Severity.DEBUG, filename!);
+        public void Warn(string filename = null) => Take(Severity.WARN, filename!);
+        public void Error(string filename = null) => Take(Severity.ERROR, filename!);
+        public void Critical(string filename = null) => Take(Severity.CRITICAL, filename!);
 
 
         /// <summary>
         /// Take screenshot, by defualt the filename will be Severity_CurrentScenario_currentDateTime unless otherwise specified
         /// </summary>
-        public void Take(Severity severity, String? filename = null)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
+        public void Take(Severity severity, string fileName = null)
         {
             var currentSev = Severity.parseLevel(Main.Configuration.GetSection("Logging").GetSection("LogLevel")["Default"]).Level;
 
@@ -43,19 +52,19 @@ namespace HitachiQA
             {
 
 
-                FileNameBase = $"{severity.Name}_{FileNameBase}";
+                fileName ??= $"{severity.Name}_{FileNameBase}";
 
                 if (!Directory.Exists(ArtifactDirectory)) { Directory.CreateDirectory(ArtifactDirectory); }
 
-                string pageSource = Driver == null ? Page.ContentAsync().Result : Driver.PageSource;
-                string sourceFilePath = Path.Combine(ArtifactDirectory, FileNameBase + "_source.html");
+                string pageSource = _driver == null ? _page.ContentAsync().Result : _driver.PageSource;
+                string sourceFilePath = Path.Combine(ArtifactDirectory, fileName + "_source.html");
                 File.WriteAllText(sourceFilePath, pageSource, Encoding.UTF8);
-                this.TestContext.AddResultFile(sourceFilePath);
+                _testContext.AddResultFile(sourceFilePath);
                 Console.WriteLine($"\nPage Source: {new Uri(sourceFilePath)}\n");
 
 
 
-                string screenshotFilePath = Path.Combine(ArtifactDirectory, FileNameBase + "_screenshot.png");
+                string screenshotFilePath = Path.Combine(ArtifactDirectory, fileName + "_screenshot.png");
 
                 if (SaveScreenshot(screenshotFilePath))
                 {
@@ -84,21 +93,21 @@ namespace HitachiQA
                         Log.Warn($"error writing url in screenshot\n {ex.Message} \n{ex.StackTrace}");
                     }
                     Console.WriteLine($"\nScreenshot: {new Uri(screenshotFilePath)}\n");
-                    this.TestContext.AddResultFile(screenshotFilePath);
+                    this._testContext.AddResultFile(screenshotFilePath);
                 }
 
             }
         }
         private static string ArtifactDirectory => Path.Combine(Directory.GetCurrentDirectory(), "Screenshots");
-        private static String FileNameBase = string.Format($"{FeatureContext.Current.FeatureInfo.Title}_{ScenarioContext.Current.ScenarioInfo.Title}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}").Replace(" ", "_");
+        private string FileNameBase => string.Format($"{_featureCtx.FeatureInfo.Title}_{_scenarioCtx.ScenarioInfo.Title}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}").Replace(" ", "_");
 
         private string GetCurrentURL()
         {
-            return Driver == null ? Page.Url : Driver.Url;
+            return _driver == null ? _page.Url : _driver.Url;
         }
         private bool SaveScreenshot(string filePath)
         {
-            ITakesScreenshot? takesScreenshot = (Driver as ITakesScreenshot);
+            ITakesScreenshot takesScreenshot = (_driver as ITakesScreenshot);
             if (takesScreenshot != null)
             {
                 var screenshot = takesScreenshot.GetScreenshot();
@@ -110,7 +119,7 @@ namespace HitachiQA
             }
             else
             {
-                Page.ScreenshotAsync(new() { Path = filePath, FullPage = true }).Wait();
+                _page.ScreenshotAsync(new() { Path = filePath, FullPage = true }).Wait();
                 return true;
             }
         }

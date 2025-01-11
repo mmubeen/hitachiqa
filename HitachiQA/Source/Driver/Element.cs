@@ -79,7 +79,7 @@ namespace HitachiQA.Driver
             return string.Join("", this.GetInnerTexts());
         }
 
-        public List<String> GetInnerTexts()
+        public List<string> GetInnerTexts()
         {
             return UserActions.FindElementsWaitUntilVisible(locators).Select(it => it.Text.Trim()).ToList();
         }
@@ -278,7 +278,7 @@ namespace HitachiQA.Driver
         //  Text Fields Actions
         //
         [Obsolete("please use SetFieldValue(string value) instead")]
-        public void setText(String TextToEnter, int? wait_Seconds = null)
+        public void setText(string TextToEnter, int? wait_Seconds = null)
         {
             UserActions.setText(locators, TextToEnter, UserActions.ProcessWaitParam(wait_Seconds));
         }
@@ -337,7 +337,7 @@ namespace HitachiQA.Driver
         // TABLE HANDLING
         //
 
-        public IEnumerable<Dictionary<String, String>> parseUITable()
+        public IEnumerable<Dictionary<string, string>> parseUITable()
         {
             if (locators.Count() > 1)
             {
@@ -346,7 +346,7 @@ namespace HitachiQA.Driver
             return UserActions.parseUITable(locators.First());
         }
 
-        public List<Dictionary<String, String?>> GetGridItems()
+        public List<Dictionary<string, string>> GetGridItems()
         {
             return UserActions.GetGridItems(locators);
         }

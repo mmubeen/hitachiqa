@@ -17,7 +17,7 @@ namespace HitachiQA.UnitTests.Helpers
             var builder = new ConfigurationBuilder();
             builder.AddInMemoryCollection(new[]
              {
-                new KeyValuePair<string, string?>("SERVER_HOST", "https://example.com/api")
+                new KeyValuePair<string, string>("SERVER_HOST", "https://example.com/api")
             });
             Configuration = builder.Build();
             httpAuthHandler = Mock.Create<HttpAuthHandler>(innerHandlerMock, clientMock, Configuration);

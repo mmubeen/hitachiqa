@@ -12,8 +12,8 @@ public abstract class InteractiveAuthBase
 
     public abstract bool IsBrowserRunning { get; }
 
-    public abstract Task InvokeBrowserAsync(string? profile);
-    public abstract Task AttemptAutoSigninAsync(string? emailIdentifierKey);
+    public abstract Task InvokeBrowserAsync(string profile);
+    public abstract Task AttemptAutoSigninAsync(string emailIdentifierKey);
     public abstract Task<BrowserCredential> GetAccessTokenCredsAsync(string identifierKey);
     public abstract Task NavigateToHostIfNeededAsync();
 

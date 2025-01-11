@@ -157,7 +157,7 @@ namespace HitachiQA.Driver
 
         public string GetAttribute(By[] ElementLocator, string attributeName)
         {
-            return FindElementWaitUntilClickable(ElementLocator).GetAttribute(attributeName);
+            return FindElementWaitUntilClickable(ElementLocator).GetDomAttribute(attributeName);
         }
 
         private void switchToIFrame(By[] bys)
@@ -202,10 +202,10 @@ namespace HitachiQA.Driver
         //
         //  Text Fields Actions
         //
-        public void setText(By TextFieldLocator, String TextToEnter, int? wait_Seconds = null)
+        public void setText(By TextFieldLocator, string TextToEnter, int? wait_Seconds = null)
             => setText(new[] { TextFieldLocator }, TextToEnter, ProcessWaitParam(wait_Seconds));
 
-        public void setText(By[] TextFieldLocator, String TextToEnter, int? wait_Seconds = null)
+        public void setText(By[] TextFieldLocator, string TextToEnter, int? wait_Seconds = null)
         {
             Actions Action = new Actions(this.WebDriver);
             var textField = FindElementWaitUntilClickable(TextFieldLocator, ProcessWaitParam(wait_Seconds));
@@ -218,7 +218,7 @@ namespace HitachiQA.Driver
         public string getTextFieldText(By[] TextFieldLocator, int? wait_Seconds = null)
         {
             var textField = FindElementWaitUntilVisible(TextFieldLocator, ProcessWaitParam(wait_Seconds));
-            return textField.GetAttribute("value");
+            return textField.GetDomAttribute("value");
         }
 
         public void clearTextField(By[] TextFieldLocator, int? wait_Seconds = null)
@@ -289,7 +289,7 @@ namespace HitachiQA.Driver
             }
         }
 
-        public IEnumerable<Dictionary<String, String>> parseUITable(By datatable)
+        public IEnumerable<Dictionary<string, string>> parseUITable(By datatable)
         {
             var tableElement = FindElementWaitUntilPresent(datatable);
             //Mat UI bootstrap table
@@ -297,17 +297,17 @@ namespace HitachiQA.Driver
             {
 
                 var datatableXpath = datatable.Locator.Criteria;
-                List<String> columnNames = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-header-cell//span[contains(@class,'datatable-header-cell-label')]", datatable.IFrameLocator).Locator).Select(element => element.Text).ToList<String>();
+                List<string> columnNames = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-header-cell//span[contains(@class,'datatable-header-cell-label')]", datatable.IFrameLocator).Locator).Select(element => element.Text).ToList<string>();
 
                 int rowCount = this.WebDriver.FindElements(By.XPath(datatableXpath + "//datatable-body-row", datatable.IFrameLocator).Locator).Count;
                 for (int rowIndex = 1; rowIndex <= rowCount; rowIndex++)
                 {
-                    var rowDict = new Dictionary<String, String>();
+                    var rowDict = new Dictionary<string, string>();
 
                     for (int i = 0; i < columnNames.Count(); i++)
                     {
-                        // String cellText = string.Join("", cells[i].FindElements(By.XPath("/descendant::*"))
-                        String cellText = string.Join("", this.WebDriver
+                        // string cellText = string.Join("", cells[i].FindElements(By.XPath("/descendant::*"))
+                        string cellText = string.Join("", this.WebDriver
                                                           .FindElements(By.XPath($"(({datatableXpath} //datatable-body-row)[{rowIndex}] //datatable-body-cell)[{i + 1}]/descendant::*", datatable.IFrameLocator).Locator)
                                                           .Select(child => child.Text).Distinct());
 
@@ -332,7 +332,7 @@ namespace HitachiQA.Driver
                 else
                 {
                     var tableDoc = new HtmlDocument();
-                    tableDoc.LoadHtml(tableElement.GetAttribute("innerHTML"));
+                    tableDoc.LoadHtml(tableElement.GetDomAttribute("innerHTML"));
                     var rows = tableDoc.DocumentNode.SelectNodes(rowsXPath);
                     var rowIndex = 0;
                     foreach (var rowNode in rows)
@@ -379,7 +379,7 @@ namespace HitachiQA.Driver
             var tableElement = FindElementWaitUntilPresent(table);
 
             var tableDoc = new HtmlDocument();
-            tableDoc.LoadHtml(tableElement.GetAttribute("innerHTML"));
+            tableDoc.LoadHtml(tableElement.GetDomAttribute("innerHTML"));
             var headersXPath = "//th[text()]/..//th";
             var headers = tableDoc.DocumentNode.SelectNodes(headersXPath);
             if (headers == null || headers.Count == 0)
@@ -514,7 +514,7 @@ namespace HitachiQA.Driver
             IJavaScriptExecutor jse = (IJavaScriptExecutor)driver;
             WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 30));
 
-            String JS_DROP_FILE =
+            string JS_DROP_FILE =
                 "var target = arguments[0]," +
                 "    offsetX = arguments[1]," +
                 "    offsetY = arguments[2]," +

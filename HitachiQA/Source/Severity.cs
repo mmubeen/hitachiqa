@@ -30,9 +30,9 @@
             {INT_DEBUG,   "DEBUG"},
         };
 
-        public static Severity parseLevel(String level)
+        public static Severity parseLevel(string level)
         {
-            if (String.IsNullOrWhiteSpace(level))
+            if (string.IsNullOrWhiteSpace(level))
             {
                 return DEFAULT;
             }

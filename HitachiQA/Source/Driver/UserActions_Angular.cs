@@ -35,7 +35,7 @@
             Click(By.XPath($"//mat-option[{LogicalIndex + 1}]"));
         }
 
-        public IEnumerable<String> GetAllMatDropdownOptions(By[] DropdownLocator)
+        public IEnumerable<string> GetAllMatDropdownOptions(By[] DropdownLocator)
         {
             var dropdown = FindElementWaitUntilClickable(DropdownLocator);
             dropdown.Click();
@@ -58,7 +58,7 @@
         {
             var mattCheckBox = FindElementWaitUntilVisible(MattCheckBoxLocator);
 
-            while (GetCheckboxState(By.Id(mattCheckBox.GetAttribute("id") + "-input")) != state)
+            while (GetCheckboxState(By.Id(mattCheckBox.GetDomAttribute("id") + "-input")) != state)
             {
                 mattCheckBox.Click();
             }
@@ -67,7 +67,7 @@
         public bool GetMattCheckboxState(By[] MattCheckBoxLocator)
         {
             var mattCheckBox = FindElementWaitUntilClickable(MattCheckBoxLocator);
-            return GetCheckboxState(By.Id(mattCheckBox.GetAttribute("id") + "-input"));
+            return GetCheckboxState(By.Id(mattCheckBox.GetDomAttribute("id") + "-input"));
         }
 
         #endregion Checkbox

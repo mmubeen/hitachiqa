@@ -16,7 +16,7 @@ namespace HitachiQA.Source.Hooks
         }
 
         [BeforeFeature]
-        public static async Task initialize(IObjectContainer oc, IConfiguration config, AuthorizationClient authClient)
+        public static void initialize(IObjectContainer oc, IConfiguration config, AuthorizationClient authClient)
         {
             var apiClient = BuildClient<RestAPI>(config, "SERVER_HOST", authClient);
             oc.RegisterInstanceAs(apiClient);

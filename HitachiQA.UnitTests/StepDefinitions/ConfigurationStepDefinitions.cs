@@ -12,7 +12,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
         string knownName = "THIS_IS_A_TEST";
         string varName = "THIS_IS_THE_TEST_VAR";
         string varVal = "VAR_VALUE";
-        string? result = "";
+        string result = "";
         IConfiguration Config { get; set; }
         ObjectContainer ObjectContainer { get; }
         public ConfigurationStepDefinitions(ObjectContainer OC)
