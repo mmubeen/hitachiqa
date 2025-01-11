@@ -5,12 +5,6 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
-parameters:
-  - name: MajorRelease
-    displayName: Push as major release
-    type: boolean
-    default: false
-
 
 parameters:
   - name: TargetServiceConnection
@@ -24,6 +18,11 @@ parameters:
     - RKH_FA_ServiceConnection
     - MMO_MS_ServiceConnection
 
+ - name: MajorRelease
+    displayName: Push as major release
+    type: boolean
+    default: false
+
 jobs:
   - job: 
     steps:
@@ -35,6 +34,7 @@ jobs:
 
     - task: NuGetCommand@2
       displayName: 'Push minor Release'
+      condition: 'not(${{ parameters.MajorRelease }})'
       inputs:
         command: 'push'
         packagesToPush: '$**/minor/*.nupkg; !**/*.symbols.nupkg'
@@ -43,6 +43,7 @@ jobs:
     
     - task: NuGetCommand@2
       displayName: 'Push major Release'
+      condition: '${{ parameters.MajorRelease }}'
       inputs:
         command: 'push'
         packagesToPush: '**/major/*.nupkg; !**/*.symbols.nupkg'
