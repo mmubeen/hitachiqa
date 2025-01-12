@@ -227,6 +227,10 @@ namespace HitachiQA.Hooks.Browsers
                 {
                     parsedValue = value;
                 }
+                else if(propTypeName == typeof(Single).Name)
+                {
+                    parsedValue = Single.Parse(value);
+                }
                 else
                 {
                     throw new NotImplementedException(propTypeName);
