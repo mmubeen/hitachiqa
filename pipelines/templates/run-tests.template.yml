@@ -23,11 +23,10 @@ steps:
     arguments: '--configuration Release'
     projects: "**/HitachiQA.UnitTests.csproj"
 
-- task: FileTransform@1
+- task: FileTransform@2
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0'
-    fileType: 'json'
-
+    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0/'
+    jsonTargetFiles: 'appsettings.json'
 - task: DotNetCoreCLI@2
   displayName: "Unit Tests"
   inputs:
