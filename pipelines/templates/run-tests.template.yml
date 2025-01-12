@@ -27,6 +27,8 @@ steps:
   inputs:
     folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0/'
     jsonTargetFiles: 'appsettings.json'
+    xmlTransformationRules: ''
+
 - task: DotNetCoreCLI@2
   displayName: "Unit Tests"
   inputs:
