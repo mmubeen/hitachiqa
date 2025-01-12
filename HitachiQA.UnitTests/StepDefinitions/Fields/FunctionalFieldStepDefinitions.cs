@@ -48,8 +48,7 @@ public class FunctionalFieldStepDefinitions
         //}
         var uri = new Uri(fullPath);
         await page.GotoAsync(uri.AbsoluteUri);
-
-
+        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
     }
 
     [When("User sets the value {string} for the field {string}")]
