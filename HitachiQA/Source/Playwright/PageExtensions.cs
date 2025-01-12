@@ -6,7 +6,7 @@ namespace HitachiQA.Playwright
 {
     public static class PageExtensions
     {
-        public async static Task<ILocator> GetFieldAsync(this IPage page, string indentifier)
+        public async static Task<ILocator> GetFieldAsync(this IPage page, string indentifier, int waitSecconds=30)
         {
             await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 
@@ -19,7 +19,7 @@ namespace HitachiQA.Playwright
                 var field = page.Locator(identifier);
 
                 //adding running task
-                tasks.Add(identifier, InvokeTrial(page, field, ct.Token));
+                tasks.Add(identifier, InvokeTrial(page, field, ct.Token, waitSecconds));
 
             }
 
@@ -38,9 +38,9 @@ namespace HitachiQA.Playwright
         }
 
         [DebuggerHidden]
-        private async static Task<bool> InvokeTrial(IPage page, ILocator fieldTrial, CancellationToken ct)
+        private async static Task<bool> InvokeTrial(IPage page, ILocator fieldTrial, CancellationToken ct, int waitSecconds=30)
         {
-            var retry = Policy.HandleResult<int>(0).WaitAndRetryAsync(5 * 30, _ => TimeSpan.FromMilliseconds(200));
+            var retry = Policy.HandleResult<int>(0).WaitAndRetryAsync(5 * waitSecconds, _ => TimeSpan.FromMilliseconds(200));
 
 
             var count = await retry.ExecuteAsync(async () =>
@@ -65,17 +65,20 @@ namespace HitachiQA.Playwright
 
         public static List<string> KnownFieldXPaths = new List<string>()
         {
+            "//*[@data-id='{input}']",
+            "//button[contains(@class, 'dropdown') and @id='{input}' and following-sibling::ul[.//button]]/..",
+            "//button[@id='{input}']",
+            "//*[@id='{input}']",
+            "//label[text()='{input}']/preceding-sibling::input[@type='radio']",
+            "//label[text()='{input}']/preceding-sibling::input[@type='checkbox']",
             "//label[text()='{input}']/..",
             "//button[normalize-space(text())='{input}']",
-            "//*[@data-id='{input}']",
-            "//*[@id='{input}']",
             "//button[.//*[normalize-space(text())='{input}']]",
             "//a[.//*[normalize-space(text())='{input}']]",
             "//a[normalize-space(text())='{input}']",
             "//button[@data-id='{input}']",
             "//*[@aria-label='{input}']",
             "//td[@data-hslcolumnname='{input}']",
-            "//button[@id='{input}']",
             "//label[normalize-space(text())='{input}']/following-sibling::input",
             "//*[@data-value='{input}']",
             "//*[@name='{input}']",

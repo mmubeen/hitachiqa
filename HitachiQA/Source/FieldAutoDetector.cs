@@ -17,7 +17,6 @@ namespace HitachiQA
                 { "//*[@role='switch']", "switch" },
                 { "//input[@type='text' and following-sibling::*[contains(@data-dyn-bind, 'Lookup')]]", "lookup_with_table" },
                 { "//following-sibling::*/select", "dropdown"},
-                { "//input[@type='checkbox']", "checkbox" },
                 { "//input[contains(@class, 'editable-lookup') and following-sibling::*[.//*[@class='fa fa-search']]]", "lookup_with_dialog"},
                 { "//td[@data-hslcolumnname][.//input[@type='text'] and .//input[@type='submit']]", "effective_grid_lookup"},
                 { "//textarea[not(@type) and not(@aria-autocomplete)]", "textfield"},
@@ -29,8 +28,12 @@ namespace HitachiQA
                 { "//input[@role='combobox' and not(contains(@id, 'DatePicker'))]", "input_with_combobox"},
                 { "//div[contains(@class,'ms-TextField is-disabled')]//button", "textfieldreadonly"},
                 { "//input[@data-role='dropdownlist']/../..", "dropdown_listbox" },
+                { "//self::*[(self::button or descendant::button or following-sibling::button) and contains(@class, 'dropdown') and following-sibling::ul[.//button]]", "button_dropdown" },
+                { "//*[descendant::input and not(descendant::input[not(@type='radio')])]", "radio_buttons_group"},
+                { "//*[descendant::input and not(descendant::input[not(@type='checkbox')])]", "checkboxes_group"},
+                { "//input[@type='checkbox' and count(//input[@type='checkbox']) = 1]", "checkbox" },
                 { "//select", "dropdown"},
-                { "//input", "textfield"}
+                { "//input", "textfield"},
         };
 
         /// <summary>

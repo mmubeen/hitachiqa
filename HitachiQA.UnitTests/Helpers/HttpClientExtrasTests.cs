@@ -59,7 +59,7 @@ namespace HitachiQA.UnitTests.Helpers
         public void AuthRequired_NullUri_ReturnsFalse()
         {
             // Arrange
-            Uri? requestUri = null;
+            Uri requestUri = null;
 
             // Act
             var result = httpAuthHandler.isAuthRequired(requestUri);

@@ -48,6 +48,7 @@ stages:
                 # Set the versions as Azure Pipeline variables
                 Write-Host "##vso[task.setvariable variable=MajorReleaseVersion]$version"
                 Write-Host "##vso[task.setvariable variable=MinorReleaseVersion]$minorReleaseVersion"
+                exit 0
 
         - template: templates/build.template.yml
         - template: templates/run-tests.template.yml

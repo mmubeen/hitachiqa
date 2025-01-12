@@ -35,12 +35,13 @@ namespace HitachiQA.Hooks.Browsers
             Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             if (profile != null)
             {
-                PlaywrightBrowser = await InvokeNewPlaywrightBrowserAsync(browserName, profile);
+                (PlaywrightBrowser, PlaywrightBrowserContext) = await InvokeNewPlaywrightBrowserAsync(Configuration, Playwright, browserName, profile);
             }
             else
             {
-                PlaywrightBrowser = await InvokeNewPlaywrightBrowserAsync(browserName);
+                (PlaywrightBrowser,_) = await InvokeNewPlaywrightBrowserAsync(Configuration, Playwright, browserName);
                 PlaywrightBrowserContext = await PlaywrightBrowser.CreateNewContextAsync(host);
+
             }
             PlaywrightBrowserContext.NullGuard();
             PlaywrightPage = await PlaywrightBrowserContext.CreateNewPageAsync();
@@ -89,24 +90,29 @@ namespace HitachiQA.Hooks.Browsers
         {
             if (this.PlaywrightPage != null && PlaywrightPage.Video != null)
             {
-                var videoPath = await PlaywrightPage.Video.PathAsync();
-                this.TestContext.AddResultFile(videoPath);
+                await AttachVideoAsync(PlaywrightPage, TestContext);
                 await PlaywrightBrowserContext?.CloseAsync();
-                Console.WriteLine($"\nVideo: {new Uri(videoPath)}\n");
-
             }
         }
 
-        public async Task<IBrowser> InvokeNewPlaywrightBrowserAsync(string browserName, string profile = null)
+        public static async Task AttachVideoAsync(IPage page, TestContext msContext)
         {
-            if (Playwright == null)
+            var videoPath = await page.Video.PathAsync();
+            msContext.AddResultFile(videoPath);
+            Console.WriteLine($"\nVideo: {new Uri(videoPath)}\n");
+        }
+
+        public static async Task<(IBrowser, IBrowserContext)> InvokeNewPlaywrightBrowserAsync(IConfiguration config, IPlaywright playwright, string browserName, string profile = null)
+        {
+            if (playwright == null)
                 throw new Exception("Playwright must be initialized before invoking browser");
 
             IBrowser browser;
+            IBrowserContext context=null;
             switch (browserName.ToLower())
             {
                 case "chrome":
-                    browser = await Playwright.Chromium.LaunchAsync(GetPlaywrightOptions("chrome"));
+                    browser = await playwright.Chromium.LaunchAsync(GetPlaywrightOptions(config, "chrome"));
                     break;
                 case "msedge":
                     if (profile != null)
@@ -117,15 +123,14 @@ namespace HitachiQA.Hooks.Browsers
                         }
                         var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                         var userData = Path.Combine(userProfile, "AppData\\Local\\Microsoft\\Edge\\User%20Data\\");
-                        var context = await Playwright
+                        context = await playwright
                             .Chromium
-                            .LaunchPersistentContextAsync(userData, GetPlaywrightOptionsWithProfile(profile, "msedge"));
-                        this.PlaywrightBrowserContext = context;
-                        return context.Browser;
+                            .LaunchPersistentContextAsync(userData, GetPlaywrightOptionsWithProfile(config, profile, "msedge"));
+                        return (context.Browser, context);
                     }
                     else
                     {
-                        browser = await Playwright.Chromium.LaunchAsync(GetPlaywrightOptions("msedge"));
+                        browser = await playwright.Chromium.LaunchAsync(GetPlaywrightOptions(config, "msedge"));
                     }
                     break;
                 default:
@@ -136,7 +141,7 @@ namespace HitachiQA.Hooks.Browsers
                     throw new NotImplementedException($"BROWSER value={browserName} is not supported");
             }
 
-            return browser;
+            return (browser, context);
 
 
         }
@@ -149,7 +154,7 @@ namespace HitachiQA.Hooks.Browsers
             return !tags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase));
         }
 
-        private BrowserTypeLaunchPersistentContextOptions GetPlaywrightOptionsWithProfile(string profile, string channel = "chrome")
+        private static BrowserTypeLaunchPersistentContextOptions GetPlaywrightOptionsWithProfile(IConfiguration config, string profile, string channel = "chrome")
         {
             var options = new BrowserTypeLaunchPersistentContextOptions();
             var props = options.GetType().Properties();
@@ -159,7 +164,7 @@ namespace HitachiQA.Hooks.Browsers
                 {
                     continue;
                 }
-                var value = Configuration.GetVariable($"Playwright.{prop.Name}", true);
+                var value = config.GetVariable($"Playwright.{prop.Name}", true);
                 if (string.IsNullOrWhiteSpace(value))
                 {
                     continue;
@@ -197,7 +202,7 @@ namespace HitachiQA.Hooks.Browsers
             return options;
         }
 
-        private BrowserTypeLaunchOptions GetPlaywrightOptions(string channel = "chrome")
+        private static BrowserTypeLaunchOptions GetPlaywrightOptions(IConfiguration configuration, string channel = "chrome")
         {
             var options = new BrowserTypeLaunchOptions();
             var props = options.GetType().Properties();
@@ -207,7 +212,7 @@ namespace HitachiQA.Hooks.Browsers
                 {
                     continue;
                 }
-                var value = Configuration.GetVariable($"Playwright.{prop.Name}", true);
+                var value = configuration.GetVariable($"Playwright.{prop.Name}", true);
                 if (string.IsNullOrWhiteSpace(value))
                 {
                     continue;
