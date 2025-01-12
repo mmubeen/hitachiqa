@@ -45,7 +45,9 @@ public class FunctionalFieldStepDefinitions
         //{
         //    await page.GotoAsync(fullPath);
         //}
-        await page.GotoAsync(fullPath);
+        var uri = new Uri(fullPath);
+        Log.Info("uri: "+uri.ToString());
+        await page.GotoAsync(uri.AbsoluteUri);
 
 
     }
