@@ -25,8 +25,8 @@ steps:
 
 - task: FileTransform@2
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0'
-    enableXmlTransform: false
+    folderPath: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/bin/Release/net8.0/'
+    jsonTargetFiles: 'appsettings.json'
 - task: DotNetCoreCLI@2
   displayName: "Unit Tests"
   inputs:
