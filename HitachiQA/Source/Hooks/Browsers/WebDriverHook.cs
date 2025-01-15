@@ -108,7 +108,7 @@ namespace HitachiQA.Hooks.Browsers
                         ChromeOptions.AddArgument("--no-sandbox"); // Bypass OS security model
                         ChromeOptions.AddArgument("--disable-dev-shm-usage");
                         ChromeOptions.AddArgument("--disable-extensions");
-                        ChromeOptions.AddArgument("--force-device-scale-factor=1");
+                        ChromeOptions.AddArgument("--force-device-scale-factor=1.5");
                         ChromeOptions.AddUserProfilePreference("profile.cookie_controls_mode", "0");
                         ChromeOptions.AddArguments(optionsList);
                     }
