@@ -62,6 +62,7 @@ stages:
             versioningScheme: 'byEnvVar'
             versionEnvVar: "MinorReleaseVersion"
             includesource: true
+            arguments: '--no-build --no-restore'
 
         - task: DotNetCoreCLI@2
           displayName: 'Builder pack minor release'
@@ -72,6 +73,7 @@ stages:
             versioningScheme: 'byEnvVar'
             versionEnvVar: "MinorReleaseVersion"
             includesource: true
+            
 
         - task: DotNetCoreCLI@2
           displayName: 'pack major release HitachiQA'
@@ -80,6 +82,7 @@ stages:
             packagesToPack: '**/HitachiQA.csproj'
             outputDir: '$(majorPackageOutputdir)'
             versioningScheme: 'off'
+            arguments: '--no-build --no-restore'
 
         - task: DotNetCoreCLI@2
           displayName: 'pack major release Builder'
