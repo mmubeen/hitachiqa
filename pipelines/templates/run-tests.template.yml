@@ -29,10 +29,21 @@ steps:
     jsonTargetFiles: 'appsettings.json'
     xmlTransformationRules: ''
 
-- task: DotNetCoreCLI@2
+- task: VSTest@3
   displayName: "Unit Tests"
   inputs:
-    command: 'test'
-    projects: '**/HitachiQA.UnitTests.dll'
-    arguments: '--settings $(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/${{parameters.runsettings}} --no-build --filter ${{parameters.filter}}'
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **/HitachiQA.UnitTests.dll
+      !**/obj/**
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    runSettingsFile: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/${{parameters.runsettings}}'
+    runInParallel: false
+    rerunFailedTests: true
+    rerunType: 'basedOnTestFailurePercentage'
+    rerunFailedThreshold: '30'
+    rerunFailedTestCasesMaxLimit: '5'
     testRunTitle: ${{ parameters.runTitle }}
+    configuration: '$(BuildConfiguration)'
+    platform: '$(BuildPlatform)'
+    otherConsoleOptions: '--filter ${{parameters.filter}}'
