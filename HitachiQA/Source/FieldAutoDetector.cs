@@ -59,7 +59,7 @@ namespace HitachiQA
 
             if (node == null)
             {
-                Log.Error($"Couldn't find a a match on any of the following xpaths: {string.Join("\n", KnownXPaths.Select(it => $"{it.Value} => {it.Key}"))}");
+                Log.Error($"Couldn't find a a match on any of the following xpaths: {string.Join("\n", KnownXPaths.Select(it => $"{it.Value} => {it.Key}"))} inside of \n {fieldDoc.DocumentNode.OuterHtml}");
                 throw new Exception($"error finding known xpath match for field located by {criteria}");
 
             }
@@ -89,7 +89,7 @@ namespace HitachiQA
 
             if (node == null)
             {
-                Console.WriteLine($"Couldn't find a a match on any of the following xpaths: {string.Join("\n", KnownXPaths.Select(it => $"{it.Value} => {it.Key}"))}");
+                Console.WriteLine($"Couldn't find a a match on any of the following xpaths: {string.Join("\n", KnownXPaths.Select(it => $"{it.Value} => {it.Key}"))} inside of \n {fieldDoc.DocumentNode.OuterHtml}");
                 throw new Exception($"error finding known xpath match for field located by {locator}");
 
             }
