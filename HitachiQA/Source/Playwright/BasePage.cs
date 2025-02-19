@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using HitachiQA.Hooks.Browsers;
+using Microsoft.Playwright;
 using Reqnroll.BoDi;
 
 namespace HitachiQA.Playwright
@@ -10,6 +11,20 @@ namespace HitachiQA.Playwright
         public IPlaywright Playwright { get; set; }
         public ScreenShot ScreenShot { get; set; }
 
+        public BasePage(PlaywrightHook hook)
+        {
+            PlaywrightPage = hook.PlaywrightPage;
+            Browser = hook.PlaywrightBrowser;
+            Playwright = hook.Playwright;
+            
+        }
+        public BasePage(IPage page, IBrowser browser, IPlaywright playwright, ScreenShot screenShot=null)
+        {
+            PlaywrightPage = page;
+            Browser = browser;
+            Playwright = playwright;
+            ScreenShot = screenShot;
+        }
         public BasePage(IObjectContainer oc)
         {
 

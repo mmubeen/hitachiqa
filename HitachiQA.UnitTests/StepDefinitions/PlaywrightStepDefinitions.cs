@@ -1,4 +1,5 @@
 using HitachiQA.Playwright;
+using Microsoft.Playwright;
 using Reqnroll.BoDi;
 
 namespace HitachiQA.UnitTests.StepDefinitions
@@ -6,18 +7,25 @@ namespace HitachiQA.UnitTests.StepDefinitions
     [Binding]
     public class PlaywrightStepDefinitions
     {
+        private readonly IPage _playwrightPage;
+        private readonly IBrowser _browser;
+        private readonly IPlaywright _playwright;
+        private readonly ScreenShot _screenShot;
+
         private readonly IObjectContainer _ioc;
         private BasePage Page { get; set; }
 
-        public PlaywrightStepDefinitions(
-            IObjectContainer ioc)
+        public PlaywrightStepDefinitions(IPage p, IBrowser b, IPlaywright playwright, ScreenShot s)
         {
-            _ioc = ioc;
+            _playwrightPage = p;
+            _browser = b;
+            _playwright = playwright;
+            _screenShot = s;
         }
         [Given(@"Playwright is up")]
         public void GivenPlaywrightIsUp()
         {
-            Page = new BasePage(_ioc);
+            Page = new BasePage(_playwrightPage, _browser, _playwright, _screenShot);
         }
 
         [Then(@"user should land on HSAL homepage playwright")]

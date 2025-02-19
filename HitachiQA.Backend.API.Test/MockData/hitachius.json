@@ -1,0 +1,37 @@
+{
+  "driver": "Playwright",
+  "browser": "chrome",
+  "host": "https://www.hitachi.us/",
+  "scenarios": [
+    {
+      "name": "Navigation Test",
+      "steps": [
+        {
+          "description": "Navigate to login page",
+          "actions": [
+            {
+              "type": "Click",
+              "selector": "Social Innovation Solutions",
+              "nth": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Navigation Test",
+      "steps": [
+        {
+          "description": "Navigate to login page",
+          "actions": [
+            {
+              "type": "Click",
+              "selector": "Social Innovation Solutions",
+              "nth": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

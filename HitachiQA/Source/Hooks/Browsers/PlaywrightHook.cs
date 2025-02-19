@@ -17,16 +17,8 @@ namespace HitachiQA.Hooks.Browsers
         public IPage PlaywrightPage { get; set; }
         public IBrowser PlaywrightBrowser { get; set; }
         public IBrowserContext PlaywrightBrowserContext { get; set; }
-        private TestContext TestContext { get; }
-        public PlaywrightHook(
-            IObjectContainer oc,
-            FeatureContext fc,
-            IConfiguration config,
-            TestContext tc,
-            BrowserIndicator bi
-            ) : base(oc, fc, config)
+        public PlaywrightHook(IConfiguration config, BrowserIndicator bi) : base(config)
         {
-            TestContext = tc;
             BrowserIndicator = bi;
         }
 
@@ -60,7 +52,7 @@ namespace HitachiQA.Hooks.Browsers
         }
 
         [BeforeScenario(Order = 2)]
-        public async Task InvokeBrowserAsync(FeatureContext fc, ScenarioContext sc, IObjectContainer oc)
+        public async Task InvokeBrowserAsync(FeatureContext fc, ScenarioContext sc, IObjectContainer oc, TestContext tc)
         {
             if (!fc.FeatureInfo.Tags.Contains("NoBrowser") && !sc.ScenarioInfo.Tags.Contains("NoBrowser"))
             {
@@ -78,7 +70,7 @@ namespace HitachiQA.Hooks.Browsers
                     oc.RegisterInstanceAs<IBrowser>(PlaywrightBrowser);
                     oc.RegisterInstanceAs<IBrowserContext>(PlaywrightBrowserContext);
                     oc.RegisterInstanceAs<IPage>(PlaywrightPage);
-                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(fc, sc, PlaywrightPage, TestContext));
+                    oc.RegisterInstanceAs<ScreenShot>(new ScreenShot(fc, sc, PlaywrightPage, tc));
                     await PlaywrightPage.GotoAsync("/");
                 }
             }
@@ -86,11 +78,11 @@ namespace HitachiQA.Hooks.Browsers
         }
 
         [AfterScenario]
-        public async Task closeContext()
+        public async Task closeContext(TestContext tc)
         {
             if (this.PlaywrightPage != null && PlaywrightPage.Video != null)
             {
-                await AttachVideoAsync(PlaywrightPage, TestContext);
+                await AttachVideoAsync(PlaywrightPage, tc);
                 await PlaywrightBrowserContext?.CloseAsync();
             }
         }

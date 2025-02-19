@@ -16,13 +16,6 @@ parameters:
     type: boolean
     default: false
 
-variables:
-  solution: '**/*.sln'
-  project: '**/*.csproj'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  name: $(Date:yyyyMMdd)$(Rev:.r)
-
 stages:
   - stage: NugetPush
     jobs:

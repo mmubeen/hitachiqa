@@ -8,7 +8,7 @@ namespace HitachiQA.Hooks
     public class CosmosHook : HookBase
     {
 
-        public CosmosHook(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
+        public CosmosHook(IConfiguration config) : base(config)
         {
 
         }

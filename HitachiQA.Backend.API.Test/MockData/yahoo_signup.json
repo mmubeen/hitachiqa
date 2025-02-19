@@ -1,0 +1,45 @@
+{
+  "driver": "Playwright",
+  "browser": "chrome",
+  "host": "https://www.yahoo.com/",
+  "scenarios": [
+    {
+      "name": "Signup Test",
+      "steps": [
+        {
+          "description": "Navigate to login page",
+          "actions": [
+            {
+              "type": "Click",
+              "selector": "Sign in"
+            },
+            {
+              "type": "Click",
+              "selector": "createacc"
+            },
+            {
+              "type": "Setfieldvalue",
+              "selector": "usernamereg-firstName",
+              "value": "miguel"
+            },
+            {
+              "type": "Setfieldvalue",
+              "selector": "userId",
+              "value": "userId"
+            },
+            {
+              "type": "Setfieldvalue",
+              "selector": "yid-domain-selector",
+              "value": "myyahoo.com"
+            },
+            {
+              "type": "Setfieldvalue",
+              "selector": "usernamereg-password",
+              "value": "Some Password"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

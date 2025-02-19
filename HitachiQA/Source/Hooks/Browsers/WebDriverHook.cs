@@ -25,7 +25,7 @@ namespace HitachiQA.Hooks.Browsers
             IConfiguration config,
             TestContext tc,
             BrowserIndicator bi
-            ) : base(oc, fc, config)
+            ) : base(config)
         {
             TestContext = tc;
             BrowserIndicator = bi;

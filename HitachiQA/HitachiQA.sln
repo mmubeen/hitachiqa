@@ -7,7 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitachiQA", "HitachiQA.cspr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitachiQA.UnitTests", "..\HitachiQA.UnitTests\HitachiQA.UnitTests.csproj", "{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}"
 EndProject
-
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HitachiQA.Backend.API", "..\HitachiQA.Backend.API\HitachiQA.Backend.API.csproj", "{0A586F80-30C0-434C-A646-AAC91EA75DAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HitachiQA.Backend.API.Test", "..\HitachiQA.Backend.API.Test\HitachiQA.Backend.API.Test.csproj", "{4420F8D5-CA15-4D25-88C3-305E9FB83C7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +25,14 @@ Global
 		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5F361AB-AF4C-4459-9484-7D3D064C2A4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A586F80-30C0-434C-A646-AAC91EA75DAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A586F80-30C0-434C-A646-AAC91EA75DAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A586F80-30C0-434C-A646-AAC91EA75DAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A586F80-30C0-434C-A646-AAC91EA75DAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4420F8D5-CA15-4D25-88C3-305E9FB83C7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4420F8D5-CA15-4D25-88C3-305E9FB83C7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4420F8D5-CA15-4D25-88C3-305E9FB83C7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4420F8D5-CA15-4D25-88C3-305E9FB83C7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

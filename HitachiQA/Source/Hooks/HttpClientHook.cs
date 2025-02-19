@@ -10,7 +10,7 @@ namespace HitachiQA.Source.Hooks
 {
     public class HttpClientHook : HookBase
     {
-        public HttpClientHook(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
+        public HttpClientHook(IConfiguration config) : base(config)
         {
 
         }

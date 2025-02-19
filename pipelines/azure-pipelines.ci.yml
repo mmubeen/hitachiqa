@@ -9,7 +9,7 @@ trigger:
     - master
     
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 variables:
   solution: '**/*.sln'
@@ -24,7 +24,7 @@ stages:
     jobs:
     - job: Build
       pool:
-        vmImage: 'ubuntu-latest'
+        vmImage: 'windows-latest'
       displayName: 'Build Test Publish'
       steps:
         - task: PowerShell@2

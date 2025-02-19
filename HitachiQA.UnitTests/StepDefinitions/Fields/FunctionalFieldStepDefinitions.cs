@@ -49,6 +49,7 @@ public class FunctionalFieldStepDefinitions
         var uri = new Uri(fullPath);
         await page.GotoAsync(uri.AbsoluteUri);
         await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        await PlaywrightHook.AttachVideoAsync(page, _testContext);
     }
 
     [When("User sets the value {string} for the field {string}")]
@@ -90,7 +91,7 @@ public class FunctionalFieldStepDefinitions
         await page.GetFieldAsync(label).ClickAsync();
     }
 
-    [Then("attach video")]
+    [Given("attach video")]
     public async Task ThenAttachVideo()
     {
         var page = await GetPageAsync();

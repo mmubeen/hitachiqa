@@ -8,7 +8,7 @@ namespace HitachiQA.Hooks
     public class SQLHook : HookBase
     {
 
-        public SQLHook(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
+        public SQLHook(IConfiguration config) : base(config)
         {
 
         }

@@ -8,7 +8,7 @@ namespace HitachiQA.Hooks
     public class ServiceBusHook : HookBase
     {
 
-        public ServiceBusHook(IObjectContainer oc, FeatureContext fc, IConfiguration config) : base(oc, fc, config)
+        public ServiceBusHook(IConfiguration config) : base(config)
         {
 
         }
