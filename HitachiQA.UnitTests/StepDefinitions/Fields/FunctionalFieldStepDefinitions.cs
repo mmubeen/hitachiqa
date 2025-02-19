@@ -21,7 +21,9 @@ public class FunctionalFieldStepDefinitions
             var config = configBuilder.AddJsonFile("appsettings.json").Build();
             config["Playwright.SlowMo"] = "50";
             var (browser, context) = await PlaywrightHook.InvokeNewPlaywrightBrowserAsync(config, playwright, "chrome");
-            context = await browser.NewContextAsync(new() { RecordVideoDir = Path.Join(Directory.GetCurrentDirectory(), "/Videos/"), StrictSelectors = true});
+            var contextOptions = new BrowserNewContextOptions { RecordVideoDir = Path.Join(Directory.GetCurrentDirectory(), "/Videos/"), StrictSelectors = true };
+            PlaywrightHook.LoadConfigurationIntoOptions(config, contextOptions);
+            context = await browser.NewContextAsync(contextOptions);
             var page = await context.NewPageAsync();
             page.SetDefaultTimeout(10000);
             _page = page;

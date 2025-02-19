@@ -147,10 +147,29 @@ namespace HitachiQA.Hooks.Browsers
             return !tags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase));
         }
 
-        private static BrowserTypeLaunchPersistentContextOptions GetPlaywrightOptionsWithProfile(IConfiguration config, string profile, string channel = "chrome")
+        public static BrowserTypeLaunchPersistentContextOptions GetPlaywrightOptionsWithProfile(IConfiguration config, string profile, string channel = "chrome")
         {
             var options = new BrowserTypeLaunchPersistentContextOptions();
-            var props = options.GetType().Properties();
+            LoadConfigurationIntoOptions(config, options);
+            options.Headless ??= false;
+            options.Channel ??= channel;
+            options.Args = [$"--profile-directory={profile}"];
+
+            return options;
+        }
+        public static BrowserTypeLaunchOptions GetPlaywrightOptions(IConfiguration configuration, string channel = "chrome")
+        {
+            var options = new BrowserTypeLaunchOptions();
+            LoadConfigurationIntoOptions(configuration, options);
+            options.Headless ??= false;
+            options.Channel ??= channel;
+            return options;
+        }
+
+        public static void LoadConfigurationIntoOptions(IConfiguration config, object options)
+        {
+            var type = options.GetType();
+            var props = type.GetProperties();
             foreach (var prop in props)
             {
                 if (prop.GetSetMethod() == null)
@@ -172,7 +191,11 @@ namespace HitachiQA.Hooks.Browsers
                 {
                     parsedValue = value;
                 }
-                else if(propTypeName == typeof(ViewportSize).Name)
+                else if (propTypeName == typeof(Single).Name)
+                {
+                    parsedValue = Single.Parse(value);
+                }
+                else if (propTypeName == typeof(ViewportSize).Name)
                 {
                     var wh = value.Split(",");
                     var width = 0;
@@ -181,7 +204,7 @@ namespace HitachiQA.Hooks.Browsers
                     {
                         width = int.Parse(wh[0]);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         throw new Exception($"Error Parsing Width of ViewportSize from {value} \n (e.g; Options.ViewportSize: '1200,800')", ex);
                     }
@@ -211,63 +234,9 @@ namespace HitachiQA.Hooks.Browsers
                 }
 
             }
-            options.Headless ??= false;
-            options.Channel ??= channel;
-            options.Args = [$"--profile-directory={profile}"];
-
-            return options;
         }
 
-        private static BrowserTypeLaunchOptions GetPlaywrightOptions(IConfiguration configuration, string channel = "chrome")
-        {
-            var options = new BrowserTypeLaunchOptions();
-            var props = options.GetType().Properties();
-            foreach (var prop in props)
-            {
-                if (prop.GetSetMethod() == null)
-                {
-                    continue;
-                }
-                var value = configuration.GetVariable($"Playwright.{prop.Name}", true);
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    continue;
-                }
-                object parsedValue;
-                var propTypeName = Nullable.GetUnderlyingType(prop.PropertyType)?.Name ?? prop.PropertyType.Name;
-                if (propTypeName == typeof(bool).Name)
-                {
-                    parsedValue = bool.Parse(value);
-                }
-                else if (propTypeName == typeof(string).Name)
-                {
-                    parsedValue = value;
-                }
-                else if(propTypeName == typeof(Single).Name)
-                {
-                    parsedValue = Single.Parse(value);
-                }
-                else
-                {
-                    throw new NotImplementedException(propTypeName);
-                }
 
-                try
-                {
-                    prop.GetSetMethod()?.Invoke(options, new[] { parsedValue });
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"error setting playwright option `Playwright.{prop.Name}` value: `{value ?? "null"}`\n", ex);
-                }
-
-            }
-
-            options.Headless ??= false;
-            options.Channel ??= channel;
-
-            return options;
-        }
 
     }
 }
