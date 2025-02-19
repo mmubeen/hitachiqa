@@ -31,7 +31,6 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
 		<PackageReference Include="Microsoft.Playwright" Version="1.49.0" />
 		<PackageReference Include="Microsoft.Playwright.MSTest" Version="1.49.0" />
 		<PackageReference Include="Otp.NET" Version="1.4.0" />
@@ -53,15 +52,6 @@
 	  <None Update="appsettings.json">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="content\testhost.dll">
-			<Pack>False</Pack>
-		</None>
-		<None Update="contentFiles\any\net8.0\testhost.dll">
-			<Pack>False</Pack>
-		</None>
 	</ItemGroup>
 
 </Project>
