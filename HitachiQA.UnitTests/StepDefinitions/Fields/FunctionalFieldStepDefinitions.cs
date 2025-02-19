@@ -50,7 +50,8 @@ public class FunctionalFieldStepDefinitions
         //}
         var uri = new Uri(fullPath);
         await page.GotoAsync(uri.AbsoluteUri);
-        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded, new PageWaitForLoadStateOptions { Timeout = 10000});
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle, new PageWaitForLoadStateOptions { Timeout = 10000 });
         await PlaywrightHook.AttachVideoAsync(page, _testContext);
     }
 
