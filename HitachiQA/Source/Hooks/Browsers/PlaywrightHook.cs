@@ -90,7 +90,7 @@ namespace HitachiQA.Hooks.Browsers
         public static async Task AttachVideoAsync(IPage page, TestContext msContext)
         {
             var videoPath = await page.Video.PathAsync();
-            msContext.AddResultFile(videoPath);
+            msContext.AddResultFile(Path.GetFullPath(videoPath));
             Console.WriteLine($"\nVideo: {new Uri(videoPath)}\n");
         }
 

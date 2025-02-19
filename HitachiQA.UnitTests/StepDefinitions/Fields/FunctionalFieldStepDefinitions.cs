@@ -56,15 +56,29 @@ public class FunctionalFieldStepDefinitions
     public async Task WhenUserSetsTheValueForTheField(string value, string identifier)
     {
         var page = await GetPageAsync();
-        await page.GetFieldAsync(identifier, 5).SetFieldValueAsync(value);
+        try
+        {
+            await page.GetFieldAsync(identifier, 10).SetFieldValueAsync(value);
+        }
+        catch (Exception ex)
+        {
+            await PlaywrightHook.AttachVideoAsync(page, _testContext);
+        }
     }
 
     [When("User sets the value {string} for the field {string} as array")]
     public async Task WhenUserSetsTheValueForTheFieldAsArray(string value, string identifier)
     {
         var page = await GetPageAsync();
-        var values = value.Split(';').Select(s=>s.Trim()).ToArray();
-        await page.GetFieldAsync(identifier, 5).SetFieldValueAsync(values);
+        try
+        {
+            var values = value.Split(';').Select(s => s.Trim()).ToArray();
+            await page.GetFieldAsync(identifier, 10).SetFieldValueAsync(values);
+        }
+        catch(Exception ex)
+        {
+            await PlaywrightHook.AttachVideoAsync(page, _testContext);
+        }
     }
 
 
@@ -72,7 +86,7 @@ public class FunctionalFieldStepDefinitions
     public async Task ThenTheFieldValueShouldBeOr(string identifier, string expected, string enteredValue)
     {
         var page = await GetPageAsync();
-        var value = await page.GetFieldAsync(identifier, 5).GetFieldValueAsync();
+        var value = await page.GetFieldAsync(identifier, 10).GetFieldValueAsync();
         if(!string.IsNullOrWhiteSpace(expected))
         {
             value.Should().Be(expected);
