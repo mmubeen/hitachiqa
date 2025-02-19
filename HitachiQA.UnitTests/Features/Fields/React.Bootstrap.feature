@@ -6,9 +6,9 @@ A short summary of the feature
 
 Scenario: Test SetFieldValue
 	Given The HTML page is loaded for 'react.bootstrap'
-	Given attach video
 	When User sets the value '<FieldValue>' for the field '<FieldIdentifier>'
 	Then The field '<FieldIdentifier>' value should be '<ExpectedValue>' or '<FieldValue>'
+	And attach video
 
 	Examples: 
 	| description                           | FieldIdentifier     | FieldValue   | ExpectedValue |

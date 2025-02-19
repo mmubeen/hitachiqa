@@ -54,4 +54,14 @@
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="content\testhost.dll">
+			<Pack>False</Pack>
+		</None>
+		<None Update="contentFiles\any\net8.0\testhost.dll">
+			<Pack>False</Pack>
+		</None>
+	</ItemGroup>
+
 </Project>

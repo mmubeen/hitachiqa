@@ -105,7 +105,7 @@ public class FunctionalFieldStepDefinitions
         await page.GetFieldAsync(label).ClickAsync();
     }
 
-    [Given("attach video")]
+    [Then("attach video")]
     public async Task ThenAttachVideo()
     {
         var page = await GetPageAsync();
