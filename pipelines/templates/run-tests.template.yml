@@ -39,6 +39,6 @@ steps:
     rerunFailedTests: true
     rerunMaxAttempts: 2
     rerunFailedThreshold: 30
-    TestCaseFilter: '${{ parameters.filter }}'
+    otherConsoleOptions: '/TestCaseFilter:${{ parameters.filter }}'
     testRunTitle: $(runTitle)
 
