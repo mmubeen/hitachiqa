@@ -36,11 +36,9 @@ steps:
     testAssemblyVer2: '**/bin/**/HitachiQA.UnitTests.dll'
     searchFolder: '$(System.DefaultWorkingDirectory)'
     runSettingsFile: '$(System.DefaultWorkingDirectory)/HitachiQA.UnitTests/${{ parameters.runsettings }}'
-    runInParallel: true
     rerunFailedTests: true
-    rerunMaxAttempts: 3
-    rerunFailedThreshold: 5
-    rerunTestCasesMaxLimit: 50
-    otherConsoleOptions: '/TestCaseFilter:${{ parameters.filter }}'
+    rerunMaxAttempts: 2
+    rerunFailedThreshold: 30
+    TestCaseFilter: '${{ parameters.filter }}'
     testRunTitle: $(runTitle)
 

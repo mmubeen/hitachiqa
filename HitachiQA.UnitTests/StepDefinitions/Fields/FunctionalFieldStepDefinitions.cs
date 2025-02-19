@@ -23,7 +23,7 @@ public class FunctionalFieldStepDefinitions
             var (browser, context) = await PlaywrightHook.InvokeNewPlaywrightBrowserAsync(config, playwright, "chrome");
             context = await browser.NewContextAsync(new() { RecordVideoDir = Path.Join(Directory.GetCurrentDirectory(), "/Videos/"), StrictSelectors = true});
             var page = await context.NewPageAsync();
-            page.SetDefaultTimeout(5000);
+            page.SetDefaultTimeout(10000);
             _page = page;
         }
         return _page;
@@ -60,9 +60,10 @@ public class FunctionalFieldStepDefinitions
         {
             await page.GetFieldAsync(identifier, 10).SetFieldValueAsync(value);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await PlaywrightHook.AttachVideoAsync(page, _testContext);
+            throw;
         }
     }
 
@@ -75,9 +76,10 @@ public class FunctionalFieldStepDefinitions
             var values = value.Split(';').Select(s => s.Trim()).ToArray();
             await page.GetFieldAsync(identifier, 10).SetFieldValueAsync(values);
         }
-        catch(Exception ex)
+        catch(Exception)
         {
             await PlaywrightHook.AttachVideoAsync(page, _testContext);
+            throw;
         }
     }
 

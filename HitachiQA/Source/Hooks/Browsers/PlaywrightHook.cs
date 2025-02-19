@@ -1,4 +1,5 @@
-﻿using HitachiQA.Helpers;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using HitachiQA.Helpers;
 using HitachiQA.Playwright;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Playwright;
@@ -171,6 +172,30 @@ namespace HitachiQA.Hooks.Browsers
                 {
                     parsedValue = value;
                 }
+                else if(propTypeName == typeof(ViewportSize).Name)
+                {
+                    var wh = value.Split(",");
+                    var width = 0;
+                    var height = 0;
+                    try
+                    {
+                        width = int.Parse(wh[0]);
+                    }
+                    catch(Exception ex)
+                    {
+                        throw new Exception($"Error Parsing Width of ViewportSize from {value} \n (e.g; Options.ViewportSize: '1200,800')", ex);
+                    }
+                    try
+                    {
+                        height = int.Parse(wh[1]);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Error Parsing Height of ViewportSize from {value} \n (e.g; Options.ViewportSize: '1200,800')", ex);
+                    }
+                    parsedValue = new ViewportSize { Width = width, Height = height };
+
+                }
                 else
                 {
                     throw new NotImplementedException(propTypeName);
@@ -186,7 +211,6 @@ namespace HitachiQA.Hooks.Browsers
                 }
 
             }
-
             options.Headless ??= false;
             options.Channel ??= channel;
             options.Args = [$"--profile-directory={profile}"];
