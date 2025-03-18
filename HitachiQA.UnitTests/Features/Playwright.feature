@@ -1,9 +1,9 @@
 ﻿
+@playwright
 Feature: Playwright
 Tests the logger functionality
 
 
-@playwright
 Scenario: Navigating to a site
 	Given Playwright is up
 	Then user should land on HSAL homepage playwright

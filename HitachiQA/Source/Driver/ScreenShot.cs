@@ -112,7 +112,7 @@ namespace HitachiQA
             {
                 var screenshot = takesScreenshot.GetScreenshot();
 
-                string screenshotFilePath = Path.Combine(ArtifactDirectory, FileNameBase + "_screenshot.png");
+                string screenshotFilePath = Path.Combine(ArtifactDirectory, filePath);
 
                 screenshot.SaveAsFile(screenshotFilePath);
                 return true;
