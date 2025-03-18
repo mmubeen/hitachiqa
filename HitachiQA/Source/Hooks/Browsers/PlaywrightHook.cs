@@ -147,8 +147,13 @@ namespace HitachiQA.Hooks.Browsers
             return !tags.Contains("Selenium", ignorecase) && (framework?.ToUpper() == "PLAYWRIGHT" || tags.Contains("Playwright", ignorecase));
         }
 
+        public static BrowserTypeLaunchPersistentContextOptions BrowserTypeLaunchPersistentContextOptions = null;
         public static BrowserTypeLaunchPersistentContextOptions GetPlaywrightOptionsWithProfile(IConfiguration config, string profile, string channel = "chrome")
         {
+            if(BrowserTypeLaunchPersistentContextOptions != null)
+            {
+                return BrowserTypeLaunchPersistentContextOptions;
+            }
             var options = new BrowserTypeLaunchPersistentContextOptions();
             LoadConfigurationIntoOptions(config, options);
             options.Headless ??= false;
@@ -157,8 +162,15 @@ namespace HitachiQA.Hooks.Browsers
 
             return options;
         }
+
+        public static BrowserTypeLaunchOptions BrowserTypeLaunchOptions = null;
         public static BrowserTypeLaunchOptions GetPlaywrightOptions(IConfiguration configuration, string channel = "chrome")
         {
+            if (BrowserTypeLaunchOptions != null)
+            {
+                return BrowserTypeLaunchOptions;
+            }
+
             var options = new BrowserTypeLaunchOptions();
             LoadConfigurationIntoOptions(configuration, options);
             options.Headless ??= false;

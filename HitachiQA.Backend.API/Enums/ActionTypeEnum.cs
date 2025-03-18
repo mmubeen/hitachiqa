@@ -13,7 +13,8 @@ public enum ActionTypeEnum
     SetFieldValue,
     
     [ActionExecutor(typeof(NavigateExecutor))]
-    Navigate
+    Navigate,
+
 }
 
 [AttributeUsage(AttributeTargets.Field)] // 👈 Applied to enum fields

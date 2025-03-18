@@ -35,6 +35,7 @@ namespace HitachiQA.UnitTests.StepDefinitions
             await Page.GetFieldAsync("open-global-search").ClickAsync();
             await Page.GetFieldAsync("site-search-keyword").SetFieldValueAsync("automation");
             await Page.Locator("xpath=//*[@aria-label='search']").ClickAsync();
+            _screenShot.Error();
         }
 
 
