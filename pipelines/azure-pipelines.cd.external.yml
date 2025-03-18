@@ -37,7 +37,7 @@ jobs:
       condition: 'not(${{ parameters.MajorRelease }})'
       inputs:
         command: 'push'
-        packagesToPush: '$**/minor/*.nupkg; !**/*.symbols.nupkg'
+        packagesToPush: '**/minor/*.nupkg; !**/*.symbols.nupkg'
         nuGetFeedType: 'external'
         publishFeedCredentials: ${{ parameters.TargetServiceConnection }}
     
