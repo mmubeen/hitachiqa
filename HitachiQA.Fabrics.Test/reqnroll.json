@@ -1,0 +1,10 @@
+{
+  "stepAssemblies": [
+    {
+      "assembly": "HitachiQA"
+    }
+  ],
+  "generator": {
+    "allowRowTests": false
+  }
+}
