@@ -1,9 +1,7 @@
-﻿using ExpeditorsBuildAutomation.Client.HttpClients;
-using ExpeditorsBuildAutomation.Client.Orchestrator;
-using HitachiQA;
+﻿using HitachiQA.Fabrics.Test.Client.Orchestrator;
 using Newtonsoft.Json.Linq;
 
-namespace ExpeditorsBuildAutomation.StepDefinitions;
+namespace HitachiQA.Fabrics.Test.StepDefinitions;
 
 [Binding]
 public class HealthCheckStepDefinitions
@@ -26,6 +24,6 @@ public class HealthCheckStepDefinitions
     [Then(@"Notebooks should come back")]
     public void ThenNotebooksShouldComeBack()
     {
-        Log.Info(Notebooks[0]);
+        Log.Info(Notebooks);
     }
 }

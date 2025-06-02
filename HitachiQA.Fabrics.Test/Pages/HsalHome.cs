@@ -1,12 +1,12 @@
-using BoDi;
 using HitachiQA.Playwright;
 using Microsoft.Playwright;
+using Reqnroll.BoDi;
 
-namespace ExpeditorsBuildAutomation.Pages
+namespace HitachiQA.Fabrics.Test.Pages
 {
     public class HsalHome : BasePage
     {
-        public HsalHome(ObjectContainer OC) : base(OC)
+        public HsalHome(IObjectContainer OC) : base(OC)
         {
         }
         public string URL_PATH = "/";

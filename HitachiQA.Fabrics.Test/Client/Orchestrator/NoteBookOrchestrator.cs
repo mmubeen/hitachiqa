@@ -1,8 +1,8 @@
-﻿using ExpeditorsBuildAutomation.Client.HttpClients;
+﻿using HitachiQA.Fabrics.Test.Client.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 
-namespace ExpeditorsBuildAutomation.Client.Orchestrator;
+namespace HitachiQA.Fabrics.Test.Client.Orchestrator;
 
 public class NoteBookOrchestrator
 {

@@ -3,5 +3,8 @@
     {
       "assembly": "HitachiQA"
     }
-  ]
+  ],
+  "generator": {
+    "allowRowTests": false
+  }
 }

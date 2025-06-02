@@ -1,12 +1,11 @@
-﻿using BoDi;
-using ExpeditorsBuildAutomation.Client.HttpClients;
-using HitachiQA;
+﻿using HitachiQA.Fabrics.Test.Client.HttpClients;
 using HitachiQA.Source.Hooks.HttpClientExtras;
 using HitachiQA.Source.HttpClients;
 using Microsoft.Extensions.Configuration;
+using Reqnroll.BoDi;
 using System.Net.Http.Headers;
 
-namespace ExpeditorsBuildAutomation.Hooks
+namespace HitachiQA.Fabrics.Test.Hooks
 {
     [Binding]
     public class HttpClientHooks

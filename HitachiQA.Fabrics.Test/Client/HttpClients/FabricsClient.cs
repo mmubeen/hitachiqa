@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-namespace ExpeditorsBuildAutomation.Client.HttpClients;
+namespace HitachiQA.Fabrics.Test.Client.HttpClients;
 
 public class FabricsClient
 {

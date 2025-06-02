@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace ExpeditorsBuildAutomation
+namespace HitachiQA.Fabrics.Test
 {
     internal static class ExtensionMethods
     {

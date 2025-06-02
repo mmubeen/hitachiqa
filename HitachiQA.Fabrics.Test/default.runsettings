@@ -6,7 +6,9 @@
 			<SERVER_HOST>https://api.fabric.microsoft.com</SERVER_HOST>
 			<BROWSER>Chrome</BROWSER>
 			<OPTIONS>--incognito</OPTIONS>
-			<WORKSPACE_ID>f8408040-f6a4-42dc-b039-19b5ba49f43a</WORKSPACE_ID>
+			<!--Prod-GitHubTest_WS3 workspace Id-->
+			<WORKSPACE_ID>dcea3d92-cc5d-4291-9db5-05a655853e66</WORKSPACE_ID>
+			<CONFIG_SOURCE_TYPE>None</CONFIG_SOURCE_TYPE>
 		</EnvironmentVariables>
 	</RunConfiguration>
 </RunSettings>
