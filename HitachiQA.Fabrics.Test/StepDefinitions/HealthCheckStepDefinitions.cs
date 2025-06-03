@@ -1,4 +1,4 @@
-﻿using HitachiQA.Fabrics.Test.Orchestrators;
+using HitachiQA.Fabrics.Test.Orchestrators;
 using Microsoft.Fabric.Api.Notebook.Models;
 using Microsoft.Fabric.Api.Utils;
 

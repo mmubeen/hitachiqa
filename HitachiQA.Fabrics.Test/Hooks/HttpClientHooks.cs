@@ -1,4 +1,4 @@
-﻿using HitachiQA.Source.Hooks.HttpClientExtras;
+using HitachiQA.Source.Hooks.HttpClientExtras;
 using HitachiQA.Source.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
