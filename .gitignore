@@ -337,3 +337,5 @@ ASALocalRun/
 .mfractor/
 
 **/Videos/**
+bin/
+obj/

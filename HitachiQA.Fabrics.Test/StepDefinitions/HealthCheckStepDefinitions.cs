@@ -1,5 +1,6 @@
-﻿using HitachiQA.Fabrics.Test.Client.Orchestrator;
-using Newtonsoft.Json.Linq;
+using HitachiQA.Fabrics.Test.Orchestrators;
+using Microsoft.Fabric.Api.Notebook.Models;
+using Microsoft.Fabric.Api.Utils;
 
 namespace HitachiQA.Fabrics.Test.StepDefinitions;
 
@@ -8,7 +9,7 @@ public class HealthCheckStepDefinitions
 {
     private readonly NoteBookOrchestrator _noteBookOrchestrator;
 
-    private JArray Notebooks { get; set; }
+    private AsyncPageableResponse<Notebook> Notebooks { get; set; }
 
     public HealthCheckStepDefinitions(NoteBookOrchestrator noteBookOrchestrator)
     {
@@ -16,14 +17,24 @@ public class HealthCheckStepDefinitions
     }
 
     [When(@"user gets Notebooks from fabrics")]
-    public async Task WhenUserGetsNotebooksFromFabrics()
+    public void WhenUserGetsNotebooksFromFabrics()
     {
-        Notebooks = await _noteBookOrchestrator.GetNotebooks();
+        //get expected data out of github 
+
+
+        // get current state in fabrics
+        Notebooks = _noteBookOrchestrator.GetNotebooksAsync();
+
+
+        //assert fabrics matches the expected in github
     }
 
     [Then(@"Notebooks should come back")]
-    public void ThenNotebooksShouldComeBack()
+    public async Task ThenNotebooksShouldComeBack()
     {
-        Log.Info(Notebooks);
+        await foreach (var notebook in Notebooks)
+        {
+            Console.WriteLine($"Notebook: {notebook.DisplayName}");
+        }
     }
 }

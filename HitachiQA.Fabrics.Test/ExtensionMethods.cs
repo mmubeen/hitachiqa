@@ -9,5 +9,10 @@ namespace HitachiQA.Fabrics.Test
             var rawStr = await message.Content.ReadAsStringAsync();
             return JObject.Parse(rawStr);
         }
+        public async static Task<JArray> ParseIntoJArrayAsync(this HttpResponseMessage message)
+        {
+            var rawStr = await message.Content.ReadAsStringAsync();
+            return JArray.Parse(rawStr);
+        }
     }
 }

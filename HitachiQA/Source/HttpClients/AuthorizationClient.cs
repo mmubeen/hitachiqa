@@ -1,4 +1,6 @@
-﻿using HitachiQA.Helpers;
+﻿using Azure.Core;
+using FluentAssertions.Common;
+using HitachiQA.Helpers;
 using HitachiQA.Source.HttpClients.Authorization;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
@@ -7,7 +9,7 @@ using System.Text.Json;
 
 namespace HitachiQA.Source.HttpClients
 {
-    public class AuthorizationClient
+    public class AuthorizationClient : TokenCredential
     {
         private readonly SemaphoreSlim _semaphore = new(1, 1);
 
@@ -15,9 +17,7 @@ namespace HitachiQA.Source.HttpClients
         private readonly InteractivePlaywrightAuth _playwrightInteractive;
         private readonly InteractiveWebdriverAuth _webDriverInteractive;
 
-        private Credentials _latestCreds { get; set; }
-
-
+        public Credentials CurrentCredentials { get; set; }
         public HttpClient HttpClient { get; init; }
         public IConfiguration Config { get; init; }
         public string TenantId { get; init; }
@@ -70,15 +70,15 @@ namespace HitachiQA.Source.HttpClients
 
                     var filePath = GetFilePath();
                     //use local cache to reuse token
-                    if (_latestCreds == null && File.Exists(filePath))
+                    if (CurrentCredentials == null && File.Exists(filePath))
                     {
                         var content = await File.ReadAllTextAsync(filePath);
-                        _latestCreds = JsonSerializer.Deserialize<Credentials>(content);
+                        CurrentCredentials = JsonSerializer.Deserialize<Credentials>(content);
                     }
                     //generate new token if needed
-                    if (forceNewToken || _latestCreds == null || _latestCreds.ExpiryDateTime <= DateTime.Now)
+                    if (forceNewToken || CurrentCredentials == null || CurrentCredentials.ExpiryDateTime <= DateTime.Now)
                     {
-                        _latestCreds = await _interactiveAuth.AuthenticateUsingBrowserAsync();
+                        CurrentCredentials = await _interactiveAuth.AuthenticateUsingBrowserAsync();
                         SaveLatestCredsLocally();
                     }
 
@@ -87,17 +87,17 @@ namespace HitachiQA.Source.HttpClients
                 else
                 {
                     //acquire new token
-                    if (forceNewToken || _latestCreds == null || _latestCreds.ExpiryDateTime <= DateTime.Now)
+                    if (forceNewToken || CurrentCredentials == null || CurrentCredentials.ExpiryDateTime <= DateTime.Now)
                     {
                         var authRes = await AutheniticateUsingClientSecretAsync();
-                        _latestCreds = authRes.ToCredentials();
+                        CurrentCredentials = authRes.ToCredentials();
                     }
 
                 }
 
 
 
-                return _latestCreds.AccessToken;
+                return CurrentCredentials.AccessToken;
             }
             finally
             {
@@ -118,7 +118,7 @@ namespace HitachiQA.Source.HttpClients
 
         private void SaveLatestCredsLocally()
         {
-            var obj = _latestCreds.ToJObject();
+            var obj = CurrentCredentials.ToJObject();
             var filePath = GetFilePath();
             Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new NullReferenceException($"[SaveLatestCredsLocally] {filePath} directory returned null"));
             File.WriteAllText(filePath, obj.ToString());
@@ -159,13 +159,23 @@ namespace HitachiQA.Source.HttpClients
             if (string.IsNullOrWhiteSpace(Username)) missingProperties.Add("API_USERNAME");
             if (string.IsNullOrWhiteSpace(Password)) missingProperties.Add("API_PASSWORD");
 
-            if (missingProperties.Any())
+            if (missingProperties.Count != 0)
             {
                 throw new Exception($"The following configuration variables are missing:\n {string.Join(", ", missingProperties)}");
             }
         }
 
+        public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
+        {
+            return GetTokenAsync(requestContext, cancellationToken).Result;
+        }
 
+        public async override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+        {
+            var token = await GetBearerTokenAsync();
+            var at = new AccessToken(token, CurrentCredentials.ExpiryDateTime.Value.ToDateTimeOffset());
+            return at;
 
+        }
     }
 }
