@@ -53,12 +53,13 @@ namespace HitachiQA.Source.HttpClients.Authorization
             ?? throw new NullReferenceException("[GetAccessTokenCreds] PlaywrightHook.PlaywrightBrowser was null, driver is expectd at this point");
             var retry = Polly.Policy
               .HandleResult<object>(r => r == null)
-              .WaitAndRetryAsync(30, _ => TimeSpan.FromSeconds(1));
+              .WaitAndRetryAsync(60, _ => TimeSpan.FromSeconds(3));
 
             var host = Config.GetVariable("HOST");
             var server = new Uri(host).Host;
             await browser.WaitForURLAsync($"**/{server}/**", new() { Timeout = 120000 });
-
+            await browser.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await Task.Delay(5000);
             var accessToken = await retry.ExecuteAsync(async () =>
             {
                 var sessionRaw = await browser.EvaluateAsync("sessionStorage");

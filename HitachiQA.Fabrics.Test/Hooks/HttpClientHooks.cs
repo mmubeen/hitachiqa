@@ -1,9 +1,10 @@
-﻿using HitachiQA.Fabrics.Test.Client.HttpClients;
-using HitachiQA.Source.Hooks.HttpClientExtras;
+﻿using HitachiQA.Source.Hooks.HttpClientExtras;
 using HitachiQA.Source.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
 using System.Net.Http.Headers;
+using Microsoft.Fabric.Api;
+
 
 namespace HitachiQA.Fabrics.Test.Hooks
 {
@@ -20,22 +21,9 @@ namespace HitachiQA.Fabrics.Test.Hooks
         [BeforeFeature]
         public static void InitializeClients(
             IObjectContainer ioc, 
-            AuthorizationClient ac,
-            IConfiguration config)
+            AuthorizationClient ac)
         {
-            var socketHander = new SocketsHttpHandler()
-            {
-                MaxConnectionsPerServer = 10
-            };
-            var logging = new HttpLoggingHandler(socketHander);
-            var auth = new HttpAuthHandler(logging, ac, config);
-            var retry = new HttpRetryHandler(auth);
-            var client = new HttpClient(retry);
-            var host = config.GetVariable("SERVER_HOST");
-            client.BaseAddress = new Uri(host);
-            client.Timeout = TimeSpan.FromSeconds(120);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            var fabricsClient = new FabricsClient(client);
+            var fabricsClient = new FabricClient(ac);
             ioc.RegisterInstanceAs(fabricsClient);
 
         }

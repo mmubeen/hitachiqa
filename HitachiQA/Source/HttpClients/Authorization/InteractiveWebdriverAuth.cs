@@ -36,7 +36,7 @@ public class InteractiveWebdriverAuth : InteractiveAuthBase
         var accessToken = retry.Execute(() =>
                         driver.ExecuteScript(@$"for (let i = 0; i < localStorage.length; i++) {{
                                   const key = localStorage.key(i);
-                                  if (key.includes('accesstoken') && key.includes('{keyIdentifier}')) {{                              
+                                  if (key.includes('accesstoken') && keyIdentifier? key.includes('{keyIdentifier}'): true) {{                              
                                     return localStorage.getItem(key);
                                   }}
                                 }}

@@ -19,11 +19,10 @@ public abstract class InteractiveAuthBase
 
     public async Task<Credentials> AuthenticateUsingBrowserAsync()
     {
+        //this Key is used to identify within the Local Storage which of
+        //the access token to use when you have multiple users logged into the same app
+
         var keyIdentifier = Config.GetVariable("AUTH_INTERACTIVE_KEY_IDENTIFIER");
-        if (string.IsNullOrWhiteSpace(keyIdentifier))
-        {
-            throw new KeyNotFoundException("AUTH_INTERACTIVE_KEY_IDENTIFIER for interactive auth is not found in the configuration");
-        }
         var disposeDriverAfterTokenAcquisition = false;
         //if no driver has been ever invoked, then we invoke and attempt to auto sign in
         if (!IsBrowserRunning)
