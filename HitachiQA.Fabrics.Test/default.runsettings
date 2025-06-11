@@ -7,7 +7,9 @@
 			<BROWSER>Chrome</BROWSER>
 			<OPTIONS>--incognito</OPTIONS>
 			<!--Prod-GitHubTest_WS3 workspace Id-->
-			<WORKSPACE_ID>dcea3d92-cc5d-4291-9db5-05a655853e66</WORKSPACE_ID>
+			<!--<WORKSPACE_ID>dcea3d92-cc5d-4291-9db5-05a655853e66</WORKSPACE_ID>-->
+			<!--QA-GitHubTest_WS2 workspace Id-->
+			<WORKSPACE_ID>a9d7edf3-9473-4176-ae84-6e7b509ea248</WORKSPACE_ID>
 			<CONFIG_SOURCE_TYPE>None</CONFIG_SOURCE_TYPE>
 		</EnvironmentVariables>
 	</RunConfiguration>

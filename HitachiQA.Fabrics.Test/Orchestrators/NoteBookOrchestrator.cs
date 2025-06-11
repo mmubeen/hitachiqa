@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Fabric.Api;
 using Microsoft.Fabric.Api.Notebook.Models;
+using System.Collections;
 
 namespace HitachiQA.Fabrics.Test.Orchestrators;
 
@@ -15,17 +16,22 @@ public class NoteBookOrchestrator
         _config = config;
     }
 
-    public Microsoft.Fabric.Api.Utils.AsyncPageableResponse<Notebook> GetNotebooksAsync()
+    public async Task<IEnumerable<Notebook>> GetNotebooksAsync()
     {        
-        var workspace = Guid.Parse(_config.GetVariable("WORKSPACE_ID")); 
-        var res = fabricClient.Notebook.Items.ListNotebooksAsync(workspace);
-        return res;
+        var workspace = Guid.Parse(_config.GetVariable("WORKSPACE_ID"));
+        var res = fabricClient.Notebook.Items.ListNotebooks(workspace);
+        var result = new List<Notebook>();
+        foreach (var notebook in res)
+        {
+            result.Add(notebook);
+        }
+        return await Task.FromResult(result);
     }
 
     public async Task<Notebook> GetNotebookByNameAsync(string displayName)
     {
-        var notebooks = GetNotebooksAsync();
-        await foreach (var notebook in notebooks) {
+        var notebooks = await GetNotebooksAsync();
+        foreach (var notebook in notebooks) {
             if(notebook.DisplayName== displayName)
             {
                 return notebook;
