@@ -58,7 +58,7 @@ namespace HitachiQA.Source.HttpClients.Authorization
             var host = Config.GetVariable("HOST");
             var server = new Uri(host).Host;
             await browser.WaitForURLAsync($"**/{server}/**", new() { Timeout = 120000 });
-            await browser.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            // await browser.WaitForLoadStateAsync(LoadState.NetworkIdle);
             await Task.Delay(5000);
             var accessToken = await retry.ExecuteAsync(async () =>
             {
