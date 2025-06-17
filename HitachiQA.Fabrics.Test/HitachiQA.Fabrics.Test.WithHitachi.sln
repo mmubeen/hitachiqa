@@ -11,16 +11,21 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		WithHitachiQA|Any CPU = WithHitachiQA|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CACB331F-B912-46CE-959E-3A9E97C3B964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CACB331F-B912-46CE-959E-3A9E97C3B964}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CACB331F-B912-46CE-959E-3A9E97C3B964}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CACB331F-B912-46CE-959E-3A9E97C3B964}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CACB331F-B912-46CE-959E-3A9E97C3B964}.WithHitachiQA|Any CPU.ActiveCfg = WithHitachiQA|Any CPU
+		{CACB331F-B912-46CE-959E-3A9E97C3B964}.WithHitachiQA|Any CPU.Build.0 = WithHitachiQA|Any CPU
 		{1B9CAC2E-90B8-3583-E3E6-95096DDB463B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B9CAC2E-90B8-3583-E3E6-95096DDB463B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B9CAC2E-90B8-3583-E3E6-95096DDB463B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B9CAC2E-90B8-3583-E3E6-95096DDB463B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B9CAC2E-90B8-3583-E3E6-95096DDB463B}.WithHitachiQA|Any CPU.ActiveCfg = Release|Any CPU
+		{1B9CAC2E-90B8-3583-E3E6-95096DDB463B}.WithHitachiQA|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
