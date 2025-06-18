@@ -1,13 +1,13 @@
 ﻿using Azure.Core;
 using FluentAssertions.Common;
 using HitachiQA.Helpers;
-using HitachiQA.Source.HttpClients.Authorization;
+using HitachiQA.HttpClients.Authorization;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace HitachiQA.Source.HttpClients
+namespace HitachiQA.HttpClients
 {
     public class AuthorizationClient : TokenCredential
     {

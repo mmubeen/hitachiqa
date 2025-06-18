@@ -1,12 +1,12 @@
 ﻿using HitachiQA.Helpers;
 using HitachiQA.Hooks;
-using HitachiQA.Source.Hooks.HttpClientExtras;
-using HitachiQA.Source.HttpClients;
+using HitachiQA.Hooks.HttpClientExtras;
+using HitachiQA.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
 using System.Net.Http.Headers;
 
-namespace HitachiQA.Source.Hooks
+namespace HitachiQA.Hooks
 {
     public class HttpClientHook : HookBase
     {

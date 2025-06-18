@@ -2,39 +2,40 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-	<RunSettingsFilePath>$(MSBuildProjectDirectory)\default.runsettings</RunSettingsFilePath>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-
-    <IsPackable>false</IsPackable>
+	<RootNamespace>Fabrics.Test</RootNamespace>
+	<IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <UserSecretsId>7b85a15c-3a25-45e6-9b9e-df20af5954a9</UserSecretsId>
     <Configurations>Debug;Release;WithHitachiQA</Configurations>
   </PropertyGroup>
 
-	<ItemGroup Condition="'$(Configuration)' != 'WithHitachiQA'">
-    <PackageReference Include="HitachiQA" Version="1.8.8-202506031" />
-	</ItemGroup>
+
+	
+  <ItemGroup>
+	<PackageReference Include="HitachiQA" Version="1.8.8-202506031" />
+	<PackageReference Include="FluentAssertions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Fabric.Api" Version="1.0.0-beta.33" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.49.0" />
+    <PackageReference Include="Microsoft.Playwright.MSTest" Version="1.49.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.9.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.9.1" />
+	<PackageReference Include="Reqnroll.MsTest" Version="2.4.1" />
+	<PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="2.4.1" />
+  </ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'WithHitachiQA'">
 		<ProjectReference Include="..\HitachiQA\HitachiQA.csproj" />
 	</ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Fabric.Api" Version="1.0.0-beta.30" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
-    <PackageReference Include="Microsoft.Playwright" Version="1.49.0" />
-    <PackageReference Include="Microsoft.Playwright.MSTest" Version="1.49.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.9.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.9.1" />
-	  <PackageReference Include="Reqnroll.MsTest" Version="2.4.1" />
-	  <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="2.4.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Orchestrators\ExpectedProviders\dcdb6d8f14a6535753793e08bed4756efb5cbea4.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

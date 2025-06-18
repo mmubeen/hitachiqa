@@ -1,4 +1,4 @@
-﻿namespace HitachiQA.Source.HttpClients.Authorization;
+﻿namespace HitachiQA.HttpClients.Authorization;
 
 public class Credentials
 {

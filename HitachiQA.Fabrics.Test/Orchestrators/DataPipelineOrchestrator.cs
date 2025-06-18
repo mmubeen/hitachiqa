@@ -1,30 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Fabrics.Test.Orchestrators;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Fabric.Api;
 using Microsoft.Fabric.Api.DataPipeline.Models;
+using Microsoft.Fabric.Api.Warehouse.Models;
 
 namespace HitachiQA.Fabrics.Test.Orchestrators;
 
-public class DataPipelineOrchestrator
+public class DataPipelineOrchestrator : EntityOrchestratorBase<DataPipeline>
 {
-    private readonly FabricClient fabricClient;
-    private readonly IConfiguration _config;
-
-    public DataPipelineOrchestrator(FabricClient fabricCLient, IConfiguration config)
+    public DataPipelineOrchestrator(FabricClient fabricClient, IConfiguration config) : base(config, fabricClient)
     {
-        fabricClient = fabricCLient;
-        _config = config;
+
     }
 
-    public async Task<IEnumerable<DataPipeline>> GetDataPipelinesAsync()
-    {        
-        var workspace = Guid.Parse(_config.GetVariable("WORKSPACE_ID"));
-        var res = fabricClient.DataPipeline.Items.ListDataPipelines(workspace);
-        var result = new List<DataPipeline>();
-        foreach (var notebook in res)
-        {
-            result.Add(notebook);
-        }
-        return await Task.FromResult(result);
+    protected override IEnumerable<DataPipeline> ListItems(Guid workspaceId)
+    {
+        return FabricClient.DataPipeline.Items.ListDataPipelines(workspaceId);
     }
 
 

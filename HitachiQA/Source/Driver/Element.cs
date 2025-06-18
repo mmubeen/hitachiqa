@@ -91,36 +91,11 @@ namespace HitachiQA.Driver
             elementText.Should().Contain(text, $"Element {locators} \ntext: {elementText}  did not contain expected \ntext: {text}");
         }
 
-        [Obsolete("please use  assertElementContainsText(string text)")]
-        public bool assertElementContainsText(string text, bool optional = false)
-        {
-            string elementText = this.GetElementText();
-
-            if (Assert.TextContains(elementText, text, true))
-            {
-                return true;
-            }
-            Functions.HandleFailure(new Exception($"Element {locators.ToString()} \ntext: {elementText}  did not contain expected \ntext: {text}"), optional);
-            return false;
-        }
-
         public void assertElementTextEquals(string text)
         {
             string elementText = this.GetElementText();
             elementText.Should().Be(text, $"Element {locators} \ntext: {elementText}  did not contain expected \ntext: {text}");
 
-        }
-
-        [Obsolete("please use assertElementTextEquals(string text)")]
-        public bool assertElementTextEquals(string text, bool optional = false)
-        {
-            string elementText = this.GetElementText();
-            if (Assert.AreEqual(elementText, text, true))
-            {
-                return true;
-            }
-            Functions.HandleFailure(new Exception($"Element {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {text}"), optional);
-            return false;
         }
 
         public void assertElementInnerTextEquals(string text)
@@ -131,17 +106,6 @@ namespace HitachiQA.Driver
 
         }
 
-        [Obsolete("please use assertElementInnerTextEquals(string text)")]
-        public bool assertElementInnerTextEquals(string text, bool optional = false)
-        {
-            string innerText = this.GetInnerText();
-            if (Assert.AreEqual(innerText, text, true))
-            {
-                return true;
-            }
-            Functions.HandleFailure(new Exception($"Element {locators.ToString()} \ninner text: {innerText} did not equal expected\n      text: {text}"), optional);
-            return false;
-        }
 
         /// <summary>
         ///  Waits for the element to be vissible in the page
@@ -302,18 +266,6 @@ namespace HitachiQA.Driver
 
             elementText.Should().Be(expected, $"Text Field {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}");
 
-        }
-
-        [Obsolete("please use GetFieldValue().should().be(expected) instead")]
-        public bool assertTextFieldTextEquals(string expected, bool optional = false)
-        {
-            string elementText = this.getTextFieldText();
-            if (Assert.AreEqual(elementText, expected, true))
-            {
-                return true;
-            }
-            Functions.HandleFailure(new Exception($"Text Field {locators.ToString()} \ntext: {elementText} did not equal expected\ntext: {expected}"), optional);
-            return false;
         }
 
 

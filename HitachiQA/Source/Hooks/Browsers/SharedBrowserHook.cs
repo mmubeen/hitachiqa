@@ -1,7 +1,7 @@
 ﻿using HitachiQA.Hooks.Browsers;
 using Reqnroll.BoDi;
 
-namespace HitachiQA.Source.Hooks.Browsers
+namespace HitachiQA.Hooks.Browsers
 {
     [Binding]
     public class SharedBrowserHook

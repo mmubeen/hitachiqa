@@ -1,6 +1,6 @@
 ﻿using Polly;
 
-namespace HitachiQA.Source.Hooks.HttpClientExtras
+namespace HitachiQA.Hooks.HttpClientExtras
 {
     public class HttpRetryHandler : DelegatingHandler
     {

@@ -1,6 +1,6 @@
 ﻿using HitachiQA.Helpers;
 using Microsoft.Extensions.Configuration;
-namespace HitachiQA.Source.HttpClients.Authorization;
+namespace HitachiQA.HttpClients.Authorization;
 
 public abstract class InteractiveAuthBase
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HitachiQA.Source.HttpClients.Authorization;
+namespace HitachiQA.HttpClients.Authorization;
 
 public class AuthorizationResponseResource
 {

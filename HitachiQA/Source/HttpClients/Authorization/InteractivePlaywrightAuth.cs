@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using Polly;
 
-namespace HitachiQA.Source.HttpClients.Authorization
+namespace HitachiQA.HttpClients.Authorization
 {
     public class InteractivePlaywrightAuth : InteractiveAuthBase
     {

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 
-namespace HitachiQA.Source.Hooks.HttpClientExtras
+namespace HitachiQA.Hooks.HttpClientExtras
 {
     public class HttpLoggingHandler : DelegatingHandler
     {

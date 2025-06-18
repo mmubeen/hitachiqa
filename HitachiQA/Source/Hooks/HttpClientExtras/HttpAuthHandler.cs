@@ -1,9 +1,9 @@
-﻿using HitachiQA.Source.HttpClients;
+﻿using HitachiQA.HttpClients;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 
 
-namespace HitachiQA.Source.Hooks.HttpClientExtras
+namespace HitachiQA.Hooks.HttpClientExtras
 {
     public class HttpAuthHandler : DelegatingHandler
     {

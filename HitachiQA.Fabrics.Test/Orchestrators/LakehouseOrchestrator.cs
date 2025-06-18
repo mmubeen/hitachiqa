@@ -4,26 +4,15 @@ using Microsoft.Fabric.Api.Lakehouse.Models;
 
 namespace HitachiQA.Fabrics.Test.Orchestrators;
 
-public class LakehouseOrchestrator
+public class LakehouseOrchestrator : EntityOrchestratorBase<Lakehouse>
 {
-    private readonly FabricClient fabricClient;
-    private readonly IConfiguration _config;
-
-    public LakehouseOrchestrator(FabricClient fabricClient, IConfiguration config)
+    public LakehouseOrchestrator(FabricClient fabricClient, IConfiguration config) : base(config, fabricClient)
     {
-        this.fabricClient = fabricClient;
-        _config = config;
+
     }
 
-    public async Task<IEnumerable<Lakehouse>> GetLakehousesAsync()
+    protected override IEnumerable<Lakehouse> ListItems(Guid workspaceId)
     {
-        var workspace = Guid.Parse(_config.GetVariable("WORKSPACE_ID"));
-        var res = fabricClient.Lakehouse.Items.ListLakehouses(workspace);
-        var result = new List<Lakehouse>();
-        foreach (var lakehouse in res)
-        {
-            result.Add(lakehouse);
-        }
-        return await Task.FromResult(result);
+        return FabricClient.Lakehouse.Items.ListLakehouses(workspaceId);
     }
 }

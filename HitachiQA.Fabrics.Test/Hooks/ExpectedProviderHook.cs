@@ -2,16 +2,17 @@ using HitachiQA.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
 using Microsoft.Fabric.Api;
+using Fabrics.Test.Orchestrators.ExpectedProviders;
 
 
 namespace HitachiQA.Fabrics.Test.Hooks
 {
     [Binding]
-    public class HttpClientHooks
+    public class ExpectedProviderHook
     {
         private readonly IConfiguration config;
 
-        public HttpClientHooks(IConfiguration config)
+        public ExpectedProviderHook(IConfiguration config)
         {
             this.config = config;
         }
@@ -21,8 +22,7 @@ namespace HitachiQA.Fabrics.Test.Hooks
             IObjectContainer ioc, 
             AuthorizationClient ac)
         {
-            var fabricsClient = new FabricClient(ac);
-            ioc.RegisterInstanceAs(fabricsClient);
+            ioc.RegisterTypeAs<GithubExpectedProvider, IExpectedProvider>();
 
         }
     }

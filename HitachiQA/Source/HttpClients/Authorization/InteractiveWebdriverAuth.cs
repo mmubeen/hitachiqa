@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using Polly;
 
-namespace HitachiQA.Source.HttpClients.Authorization;
+namespace HitachiQA.HttpClients.Authorization;
 
 public class InteractiveWebdriverAuth : InteractiveAuthBase
 {

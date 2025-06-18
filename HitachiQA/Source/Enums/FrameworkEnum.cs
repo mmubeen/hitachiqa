@@ -1,4 +1,4 @@
-﻿namespace HitachiQA.Source.Enums;
+﻿namespace HitachiQA.Enums;
 
 public enum FrameworkEnum
 {
