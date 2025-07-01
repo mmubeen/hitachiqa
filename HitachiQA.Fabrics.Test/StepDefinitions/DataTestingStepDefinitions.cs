@@ -1,141 +1,51 @@
-using System;
 using HitachiQA;
-using IBM.Data.Db2;
+using HitachiQA.Helpers;
 
-using Reqnroll;
+namespace Fabrics.Test.StepDefinitions;
 
-namespace Fabrics.Test.StepDefinitions
+
+[Binding]
+public class DataTestingStepDefinitions
 {
+    private readonly SQL db2;
 
-    [Binding]
-    public class DataTestingStepDefinitions
-
+    public DataTestingStepDefinitions(SQL sql)
     {
+        db2 = sql;
+    }
 
-        [Given("We access the data from DW Tables")]
-        public async Task GivenWeAccessTheDataFromDWTables()
+
+    [Given("We access the data from DW Tables")]
+    public async Task GivenWeAccessTheDataFromDWTables()
+    {
+        Log.Info("Starting: DW table access");
+
+        var host = Environment.GetEnvironmentVariable("DB_HOST");
+        var port = Environment.GetEnvironmentVariable("DB_PORT");
+        var name = Environment.GetEnvironmentVariable("DB_NAME");
+        var user = Environment.GetEnvironmentVariable("DB_USER");
+        var pass = Environment.GetEnvironmentVariable("DB_PASS");
+
+        if (string.IsNullOrWhiteSpace(host) ||
+            string.IsNullOrWhiteSpace(port) ||
+            string.IsNullOrWhiteSpace(name) ||
+            string.IsNullOrWhiteSpace(user) ||
+            string.IsNullOrWhiteSpace(pass))
         {
-
-            Log.Info("Starting: DW table access");
-
-            var host = Environment.GetEnvironmentVariable("DB_HOST");
-            var port = Environment.GetEnvironmentVariable("DB_PORT");
-            var name = Environment.GetEnvironmentVariable("DB_NAME");
-            var user = Environment.GetEnvironmentVariable("DB_USER");
-            var pass = Environment.GetEnvironmentVariable("DB_PASS");
-
-            if (string.IsNullOrWhiteSpace(host) ||
-                string.IsNullOrWhiteSpace(port) ||
-                string.IsNullOrWhiteSpace(name) ||
-                string.IsNullOrWhiteSpace(user) ||
-                string.IsNullOrWhiteSpace(pass))
-            {
-                throw new Exception("One or more required DB environment variables are missing or empty.");
-            }
-
-            string connectionString = $"Server={host}:{port};" +
-                                      $"Database={name};" +
-                                      $"UserID={user};" +
-                                      $"Password={pass};" +
-                                      $"Connect Timeout=30;";
-
-            try
-
-            {
-
-                using var connection = new DB2Connection(connectionString);
-
-                Log.Info("Opening DB connection...");
-
-                await connection.OpenAsync();
-
-                Log.Info("DB connection successful!");
-
-                string sql = "SELECT CURRENT TIMESTAMP FROM SYSIBM.SYSDUMMY1";
-
-                using var command = new DB2Command(sql, connection);
-
-                var result = await command.ExecuteScalarAsync();
-
-                if (result == null)
-
-                    throw new Exception("No result returned from DB query.");
-
-                Log.Info($"Current DB2 Timestamp: {result}");
-
-                await ExecuteExampleQueryAsync(connection);
-
-            }
-
-            catch (DB2Exception ex)
-
-            {
-
-                throw new Exception($"DB2 Error: {ex.Message} | SQL State: {ex.SqlState} | Error Code: {ex.ErrorCode}");
-
-            }
-
-            catch (Exception ex)
-
-            {
-
-                throw new Exception($"General Error: {ex.Message}");
-
-            }
-
+            throw new Exception("One or more required DB environment variables are missing or empty.");
         }
 
-        private async Task ExecuteExampleQueryAsync(DB2Connection connection)
+        string connectionString = $"Server={host}:{port};" +
+                                  $"Database={name};" +
+                                  $"UserID={user};" +
+                                  $"Password={pass};" +
+                                  $"Connect Timeout=30;";
 
-        {
+        string sql01 = @"SELECT CURRENCY_EXCHANGE_KEY, CURRENCY_KEY FROM ead_md.currency_exchange_dimension WHERE INSERT_DATE BETWEEN '2025-02-01' AND '2025-05-30' ORDER BY CURRENCY_EXCHANGE_KEY LIMIT 10";
+        var result = await db2.ExecuteQueryAsync(sql01);
+        Log.Info($"Returned {result.Count} results");
+        Log.Info(result);
 
-            string sql = @"
-                 
-                SELECT TABSCHEMA, TABNAME 
-   
-                FROM SYSCAT.TABLES 
-    
-                WHERE TABSCHEMA NOT LIKE 'SYS%' 
-    
-                FETCH FIRST 10 ROWS ONLY";
-
-            string sql01 = @"SELECT CURRENCY_EXCHANGE_KEY, CURRENCY_KEY FROM ead_md.currency_exchange_dimension WHERE INSERT_DATE BETWEEN '2025-02-01' AND '2025-05-30' ORDER BY CURRENCY_EXCHANGE_KEY LIMIT 10";
-
-            Log.Info("Executing table list query...");
-
-            using var command = new DB2Command(sql01, connection);
-
-            using var reader = await command.ExecuteReaderAsync();
-
-            int rowCount = 0;
-
-            Log.Info("Schema\t\tTable Name");
-
-            Log.Info("------\t\t----------");
-
-            while (await reader.ReadAsync())
-
-            {
-
-                string schema = reader["CURRENCY_EXCHANGE_KEY"].ToString();
-
-                string tableName = reader["CURRENCY_KEY"].ToString();
-
-                Log.Info($"{schema}\t\t{tableName}");
-
-                rowCount++;
-
-            }
-
-            if (rowCount == 0)
-
-                throw new Exception("No user tables found in SYSCAT.TABLES.");
-
-            else
-
-                Log.Info($"Retrieved {rowCount} user tables.");
-
-        }
 
     }
 

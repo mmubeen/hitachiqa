@@ -20,8 +20,9 @@ namespace HitachiQA.Hooks
             var connectionString = config.GetVariable("SQL_CONNECTION_STRING", true);
             if (connectionString != null)
             {
+                var useDb2 = config.GetValue<bool>("SQL_USEDB2");
                 connectionString = connectionString.Replace(";ProviderName=system.data.sqlclient", "");
-                var client = new SQL(connectionString);
+                var client = new SQL(connectionString, useDb2);
                 oc.RegisterInstanceAs<SQL>(client);
                 Console.WriteLine("Loaded SQL Client");
             }

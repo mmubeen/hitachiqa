@@ -2,6 +2,8 @@
 using System.Collections;
 using Microsoft.Data.SqlClient;
 using System.Text;
+using IBM.Data.Db2;
+using System.Data.Common;
 
 namespace HitachiQA.Helpers
 {
@@ -9,11 +11,21 @@ namespace HitachiQA.Helpers
     {
 
         private readonly string _connectionString;
-        public SQL(string ConnectionString)
+        private bool _useDb2 { get; init; }
+        public SQL(string ConnectionString, bool useDb2)
         {
             _connectionString = ConnectionString;
-
+            _useDb2 = useDb2;
         }
+
+        private DbConnection GetConnection()
+        {
+            if (_useDb2)
+                return new DB2Connection(_connectionString);
+
+            return new SqlConnection(_connectionString);
+        }
+
         public async Task<List<Dictionary<String, dynamic>>> ExecuteQueryAsync(String query)
         {
             return await ExecuteQueryAsync(query, ("", ""));
@@ -25,16 +37,14 @@ namespace HitachiQA.Helpers
             return await ExecuteQueryAsync(command);
         }
 
-
-
-        public async Task<List<Dictionary<String, dynamic>>> ExecuteQueryAsync(SqlCommand command)
+        public async Task<List<Dictionary<String, dynamic>>> ExecuteQueryAsync(DbCommand command)
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = GetConnection();
             command.Connection = connection;
             var results = new List<Dictionary<string, dynamic>>();
 
             await connection.OpenAsync();
-            SqlDataReader reader = null;
+            DbDataReader reader = null;
             try
             {
                 if (command.CommandText.StartsWith("insert", System.StringComparison.OrdinalIgnoreCase))
@@ -68,38 +78,43 @@ namespace HitachiQA.Helpers
 
         }
 
-
-
-
-        public async Task<long> InsertAsync(string tableName, params (string key, dynamic value)[] parameters)
-        {
-            return await InsertAsync(tableName, null, parameters);
-        }
-        public async Task<long> InsertAsync(string tableName, String sequenceName, params (string key, dynamic value)[] parameters)
-        {
-            var command = BuildInsertSqlCommand(tableName, sequenceName, parameters);
-            var result = await ExecuteQueryAsync(command);
-            var newId = (long)result.First()["Id"];
-            await ExecuteQueryAsync($"UPDATE {tableName} SET LogicId = 'L'+@newIdStr where Id = @newId", ("@newId", newId), ("@newIdStr", newId.ToString()));
-            return newId;
-
-        }
-
-        public static SqlCommand BuildExecuteQueryCommand(ref string query, ref (string key, dynamic value)[] parameters)
+        public DbCommand BuildExecuteQueryCommand(ref string query, ref (string key, dynamic value)[] parameters)
         {
             ProcessListParameterValues(ref query, ref parameters);
 
-            var command = new SqlCommand(query);
-
-            foreach (var parameter in parameters)
+            if (_useDb2)
             {
-                if (!(parameter.value is IEnumerable<object>))
-                {
-                    command.Parameters.AddWithValue(!parameter.key.StartsWith('@') ? '@' + parameter.key : parameter.key, parameter.value);
-                }
-            }
+                var command = new DB2Command(query);
 
-            return command;
+                foreach (var parameter in parameters)
+                {
+                    if (!(parameter.value is IEnumerable<object>) || parameter.value is string)
+                    {
+                        var param = new DB2Parameter
+                        {
+                            ParameterName = parameter.key.StartsWith("@") ? parameter.key : "@" + parameter.key,
+                            Value = parameter.value ?? DBNull.Value
+                        };
+                        command.Parameters.Add(param);
+                    }
+                }
+
+                return command;
+            }
+            else
+            {
+                var command = new SqlCommand(query);
+
+                foreach (var parameter in parameters)
+                {
+                    if (!(parameter.value is IEnumerable<object>))
+                    {
+                        command.Parameters.AddWithValue(!parameter.key.StartsWith('@') ? '@' + parameter.key : parameter.key, parameter.value);
+                    }
+                }
+
+                return command;
+            }
         }
 
         public static void ProcessListParameterValues(ref string query, ref (string key, dynamic value)[] parameters)
@@ -124,40 +139,6 @@ namespace HitachiQA.Helpers
                 }
             }
         }
-
-        public static SqlCommand BuildInsertSqlCommand(string tableName, string sequenceName, (string key, dynamic value)[] parameters)
-        {
-            var statement = new StringBuilder();
-            statement.Append($"INSERT INTO {tableName} (");
-            if (sequenceName != null)
-            {
-                statement.Append(" Id, ");
-            }
-            statement.Append("InsertDateTime, insertedBy,SourceSystemId, Version, ");
-            statement.Append(string.Join(", ", parameters.Select(it => it.key)));
-            statement.Append(") OUTPUT INSERTED.Id VALUES (");
-            if (sequenceName != null)
-            {
-                statement.Append($" NEXT VALUE FOR {sequenceName}, ");
-            }
-            statement.Append("GETDATE(), 'AutomationDataStubber', 0, FORMAT(GETDATE(), 'yyyyMMddHHmmssfff'), ");
-            statement.Append(string.Join(", ", parameters.Select(it => $"@{it.key}")));
-            statement.Append(");");
-
-            var command = new SqlCommand(statement.ToString());
-            foreach (var param in parameters)
-            {
-                var key = param.key;
-                var val = param.value;
-                if (!key.StartsWith("@"))
-                    key = "@" + param.key;
-
-                command.Parameters.AddWithValue(key, val);
-            }
-
-            return command;
-        }
-
 
 
     }
