@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
 using Microsoft.Fabric.Api;
-using HitachiQA.Source.HttpClients;
+using HitachiQA.HttpClients;
 
 
 namespace HitachiQA.Fabrics.Test.Hooks

@@ -19,8 +19,15 @@ namespace Fabrics.Test.StepDefinitions
     [Binding]
     public class DataTestingStepDefinitions
     {
+        private readonly SQL _db2;
+        private readonly FabricSQL _fdl;
+        public DataTestingStepDefinitions(SQL db2, FabricSQL fdl)
+        {
+            _db2 = db2;
+            _fdl = fdl;
+        }
         [Given("We access the data from DW Tables")]
-        public async Task GivenWeAccessTheDataFromDWTables()
+        public void GivenWeAccessTheDataFromDWTables()
         {
             try
             {
@@ -32,21 +39,15 @@ namespace Fabrics.Test.StepDefinitions
                 if (!File.Exists(jsonFilePath))
                     throw new FileNotFoundException($"JSON configuration file not found at {jsonFilePath}");
 
-                string jsonContent = await File.ReadAllTextAsync(jsonFilePath);
+                string jsonContent = File.ReadAllText(jsonFilePath);
                 var queryConfigs = JsonSerializer.Deserialize<List<QueryConfig>>(jsonContent);
 
                 if (queryConfigs == null || !queryConfigs.Any())
                     throw new Exception("No configurations found in the JSON file.");
 
-                // Setup DB connections
-                var db2Name = "DB2";
-                var fdlName = "DB3";
-
-                var db2Conn = $"Server=(localdb)\\MSSQLLocalDB;Database={db2Name};Trusted_Connection=True;";
-                var fdlConn = $"Server=(localdb)\\MSSQLLocalDB;Database={fdlName};Trusted_Connection=True;";
-
-                var db2 = new SQL(db2Conn);
-                var fdl = new SQL(fdlConn);
+                // Setup DB connections 
+                var db2Name = "edwperf";
+                var fdlName = "Lakehouse_Gold";
 
                 string outputDir = Path.Combine(projectRoot, "DW_Comparison_CSVs");
                 Directory.CreateDirectory(outputDir);
@@ -55,8 +56,8 @@ namespace Fabrics.Test.StepDefinitions
                 {
                     Log.Info($"Comparing table: {config.Table}");
 
-                    var res2 = await db2.ExecuteQueryAsync(config.SQLDB2);
-                    var resFdl = await fdl.ExecuteQueryAsync(config.SQLFDL);
+                    var res2 = _db2.ExecuteQueryAsync(config.SQLDB2).Result;
+                    var resFdl = _fdl.ExecuteQueryAsync(config.SQLFDL).Result;
 
                     var commonCols = (res2.FirstOrDefault()?.Keys.ToList() ?? new List<string>())
                      .Intersect(resFdl.FirstOrDefault()?.Keys.ToList() ?? new List<string>())
@@ -66,7 +67,7 @@ namespace Fabrics.Test.StepDefinitions
                     if (!commonCols.Any())
                     {
                         string file = Path.Combine(outputDir, $"{config.Table}_no_common_columns.csv");
-                        await File.WriteAllTextAsync(file, $"No common columns for table '{config.Table}'");
+                        File.WriteAllText(file, $"No common columns for table '{config.Table}'");
                         continue;
                     }
 
