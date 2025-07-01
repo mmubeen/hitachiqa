@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+	<RunConfiguration>
+		<EnvironmentVariables>
+			<HOST>https://app.powerbi.com/</HOST>
+			<SERVER_HOST>https://api.fabric.microsoft.com</SERVER_HOST>
+			<BROWSER>msedge</BROWSER>
+			<!--Prod-GitHubTest_WS3 workspace Id-->
+			<!--<WORKSPACE_ID>dcea3d92-cc5d-4291-9db5-05a655853e66</WORKSPACE_ID>-->
+			<!--QA-GitHubTest_WS2 workspace Id-->
+			<!--<WORKSPACE_ID>a9d7edf3-9473-4176-ae84-6e7b509ea248</WORKSPACE_ID>-->
+			<!--Dev_GitHubTest_WS1 workspace Id-->
+			<WORKSPACE_ID>3b068c1f-ce74-41e1-9bee-6788bc759f2d</WORKSPACE_ID>
+			<CONFIG_SOURCE_TYPE>None</CONFIG_SOURCE_TYPE>
+		</EnvironmentVariables>
+	</RunConfiguration>
+</RunSettings>
