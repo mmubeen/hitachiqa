@@ -99,9 +99,11 @@ namespace Fabrics.Test.StepDefinitions
     
                 FETCH FIRST 10 ROWS ONLY";
 
+            string sql01 = @"SELECT CURRENCY_EXCHANGE_KEY, CURRENCY_KEY FROM ead_md.currency_exchange_dimension WHERE INSERT_DATE BETWEEN '2025-02-01' AND '2025-05-30' ORDER BY CURRENCY_EXCHANGE_KEY LIMIT 10";
+
             Log.Info("Executing table list query...");
 
-            using var command = new DB2Command(sql, connection);
+            using var command = new DB2Command(sql01, connection);
 
             using var reader = await command.ExecuteReaderAsync();
 
@@ -115,9 +117,9 @@ namespace Fabrics.Test.StepDefinitions
 
             {
 
-                string schema = reader["TABSCHEMA"].ToString();
+                string schema = reader["CURRENCY_EXCHANGE_KEY"].ToString();
 
-                string tableName = reader["TABNAME"].ToString();
+                string tableName = reader["CURRENCY_KEY"].ToString();
 
                 Log.Info($"{schema}\t\t{tableName}");
 
