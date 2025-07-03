@@ -1,0 +1,8 @@
+First DB:, DB2
+Second DB:, DB3
+Query DB2:, SELECT * FROM department
+Query FDL:, SELECT * FROM department
+
+Record #,DB2.departmentName,FDL.departmentName,Mismatch (departmentName),DB2.location,FDL.location,Mismatch (location)
+1,QA,QA,FALSE,Main,site,TRUE
+2,[No Row],Dev,TRUE,[No Row],Main,TRUE

@@ -1,0 +1,14 @@
+﻿[
+  {
+    "Table": "person",
+    "SQLDB2": "SELECT * FROM person order by firstName desc",
+    "SQLFDL": "SELECT * FROM person order by firstName desc"
+  },
+  {
+    "Table": "department",
+    "SQLDB2": "SELECT * FROM department",
+    "SQLFDL": "SELECT * FROM department"
+  }
+
+
+]

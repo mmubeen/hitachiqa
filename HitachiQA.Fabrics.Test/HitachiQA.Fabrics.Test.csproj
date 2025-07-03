@@ -40,5 +40,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="DW_Comparison_CSVs\" />
+  </ItemGroup>
 
 </Project>

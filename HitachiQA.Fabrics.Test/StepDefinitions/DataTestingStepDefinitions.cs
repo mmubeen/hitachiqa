@@ -1,12 +1,21 @@
 ﻿using HitachiQA;
 using HitachiQA.Helpers;
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Fabrics.Test.StepDefinitions
 {
+    public class QueryConfig
+    {
+        public string Table { get; set; }
+        public string SQLDB2 { get; set; }
+        public string SQLFDL { get; set; }
+    }
+
     [Binding]
     public class DataTestingStepDefinitions
     {
@@ -15,93 +24,82 @@ namespace Fabrics.Test.StepDefinitions
         {
             try
             {
-                Log.Info("Starting database comparison");
+                Log.Info("Starting database comparison from JSON configuration");
 
+                // Load JSON file
+                var projectRoot = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\.."));
+                var jsonFilePath = Path.Combine(projectRoot, "query_config.json");
+                if (!File.Exists(jsonFilePath))
+                    throw new FileNotFoundException($"JSON configuration file not found at {jsonFilePath}");
+
+                string jsonContent = await File.ReadAllTextAsync(jsonFilePath);
+                var queryConfigs = JsonSerializer.Deserialize<List<QueryConfig>>(jsonContent);
+
+                if (queryConfigs == null || !queryConfigs.Any())
+                    throw new Exception("No configurations found in the JSON file.");
+
+                // Setup DB connections
                 var db2Name = "DB2";
-                var db3Name = "DB3";
+                var fdlName = "DB3";
 
                 var db2Conn = $"Server=(localdb)\\MSSQLLocalDB;Database={db2Name};Trusted_Connection=True;";
-                var db3Conn = $"Server=(localdb)\\MSSQLLocalDB;Database={db3Name};Trusted_Connection=True;";
+                var fdlConn = $"Server=(localdb)\\MSSQLLocalDB;Database={fdlName};Trusted_Connection=True;";
 
                 var db2 = new SQL(db2Conn);
-                var db3 = new SQL(db3Conn);
+                var fdl = new SQL(fdlConn);
 
-                string tableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
-                var tablesDB2 = (await db2.ExecuteQueryAsync(tableQuery))?.Select(r => (string)r["TABLE_NAME"]).ToList() ?? new List<string>();
-                var tablesDB3 = (await db3.ExecuteQueryAsync(tableQuery))?.Select(r => (string)r["TABLE_NAME"]).ToList() ?? new List<string>();
-                var allTables = new HashSet<string>(tablesDB2.Union(tablesDB3));
-
-                string outputDir = Path.Combine(Directory.GetCurrentDirectory(), "DW_Comparison_CSVs");
+                string outputDir = Path.Combine(projectRoot, "DW_Comparison_CSVs");
                 Directory.CreateDirectory(outputDir);
 
-                foreach (string table in allTables)
+                foreach (var config in queryConfigs)
                 {
-                    Log.Info($"Comparing table: {table}");
+                    Log.Info($"Comparing table: {config.Table}");
 
-                    if (!tablesDB2.Contains(table) || !tablesDB3.Contains(table))
-                    {
-                        string missingFile = Path.Combine(outputDir, $"{table}_missing_table.csv");
-                        await File.WriteAllTextAsync(missingFile, $"Table '{table}' missing in {(tablesDB2.Contains(table) ? db3Name : db2Name)}");
-                        continue;
-                    }
+                    var res2 = await db2.ExecuteQueryAsync(config.SQLDB2);
+                    var resFdl = await fdl.ExecuteQueryAsync(config.SQLFDL);
 
-                    var db2Cols = await GetTableColumns(db2, table);
-                    var db3Cols = await GetTableColumns(db3, table);
-                    var commonCols = db2Cols.Intersect(db3Cols).ToList();
-                    var missingInDB2 = db3Cols.Except(db2Cols).ToList();
-                    var missingInDB3 = db2Cols.Except(db3Cols).ToList();
+                    var commonCols = (res2.FirstOrDefault()?.Keys.ToList() ?? new List<string>())
+                     .Intersect(resFdl.FirstOrDefault()?.Keys.ToList() ?? new List<string>())
+                     .ToList();
+
 
                     if (!commonCols.Any())
                     {
-                        string file = Path.Combine(outputDir, $"{table}_no_common_columns.csv");
-                        await File.WriteAllTextAsync(file, $"No common columns in table '{table}'");
+                        string file = Path.Combine(outputDir, $"{config.Table}_no_common_columns.csv");
+                        await File.WriteAllTextAsync(file, $"No common columns for table '{config.Table}'");
                         continue;
                     }
 
-                    string sql = $"SELECT {string.Join(", ", commonCols.Select(c => $"[{c}]"))} FROM [{table}]";
-                    var res2 = await db2.ExecuteQueryAsync(sql);
-                    var res3 = await db3.ExecuteQueryAsync(sql);
-
-                    string filePath = Path.Combine(outputDir, $"{table}_comparison.csv");
+                    string filePath = Path.Combine(outputDir, $"{config.Table}_comparison.csv");
                     using var writer = new StreamWriter(filePath);
 
                     // Header Info
                     writer.WriteLine($"First DB:, {db2Name}");
-                    writer.WriteLine($"Second DB:, {db3Name}");
-                    writer.WriteLine($"Query Executed:, {sql}");
+                    writer.WriteLine($"Second DB:, {fdlName}");
+                    writer.WriteLine($"Query DB2:, {config.SQLDB2}");
+                    writer.WriteLine($"Query FDL:, {config.SQLFDL}");
                     writer.WriteLine();
-
-                    // Schema Differences
-                    if (missingInDB2.Any() || missingInDB3.Any())
-                    {
-                        writer.WriteLine("Schema Differences:");
-                        if (missingInDB2.Any())
-                            writer.WriteLine($"Columns missing in {db2Name}:, {string.Join(", ", missingInDB2)}");
-                        if (missingInDB3.Any())
-                            writer.WriteLine($"Columns missing in {db3Name}:, {string.Join(", ", missingInDB3)}");
-                        writer.WriteLine();
-                    }
 
                     // Column Headers
                     var header = new List<string> { "Record #" };
                     foreach (var col in commonCols)
                     {
                         header.Add($"DB2.{col}");
-                        header.Add($"DB3.{col}");
+                        header.Add($"FDL.{col}");
                         header.Add($"Mismatch ({col})");
                     }
                     writer.WriteLine(string.Join(",", header));
 
                     // Data Rows
-                    int maxRows = Math.Max(res2.Count, res3.Count);
+                    int maxRows = Math.Max(res2.Count, resFdl.Count);
                     for (int i = 0; i < maxRows; i++)
                     {
                         bool rowMismatch = false;
                         foreach (var col in commonCols)
                         {
                             var val2 = i < res2.Count ? res2[i][col]?.ToString()?.Trim() ?? "NULL" : "[No Row]";
-                            var val3 = i < res3.Count ? res3[i][col]?.ToString()?.Trim() ?? "NULL" : "[No Row]";
-                            if (val2 != val3) { rowMismatch = true; break; }
+                            var valFdl = i < resFdl.Count ? resFdl[i][col]?.ToString()?.Trim() ?? "NULL" : "[No Row]";
+                            if (val2 != valFdl) { rowMismatch = true; break; }
                         }
 
                         if (!rowMismatch) continue;
@@ -110,10 +108,10 @@ namespace Fabrics.Test.StepDefinitions
                         foreach (var col in commonCols)
                         {
                             var val2 = i < res2.Count ? res2[i][col]?.ToString()?.Trim() ?? "NULL" : "[No Row]";
-                            var val3 = i < res3.Count ? res3[i][col]?.ToString()?.Trim() ?? "NULL" : "[No Row]";
-                            var mismatch = val2 != val3 ? "TRUE" : "FALSE";
+                            var valFdl = i < resFdl.Count ? resFdl[i][col]?.ToString()?.Trim() ?? "NULL" : "[No Row]";
+                            var mismatch = val2 != valFdl ? "TRUE" : "FALSE";
                             row.Add(val2);
-                            row.Add(val3);
+                            row.Add(valFdl);
                             row.Add(mismatch);
                         }
 
@@ -125,20 +123,9 @@ namespace Fabrics.Test.StepDefinitions
             }
             catch (Exception ex)
             {
-                Log.Error("Comparison failed");
+                Log.Error($"Comparison failed: {ex.Message}");
                 throw;
             }
-        }
-
-        private async Task<List<string>> GetTableColumns(SQL db, string table)
-        {
-            string colQuery = $@"
-                SELECT COLUMN_NAME
-                FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_NAME = '{table}'
-                ORDER BY ORDINAL_POSITION";
-            var rows = await db.ExecuteQueryAsync(colQuery);
-            return rows?.Select(r => (string)r["COLUMN_NAME"]).ToList() ?? new List<string>();
         }
 
         private string EscapeForCsv(string value)

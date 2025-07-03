@@ -1,0 +1,9 @@
+First DB:, DB2
+Second DB:, DB3
+Query DB2:, SELECT * FROM person order by firstName desc
+Query FDL:, SELECT * FROM person order by firstName desc
+
+Record #,DB2.firstName,FDL.firstName,Mismatch (firstName),DB2.lastName,FDL.lastName,Mismatch (lastName)
+1,test1,test2,TRUE,ltest5555,ltest2,TRUE
+2,test,test1,TRUE,ltest,ltest3,TRUE
+3,[No Row],test,TRUE,[No Row],ltest,TRUE
